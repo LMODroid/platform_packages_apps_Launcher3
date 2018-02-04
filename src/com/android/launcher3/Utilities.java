@@ -30,6 +30,7 @@ import android.app.ActivityOptions;
 import android.app.Person;
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.LauncherActivityInfo;
 import android.content.pm.LauncherApps;
 import android.content.pm.ShortcutInfo;
@@ -151,6 +152,8 @@ public final class Utilities {
 
     @IntDef({TRANSLATE_UP, TRANSLATE_DOWN, TRANSLATE_LEFT, TRANSLATE_RIGHT})
     public @interface AdjustmentDirection{}
+
+    public static final String KEY_WORKSPACE_LOCK = "pref_workspace_lock";
 
     /**
      * Returns true if theme is dark.
@@ -974,5 +977,10 @@ public final class Utilities {
         if (BuildConfig.IS_DEBUG_DEVICE) {
             Log.d(tag, message);
         }
+    }
+
+    public static boolean isWorkspaceEditAllowed(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return !prefs.getBoolean(KEY_WORKSPACE_LOCK, false);
     }
 }
