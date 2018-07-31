@@ -71,6 +71,7 @@ import androidx.core.graphics.ColorUtils;
 import com.android.launcher3.deviceprofile.DeviceProperties;
 import com.android.launcher3.graphics.ThemeManager;
 import com.android.launcher3.graphics.TintedDrawableSpan;
+import com.android.launcher3.lmodroid.LMOUtils;
 import com.android.launcher3.testing.shared.ResourceUtils;
 import com.android.launcher3.util.IntArray;
 import com.android.launcher3.util.SplitConfigurationOptions.SplitPositionOption;
@@ -130,6 +131,8 @@ public final class Utilities {
 
     @IntDef({TRANSLATE_UP, TRANSLATE_DOWN, TRANSLATE_LEFT, TRANSLATE_RIGHT})
     public @interface AdjustmentDirection{}
+
+    public static final String GSA_PACKAGE = "com.google.android.googlequicksearchbox";
 
     /**
      * Returns true if theme is dark.
@@ -945,5 +948,9 @@ public final class Utilities {
 
     public static boolean isWorkspaceEditAllowed(Context context) {
         return !LauncherPrefs.WORKSPACE_LOCK.get(context);
+    }
+
+    public static boolean isGSAEnabled(Context context) {
+        return LMOUtils.isPackageEnabled(context, GSA_PACKAGE);
     }
 }
