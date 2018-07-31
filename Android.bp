@@ -402,6 +402,7 @@ android_library {
         "dagger2",
         "jsr330",
         "com_android_systemui_shared_flags_lib",
+        "libGoogleFeed",
     ],
     manifest: "AndroidManifest-common.xml",
     sdk_version: "current",
@@ -462,6 +463,13 @@ android_app {
     },
     kotlincflags: [
         "-Xjvm-default=all",
+    ],
+}
+
+java_import {
+    name: "libGoogleFeed",
+    jars: [
+        "libs/libGoogleFeed.jar",
     ],
 }
 
