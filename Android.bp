@@ -166,7 +166,8 @@ android_library {
         "android.appwidget.flags-aconfig-java",
         "com.android.window.flags.window-aconfig-java",
         "framework-lmodroid.static",
-        "SettingsLib"
+        "SettingsLib",
+        "libGoogleFeed"
     ],
     manifest: "AndroidManifest-common.xml",
     sdk_version: "current",
@@ -218,6 +219,13 @@ android_app {
     lint: {
         baseline_filename: "lint-baseline.xml",
     },
+}
+
+java_import {
+    name: "libGoogleFeed",
+    jars: [
+        "libs/libGoogleFeed.jar",
+    ],
 }
 
 // Library with all the dependencies for building quickstep
