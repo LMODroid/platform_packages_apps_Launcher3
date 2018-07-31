@@ -89,6 +89,7 @@ import com.android.launcher3.icons.CacheableShortcutInfo;
 import com.android.launcher3.icons.IconShape;
 import com.android.launcher3.icons.IconThemeController;
 import com.android.launcher3.icons.LauncherIcons;
+import com.android.launcher3.lmodroid.LMOUtils;
 import com.android.launcher3.model.data.ItemInfo;
 import com.android.launcher3.model.data.ItemInfoWithIcon;
 import com.android.launcher3.pm.ShortcutConfigActivityInfo;
@@ -161,6 +162,8 @@ public final class Utilities {
 
     @IntDef({TRANSLATE_UP, TRANSLATE_DOWN, TRANSLATE_LEFT, TRANSLATE_RIGHT})
     public @interface AdjustmentDirection{}
+
+    public static final String GSA_PACKAGE = "com.google.android.googlequicksearchbox";
 
     public static final String KEY_WORKSPACE_LOCK = "pref_workspace_lock";
 
@@ -1068,5 +1071,9 @@ public final class Utilities {
     public static boolean isWorkspaceEditAllowed(Context context) {
         SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
         return !prefs.getBoolean(KEY_WORKSPACE_LOCK, false);
+    }
+
+    public static boolean isGSAEnabled(Context context) {
+        return LMOUtils.isPackageEnabled(context, GSA_PACKAGE);
     }
 }

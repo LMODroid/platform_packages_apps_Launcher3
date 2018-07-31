@@ -45,6 +45,7 @@ import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
+import com.android.launcher3.lmodroid.LMOUtils;
 import com.android.launcher3.model.WidgetsModel;
 
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
@@ -149,6 +150,11 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
         private String mHighLightKey;
         private boolean mPreferenceHighlighted = false;
 
+        private static final String KEY_MINUS_ONE = "pref_enable_minus_one";
+        private static final String SEARCH_PACKAGE = "com.google.android.googlequicksearchbox";
+
+        private Preference mShowGoogleAppPref;
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             final Bundle args = getArguments();
@@ -171,6 +177,9 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
                     screen.removePreference(preference);
                 }
             }
+
+            mShowGoogleAppPref = screen.findPreference(KEY_MINUS_ONE);
+            updateIsGoogleAppEnabled();
 
             if (getActivity() != null && !TextUtils.isEmpty(getPreferenceScreen().getTitle())) {
                 getActivity().setTitle(getPreferenceScreen().getTitle());
@@ -202,6 +211,13 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
             return null;
         }
 
+        private void updateIsGoogleAppEnabled() {
+            if (mShowGoogleAppPref != null) {
+                mShowGoogleAppPref.setEnabled(
+                        LMOUtils.isPackageEnabled(getContext(), SEARCH_PACKAGE));
+            }
+        }
+
         /**
          * Initializes a preference. This is called for every preference. Returning false here
          * will remove that preference from the list.
@@ -223,6 +239,7 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
                     requestAccessibilityFocus(getListView());
                 }
             }
+            updateIsGoogleAppEnabled();
         }
 
         private PreferenceHighlighter createHighlighter() {

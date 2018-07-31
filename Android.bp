@@ -449,6 +449,7 @@ android_library {
         "launcher-dagger-qualifiers",
         "launcher-executor-qualifiers",
         "launcher-executors-module",
+        "libGoogleFeed",
     ],
     manifest: "AndroidManifest-common.xml",
     sdk_version: "current",
@@ -512,6 +513,13 @@ android_app {
     },
     kotlincflags: [
         "-Xjvm-default=all",
+    ],
+}
+
+java_import {
+    name: "libGoogleFeed",
+    jars: [
+        "libs/libGoogleFeed.jar",
     ],
 }
 
