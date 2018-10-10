@@ -37,6 +37,8 @@ import static com.android.launcher3.util.SimpleBroadcastReceiver.actionsFilter;
 import android.content.Context;
 import android.content.Intent;
 import com.android.launcher3.concurrent.annotations.Ui;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
@@ -73,6 +75,7 @@ import com.android.launcher3.util.DaggerSingletonObject;
 import com.android.launcher3.util.DaggerSingletonTracker;
 import com.android.launcher3.util.DisplayController;
 import com.android.launcher3.util.DisplayController.Info;
+import com.android.launcher3.util.LockedUserState;
 import com.android.launcher3.util.LooperExecutor;
 import com.android.launcher3.util.Partner;
 import com.android.launcher3.util.ResourceHelper;
@@ -100,7 +103,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 @LauncherAppSingleton
-public class InvariantDeviceProfile {
+public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener {
 
     public static final String TAG = "IDP";
     // We do not need any synchronization for this variable as its only written on UI thread.
@@ -144,6 +147,10 @@ public class InvariantDeviceProfile {
     private static final String RES_GRID_NUM_COLUMNS = "grid_num_columns";
     private static final String RES_GRID_ICON_SIZE_DP = "grid_icon_size_dp";
 
+    public static final String KEY_SHOW_DESKTOP_LABELS = "pref_desktop_show_labels";
+    public static final String KEY_SHOW_DRAWER_LABELS = "pref_drawer_show_labels";
+
+    private final Context mContext;
     private final DisplayController mDisplayController;
     private final WindowManagerProxy mWMProxy;
     private final LauncherPrefs mPrefs;
@@ -284,6 +291,7 @@ public class InvariantDeviceProfile {
             DaggerSingletonTracker lifeCycle,
             TaskbarModeUtil taskbarModeUtil,
             @Ui final LooperExecutor mainExecutor) {
+        mContext = context;
         mDisplayController = dc;
         mWMProxy = wmProxy;
         this.taskbarModeUtil = taskbarModeUtil;
@@ -324,6 +332,10 @@ public class InvariantDeviceProfile {
         prefs.addListener(prefListener, FIXED_LANDSCAPE_MODE, ENABLE_TWOLINE_ALLAPPS_TOGGLE);
         lifeCycle.addCloseable(() -> prefs.removeListener(prefListener,
                 FIXED_LANDSCAPE_MODE, ENABLE_TWOLINE_ALLAPPS_TOGGLE));
+        
+        // our listener needs the credential-encrypted prefs, which don't exist before the user is unlocked
+        LockedUserState.get(context).runOnUserUnlocked(
+                () -> prefs.getPrefs(context).registerOnSharedPreferenceChangeListener(this));
 
         SimpleBroadcastReceiver localeReceiver = new SimpleBroadcastReceiver(context,
                 mMainExecutor, i -> onConfigChanged());
@@ -561,6 +573,13 @@ public class InvariantDeviceProfile {
 
         // Generate new Icon Shape info
         mThemeManager.generateIconShape(iconBitmapSize);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        if (KEY_SHOW_DESKTOP_LABELS.equals(key) || KEY_SHOW_DRAWER_LABELS.equals(key)) {
+            onConfigChanged();
+        }
     }
 
     private static boolean firstGridFilter(GridOption gridOption, int deviceType,
