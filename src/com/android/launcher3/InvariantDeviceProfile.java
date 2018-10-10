@@ -35,6 +35,8 @@ import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
@@ -94,7 +96,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 @LauncherAppSingleton
-public class InvariantDeviceProfile {
+public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener {
 
     public static final String TAG = "IDP";
     // We do not need any synchronization for this variable as its only written on UI thread.
@@ -137,6 +139,10 @@ public class InvariantDeviceProfile {
     private static final String RES_GRID_NUM_COLUMNS = "grid_num_columns";
     private static final String RES_GRID_ICON_SIZE_DP = "grid_icon_size_dp";
 
+    public static final String KEY_SHOW_DESKTOP_LABELS = "pref_desktop_show_labels";
+    public static final String KEY_SHOW_DRAWER_LABELS = "pref_drawer_show_labels";
+
+    private final Context mContext;
     private final DisplayController mDisplayController;
     private final WindowManagerProxy mWMProxy;
     private final LauncherPrefs mPrefs;
@@ -268,6 +274,7 @@ public class InvariantDeviceProfile {
             WindowManagerProxy wmProxy,
             ThemeManager themeManager,
             DaggerSingletonTracker lifeCycle) {
+        mContext = context;
         mDisplayController = dc;
         mWMProxy = wmProxy;
         mPrefs = prefs;
@@ -305,6 +312,8 @@ public class InvariantDeviceProfile {
         prefs.addListener(prefListener, FIXED_LANDSCAPE_MODE, ENABLE_TWOLINE_ALLAPPS_TOGGLE);
         lifeCycle.addCloseable(() -> prefs.removeListener(prefListener,
                 FIXED_LANDSCAPE_MODE, ENABLE_TWOLINE_ALLAPPS_TOGGLE));
+        
+        prefs.getPrefs(context).registerOnSharedPreferenceChangeListener(this);
 
         SimpleBroadcastReceiver localeReceiver = new SimpleBroadcastReceiver(context,
                 MAIN_EXECUTOR, i -> onConfigChanged(context));
@@ -539,6 +548,13 @@ public class InvariantDeviceProfile {
         boolean modelPropsChanged = !Arrays.equals(oldState, toModelState());
         for (OnIDPChangeListener listener : mChangeListeners) {
             listener.onIdpChanged(modelPropsChanged);
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        if (KEY_SHOW_DESKTOP_LABELS.equals(key) || KEY_SHOW_DRAWER_LABELS.equals(key)) {
+            onConfigChanged(mContext);
         }
     }
 
