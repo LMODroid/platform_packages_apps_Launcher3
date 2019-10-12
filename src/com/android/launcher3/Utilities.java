@@ -73,6 +73,7 @@ import androidx.annotation.NonNull;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.os.BuildCompat;
 
+import com.android.launcher3.LauncherModel;
 import com.android.launcher3.dragndrop.FolderAdaptiveIcon;
 import com.android.launcher3.graphics.GridCustomizationsProvider;
 import com.android.launcher3.graphics.TintedDrawableSpan;
@@ -99,6 +100,8 @@ import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.android.launcher3.util.Executors.MODEL_EXECUTOR;
 
 /**
  * Various utilities shared amongst the Launcher's classes.
@@ -128,6 +131,8 @@ public final class Utilities {
 
     public static final boolean ATLEAST_S = BuildCompat.isAtLeastS()
             || Build.VERSION.SDK_INT >= Build.VERSION_CODES.S;
+
+    private static final long WAIT_BEFORE_RESTART = 250;
 
     /**
      * Set on a motion event dispatched from the nav bar. See {@link MotionEvent#setEdgeFlags(int)}.
@@ -772,6 +777,17 @@ public final class Utilities {
         return extra == null || type.isInstance(extra);
     }
 
+    /**
+     * @param context the context to use for resources
+     * @return true if the user is currently using gesture navigation
+     */
+    public static boolean isUsingGestureNav(Context context) {
+        final Resources res = context.getResources();
+        final int resID = res.getIdentifier(
+            "config_navBarInteractionMode", "integer", "android");
+        return res.getInteger(resID) == 2;
+    }
+
     public static float squaredHypot(float x, float y) {
         return x * x + y * y;
     }
@@ -895,5 +911,15 @@ public final class Utilities {
     public static boolean isWorkspaceEditAllowed(Context context) {
         SharedPreferences prefs = getPrefs(context.getApplicationContext());
         return !prefs.getBoolean(InvariantDeviceProfile.KEY_WORKSPACE_LOCK, false);
+    }
+
+    public static void restart(final Context context) {
+        MODEL_EXECUTOR.execute(() -> {
+            try {
+                Thread.sleep(WAIT_BEFORE_RESTART);
+            } catch (Exception ignored) {
+            }
+            android.os.Process.killProcess(android.os.Process.myPid());
+        });
     }
 }
