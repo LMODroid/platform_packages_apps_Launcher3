@@ -16,6 +16,7 @@
 
 package com.android.launcher3.popup
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
@@ -46,6 +47,9 @@ import com.android.launcher3.testing.TestLogging
 import com.android.launcher3.testing.shared.TestProtocol
 import com.android.launcher3.views.ActivityContext
 import com.android.launcher3.views.OptionsPopupView.OptionItem
+
+private const val CUSTOMIZATION_PICKER_ACTIVITY =
+    "com.android.customization.picker.CustomizationPickerActivity"
 
 /** Class to create default set of long-press options. */
 object WorkspaceLongPressOptions {
@@ -200,6 +204,8 @@ object WorkspaceLongPressOptions {
         val pickerPackage = launcher.getString(R.string.wallpaper_picker_package)
         if (!TextUtils.isEmpty(pickerPackage)) {
             intent.setPackage(pickerPackage)
+            // Our picker app has more than one ACTION_SET_WALLPAPER activity
+            intent.setComponent(ComponentName(pickerPackage, CUSTOMIZATION_PICKER_ACTIVITY))
         }
         launcher.startActivitySafely(
             v,
