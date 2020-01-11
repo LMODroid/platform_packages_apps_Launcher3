@@ -81,6 +81,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 import com.android.internal.logging.InstanceId;
+import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.R;
 import com.android.launcher3.SplitScreenUiState;
 import com.android.launcher3.anim.PendingAnimation;
@@ -1080,7 +1081,7 @@ public class SplitSelectStateController {
 
             mTaskInfo = taskInfo;
             PackageManager pm = mContext.getPackageManager();
-            IconProvider provider = new IconProvider(mContext);
+            IconProvider provider = LauncherAppState.getInstance(mContext).getIconProvider();
             int displayId = ExternalDisplaysKt.getSafeDisplayId(taskInfo);
 
             try {
