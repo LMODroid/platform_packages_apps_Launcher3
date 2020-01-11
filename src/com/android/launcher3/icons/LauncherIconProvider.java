@@ -48,7 +48,7 @@ import javax.inject.Inject;
  * Extension of {@link IconProvider} with support for overriding theme icons
  */
 @LauncherAppSingleton
-public class LauncherIconProvider extends IconProvider {
+public class LauncherIconProvider extends ThirdPartyIconProvider {
 
     private static final String TAG_ICON = "icon";
     private static final String ATTR_PACKAGE = "package";
