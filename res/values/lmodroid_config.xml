@@ -33,4 +33,7 @@
 
     <!-- Whether to place memory info below action buttons. -->
     <bool name="config_placeMemInfoBelowActions">true</bool>
+
+    <!-- Themed icons -->
+    <string name="drawable_factory_class" translatable="false">com.android.launcher3.icons.ThirdPartyDrawableFactory</string>
 </resources>
