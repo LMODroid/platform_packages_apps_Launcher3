@@ -54,6 +54,7 @@ import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.config.FeatureFlags;
+import com.android.launcher3.lmodroid.LMOUtils;
 import com.android.launcher3.states.RotationHelper;
 import com.android.launcher3.util.DisplayController;
 
@@ -73,6 +74,9 @@ public class SettingsMisc extends CollapsingToolbarBaseActivity
     public static final String EXTRA_SHOW_FRAGMENT_ARGS = ":settings:show_fragment_args";
     private static final int DELAY_HIGHLIGHT_DURATION_MILLIS = 600;
     public static final String SAVE_HIGHLIGHTED_KEY = "android:preference_highlighted";
+
+    private static final String KEY_SUGGESTIONS = "pref_suggestions";
+    private static final String SUGGESTIONS_PACKAGE = "com.google.android.as";
 
     @VisibleForTesting
     static final String EXTRA_FRAGMENT = ":settings:fragment";
@@ -270,6 +274,8 @@ public class SettingsMisc extends CollapsingToolbarBaseActivity
                             }
                     );
                     return !info.isTablet(info.realBounds);
+                case KEY_SUGGESTIONS:
+                    return LMOUtils.isPackageEnabled(getActivity(), SUGGESTIONS_PACKAGE);
             }
 
             return true;
