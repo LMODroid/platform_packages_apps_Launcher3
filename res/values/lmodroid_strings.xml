@@ -43,4 +43,8 @@
     <!-- Show top shadow -->
     <string name="show_top_shadow">Show top shadow</string>
 
+    <!-- App suggestions -->
+    <string name="pref_suggestions_title">Suggestions</string>
+    <string name="pref_suggestions_summary">For app drawer &amp; home screen suggestions</string>
+
 </resources>
