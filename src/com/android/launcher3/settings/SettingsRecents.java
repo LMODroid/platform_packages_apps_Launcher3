@@ -16,23 +16,16 @@
 
 package com.android.launcher3.settings;
 
-import static android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED;
+import static androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_ACCESSIBILITY_FOCUS;
 
-import static androidx.preference.PreferenceFragmentCompat.ARG_PREFERENCE_ROOT;
-
-import static com.android.launcher3.BuildConfig.IS_DEBUG_DEVICE;
-import static com.android.launcher3.states.RotationHelper.ALLOW_ROTATION_PREFERENCE_KEY;
-
-import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.view.WindowCompat;
 import androidx.fragment.app.DialogFragment;
@@ -46,35 +39,37 @@ import androidx.preference.PreferenceGroup.PreferencePositionCallback;
 import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.launcher3.BuildConfig;
+import com.android.launcher3.DeviceProfile;
+import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.LauncherFiles;
+import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
-import com.android.launcher3.util.DisplayController;
-import com.android.launcher3.util.SettingsCache;
+import com.android.launcher3.Utilities;
+import com.android.launcher3.model.WidgetsModel;
 
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
 
 /**
  * Settings activity for Launcher.
  */
-public class SettingsActivity extends CollapsingToolbarBaseActivity
-        implements OnPreferenceStartFragmentCallback, OnPreferenceStartScreenCallback {
+public class SettingsRecents extends CollapsingToolbarBaseActivity
+        implements OnPreferenceStartFragmentCallback, OnPreferenceStartScreenCallback,
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
-    public static final String EXTRA_FRAGMENT_ARGS = ":settings:fragment_args";
-
-    // Intent extra to indicate the pref-key to highlighted when opening the settings activity
-    public static final String EXTRA_FRAGMENT_HIGHLIGHT_KEY = ":settings:fragment_args_key";
-    // Intent extra to indicate the pref-key of the root screen when opening the settings activity
-    public static final String EXTRA_FRAGMENT_ROOT_KEY = ARG_PREFERENCE_ROOT;
-
+    public static final String EXTRA_FRAGMENT_ARG_KEY = ":settings:fragment_args_key";
+    public static final String EXTRA_SHOW_FRAGMENT_ARGS = ":settings:show_fragment_args";
     private static final int DELAY_HIGHLIGHT_DURATION_MILLIS = 600;
     public static final String SAVE_HIGHLIGHTED_KEY = "android:preference_highlighted";
+
+    @VisibleForTesting
+    static final String EXTRA_FRAGMENT = ":settings:fragment";
+    @VisibleForTesting
+    static final String EXTRA_FRAGMENT_ARGS = ":settings:fragment_args";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
-
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         Intent intent = getIntent();
@@ -85,28 +80,28 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
                 args = new Bundle();
             }
 
-            String highlight = intent.getStringExtra(EXTRA_FRAGMENT_HIGHLIGHT_KEY);
-            if (!TextUtils.isEmpty(highlight)) {
-                args.putString(EXTRA_FRAGMENT_HIGHLIGHT_KEY, highlight);
-            }
-            String root = intent.getStringExtra(EXTRA_FRAGMENT_ROOT_KEY);
-            if (!TextUtils.isEmpty(root)) {
-                args.putString(EXTRA_FRAGMENT_ROOT_KEY, root);
+            String prefKey = intent.getStringExtra(EXTRA_FRAGMENT_ARG_KEY);
+            if (!TextUtils.isEmpty(prefKey)) {
+                args.putString(EXTRA_FRAGMENT_ARG_KEY, prefKey);
             }
 
             final FragmentManager fm = getSupportFragmentManager();
             final Fragment f = fm.getFragmentFactory().instantiate(getClassLoader(),
-                    getString(R.string.settings_fragment_name));
+                    getString(R.string.recents_settings_fragment_name));
             f.setArguments(args);
             // Display the fragment as the main content.
             fm.beginTransaction()
                     .replace(com.android.settingslib.collapsingtoolbar.R.id.content_frame, f)
                     .commit();
         }
+        LauncherPrefs.getPrefs(getApplicationContext()).registerOnSharedPreferenceChangeListener(this);
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) { }
+
     private boolean startPreference(String fragment, Bundle args, String key) {
-        if (getSupportFragmentManager().isStateSaved()) {
+        if (Utilities.ATLEAST_P && getSupportFragmentManager().isStateSaved()) {
             // Sometimes onClick can come after onPause because of being posted on the handler.
             // Skip starting new preferences in that case.
             return false;
@@ -117,7 +112,8 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
             f.setArguments(args);
             ((DialogFragment) f).show(fm, key);
         } else {
-            startActivity(new Intent(this, SettingsActivity.class)
+            startActivity(new Intent(this, SettingsRecents.class)
+                    .putExtra(EXTRA_FRAGMENT, fragment)
                     .putExtra(EXTRA_FRAGMENT_ARGS, args));
         }
         return true;
@@ -132,8 +128,8 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
     @Override
     public boolean onPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref) {
         Bundle args = new Bundle();
-        args.putString(ARG_PREFERENCE_ROOT, pref.getKey());
-        return startPreference(getString(R.string.settings_title), args, pref.getKey());
+        args.putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, pref.getKey());
+        return startPreference(getString(R.string.recents_category_title), args, pref.getKey());
     }
 
     @Override
@@ -148,38 +144,33 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
     /**
      * This fragment shows the launcher preferences.
      */
-    public static class LauncherSettingsFragment extends PreferenceFragmentCompat implements
-            SettingsCache.OnChangeListener {
-
-        protected boolean mDeveloperOptionsEnabled = false;
-
-        private boolean mRestartOnResume = false;
+    public static class RecentsSettingsFragment extends PreferenceFragmentCompat {
 
         private String mHighLightKey;
         private boolean mPreferenceHighlighted = false;
 
         @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            if (BuildConfig.IS_DEBUG_DEVICE) {
-                Uri devUri = Settings.Global.getUriFor(DEVELOPMENT_SETTINGS_ENABLED);
-                SettingsCache settingsCache = SettingsCache.INSTANCE.get(getContext());
-                mDeveloperOptionsEnabled = settingsCache.getValue(devUri);
-                settingsCache.register(devUri, this);
-            }
-            super.onCreate(savedInstanceState);
-        }
-
-        @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             final Bundle args = getArguments();
-            mHighLightKey = args == null ? null : args.getString(EXTRA_FRAGMENT_HIGHLIGHT_KEY);
+            mHighLightKey = args == null ? null : args.getString(EXTRA_FRAGMENT_ARG_KEY);
+            if (rootKey == null && !TextUtils.isEmpty(mHighLightKey)) {
+                rootKey = getParentKeyForPref(mHighLightKey);
+            }
 
             if (savedInstanceState != null) {
                 mPreferenceHighlighted = savedInstanceState.getBoolean(SAVE_HIGHLIGHTED_KEY);
             }
 
             getPreferenceManager().setSharedPreferencesName(LauncherFiles.SHARED_PREFERENCES_KEY);
-            setPreferencesFromResource(R.xml.launcher_preferences, rootKey);
+            setPreferencesFromResource(R.xml.launcher_recents_preferences, rootKey);
+
+            PreferenceScreen screen = getPreferenceScreen();
+            for (int i = screen.getPreferenceCount() - 1; i >= 0; i--) {
+                Preference preference = screen.getPreference(i);
+                if (!initPreference(preference)) {
+                    screen.removePreference(preference);
+                }
+            }
 
             if (getActivity() != null && !TextUtils.isEmpty(getPreferenceScreen().getTitle())) {
                 getActivity().setTitle(getPreferenceScreen().getTitle());
@@ -199,15 +190,24 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
                         bottomPadding + insets.getSystemWindowInsetBottom());
                 return insets.consumeSystemWindowInsets();
             });
-
-            // Overriding Text Direction in the Androidx preference library to support RTL
-            view.setTextDirection(View.TEXT_DIRECTION_LOCALE);
         }
 
         @Override
         public void onSaveInstanceState(Bundle outState) {
             super.onSaveInstanceState(outState);
             outState.putBoolean(SAVE_HIGHLIGHTED_KEY, mPreferenceHighlighted);
+        }
+
+        protected String getParentKeyForPref(String key) {
+            return null;
+        }
+
+        /**
+         * Initializes a preference. This is called for every preference. Returning false here
+         * will remove that preference from the list.
+         */
+        protected boolean initPreference(Preference preference) {
+            return true;
         }
 
         @Override
@@ -219,44 +219,9 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
                 if (highlighter != null) {
                     getView().postDelayed(highlighter, DELAY_HIGHLIGHT_DURATION_MILLIS);
                     mPreferenceHighlighted = true;
+                } else {
+                    requestAccessibilityFocus(getListView());
                 }
-            }
-
-            if (mRestartOnResume) {
-                recreateActivityNow();
-            }
-        }
-
-        @Override
-        public void onSettingsChanged(boolean isEnabled) {
-            // Developer options changed, try recreate
-            tryRecreateActivity();
-        }
-
-        @Override
-        public void onDestroy() {
-            super.onDestroy();
-            if (IS_DEBUG_DEVICE) {
-                SettingsCache.INSTANCE.get(getContext())
-                        .unregister(Settings.Global.getUriFor(DEVELOPMENT_SETTINGS_ENABLED), this);
-            }
-        }
-
-        /**
-         * Tries to recreate the preference
-         */
-        protected void tryRecreateActivity() {
-            if (isResumed()) {
-                recreateActivityNow();
-            } else {
-                mRestartOnResume = true;
-            }
-        }
-
-        private void recreateActivityNow() {
-            Activity activity = getActivity();
-            if (activity != null) {
-                activity.recreate();
             }
         }
 
@@ -276,6 +241,15 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
             return position >= 0 ? new PreferenceHighlighter(
                     list, position, screen.findPreference(mHighLightKey))
                     : null;
+        }
+
+        private void requestAccessibilityFocus(@NonNull final RecyclerView rv) {
+            rv.post(() -> {
+                if (!rv.hasFocus() && rv.getChildCount() > 0) {
+                    rv.getChildAt(0)
+                            .performAccessibilityAction(ACTION_ACCESSIBILITY_FOCUS, null);
+                }
+            });
         }
     }
 }
