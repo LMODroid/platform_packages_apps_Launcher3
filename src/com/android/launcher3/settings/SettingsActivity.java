@@ -20,14 +20,10 @@ import static android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED;
 
 import static androidx.preference.PreferenceFragmentCompat.ARG_PREFERENCE_ROOT;
 
-import static com.android.launcher3.BuildConfig.IS_STUDIO_BUILD;
-import static com.android.launcher3.InvariantDeviceProfile.TYPE_MULTI_DISPLAY;
-import static com.android.launcher3.InvariantDeviceProfile.TYPE_TABLET;
 import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -55,8 +51,6 @@ import com.android.launcher3.BuildConfig;
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.R;
-import com.android.launcher3.display.DisplayController;
-import com.android.launcher3.display.LauncherDisplayInfo;
 import com.android.launcher3.util.SafeCloseable;
 import com.android.launcher3.util.SettingsCache;
 
@@ -66,12 +60,7 @@ import com.android.launcher3.util.SettingsCache;
 public class SettingsActivity extends FragmentActivity
         implements OnPreferenceStartFragmentCallback, OnPreferenceStartScreenCallback {
 
-    @VisibleForTesting
-    static final String DEVELOPER_OPTIONS_KEY = "pref_developer_options";
-
     public static final String FIXED_LANDSCAPE_MODE = "pref_fixed_landscape_mode";
-
-    private static final String NOTIFICATION_DOTS_PREFERENCE_KEY = "pref_icon_badging";
 
     public static final String EXTRA_FRAGMENT_ARGS = ":settings:fragment_args";
 
@@ -149,7 +138,7 @@ public class SettingsActivity extends FragmentActivity
     public boolean onPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref) {
         Bundle args = new Bundle();
         args.putString(ARG_PREFERENCE_ROOT, pref.getKey());
-        return startPreference(getString(R.string.settings_fragment_name), args, pref.getKey());
+        return startPreference(getString(R.string.settings_button_text), args, pref.getKey());
     }
 
     @Override
@@ -206,30 +195,6 @@ public class SettingsActivity extends FragmentActivity
 
             getPreferenceManager().setSharedPreferencesName(LauncherFiles.SHARED_PREFERENCES_KEY);
             setPreferencesFromResource(R.xml.launcher_preferences, rootKey);
-
-            PreferenceScreen screen = getPreferenceScreen();
-            for (int i = screen.getPreferenceCount() - 1; i >= 0; i--) {
-                Preference preference = screen.getPreference(i);
-                if (!initPreference(preference)) {
-                    screen.removePreference(preference);
-                }
-            }
-
-            // If the target preference is not in the current preference screen, find the parent
-            // preference screen that contains the target preference and set it as the preference
-            // screen.
-            if (mHighLightKey != null
-                    && !isKeyInPreferenceGroup(mHighLightKey, screen)) {
-                final PreferenceScreen parentPreferenceScreen =
-                        findParentPreference(screen, mHighLightKey);
-                if (parentPreferenceScreen != null && getActivity() != null) {
-                    if (!TextUtils.isEmpty(parentPreferenceScreen.getTitle())) {
-                        getActivity().setTitle(parentPreferenceScreen.getTitle());
-                    }
-                    setPreferenceScreen(parentPreferenceScreen);
-                    return;
-                }
-            }
 
             if (getActivity() != null && !TextUtils.isEmpty(getPreferenceScreen().getTitle())) {
                 getActivity().setTitle(getPreferenceScreen().getTitle());
@@ -292,44 +257,6 @@ public class SettingsActivity extends FragmentActivity
         public void onSaveInstanceState(Bundle outState) {
             super.onSaveInstanceState(outState);
             outState.putBoolean(SAVE_HIGHLIGHTED_KEY, mPreferenceHighlighted);
-        }
-
-        /**
-         * Initializes a preference. This is called for every preference. Returning false here
-         * will remove that preference from the list.
-         */
-        protected boolean initPreference(Preference preference) {
-            LauncherDisplayInfo info = DisplayController.INSTANCE.get(getContext()).getInfo();
-            switch (preference.getKey()) {
-                case NOTIFICATION_DOTS_PREFERENCE_KEY:
-                    return BuildConfig.NOTIFICATION_DOTS_ENABLED;
-                case DEVELOPER_OPTIONS_KEY:
-                    if (IS_STUDIO_BUILD) {
-                        preference.setOrder(0);
-                    }
-                    return mDeveloperOptionsEnabled;
-                case FIXED_LANDSCAPE_MODE:
-                    if ((InvariantDeviceProfile.INSTANCE.get(getContext()).deviceType
-                                    == TYPE_MULTI_DISPLAY)
-                            || (InvariantDeviceProfile.INSTANCE.get(getContext()).deviceType
-                                    == TYPE_TABLET)) {
-                        return false;
-                    }
-                    // When the setting changes rotate the screen accordingly to showcase the result
-                    // of the setting
-                    preference.setOnPreferenceChangeListener(
-                            (pref, newValue) -> {
-                                getActivity().setRequestedOrientation(
-                                        (boolean) newValue
-                                                ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                                                : ActivityInfo.SCREEN_ORIENTATION_USER
-                                );
-                                return true;
-                            }
-                    );
-                    return !info.isLargeScreen(info.realBounds);
-            }
-            return true;
         }
 
         @Override
