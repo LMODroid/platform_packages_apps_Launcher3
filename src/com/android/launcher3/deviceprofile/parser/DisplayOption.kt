@@ -18,6 +18,9 @@ package com.android.launcher3.deviceprofile.parser
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.PointF
+import com.android.launcher3.InvariantDeviceProfile.KEY_FONT_SIZE
+import com.android.launcher3.InvariantDeviceProfile.KEY_ICON_SIZE
+import com.android.launcher3.LauncherPrefs
 import com.android.launcher3.R
 import com.android.launcher3.deviceprofile.parser.DeviceTypedMap.COUNT_SIZES
 import com.android.launcher3.deviceprofile.parser.DeviceTypedMap.INDEX_DEFAULT
@@ -112,6 +115,11 @@ private constructor(@JvmField val grid: GridOption, context: Context, ta: TypedA
             }
             .toFloatArray()
 
+    private val iconSizeModifier =
+        LauncherPrefs.getIntWhenUnlocked(context, KEY_ICON_SIZE, 100) / 100f
+    private val fontSizeModifier =
+        LauncherPrefs.getIntWhenUnlocked(context, KEY_FONT_SIZE, 100) / 100f
+
     @JvmField
     val iconSizes: FloatArray =
         ta.parseTypedMap(
@@ -123,6 +131,7 @@ private constructor(@JvmField val grid: GridOption, context: Context, ta: TypedA
             ) { i, v ->
                 getFloat(i, v)
             }
+            .map { it * iconSizeModifier }
             .toFloatArray()
 
     @JvmField
@@ -136,6 +145,7 @@ private constructor(@JvmField val grid: GridOption, context: Context, ta: TypedA
             ) { i, v ->
                 getFloat(i, v)
             }
+            .map { it * fontSizeModifier }
             .toFloatArray()
 
     @JvmField

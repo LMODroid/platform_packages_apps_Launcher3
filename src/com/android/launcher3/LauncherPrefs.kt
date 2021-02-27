@@ -18,6 +18,7 @@ package com.android.launcher3
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+import android.os.UserManager
 import androidx.annotation.VisibleForTesting
 import com.android.launcher3.GridType.Companion.GRID_TYPE_ANY
 import com.android.launcher3.InvariantDeviceProfile.GRID_NAME_PREFS_KEY
@@ -393,6 +394,18 @@ constructor(@ApplicationContext private val encryptedContext: Context) {
         @Deprecated("Don't use shared preferences directly. Use other LauncherPref methods.")
         @JvmStatic
         fun getPrefs(context: Context) = INSTANCE[context].backedUpPrefs
+
+        /**
+         * Our customizations live in credential-encrypted prefs, which can't be read before the
+         * user is unlocked (the device profile is built at boot): use the default until then.
+         */
+        @JvmStatic
+        fun getIntWhenUnlocked(context: Context, key: String, defaultValue: Int): Int =
+            if (context.getSystemService(UserManager::class.java)!!.isUserUnlocked) {
+                getPrefs(context).getInt(key, defaultValue)
+            } else {
+                defaultValue
+            }
     }
 }
 

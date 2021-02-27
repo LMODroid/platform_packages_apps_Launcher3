@@ -72,6 +72,7 @@ import com.android.launcher3.testing.shared.ResourceUtils;
 import com.android.launcher3.util.DaggerSingletonObject;
 import com.android.launcher3.util.DaggerSingletonTracker;
 import com.android.launcher3.util.ListenableDiffAwareRef;
+import com.android.launcher3.util.LockedUserState;
 import com.android.launcher3.util.LooperExecutor;
 import com.android.launcher3.util.Partner;
 import com.android.launcher3.util.SimpleBroadcastReceiver;
@@ -126,6 +127,9 @@ public class InvariantDeviceProfile {
     private static final String RES_GRID_NUM_ROWS = "grid_num_rows";
     private static final String RES_GRID_NUM_COLUMNS = "grid_num_columns";
     private static final String RES_GRID_ICON_SIZE_DP = "grid_icon_size_dp";
+
+    public static final String KEY_ICON_SIZE = "pref_custom_icon_size";
+    public static final String KEY_FONT_SIZE = "pref_custom_font_size";
 
     private final DisplayController mDisplayController;
     private final WindowManagerProxy mWMProxy;
@@ -276,6 +280,12 @@ public class InvariantDeviceProfile {
         initGrid(gridName);
         mThemeManager.generateIconShape(iconBitmapSize);
 
+        // Built before the user was unlocked: our size prefs were defaults, re-read them now
+        LockedUserState lockedUserState = LockedUserState.get(context);
+        if (!lockedUserState.isUserUnlocked()) {
+            lockedUserState.runOnUserUnlocked(this::onConfigChanged);
+        }
+
         ListenableDiffAwareRef<LauncherDisplayInfo, Integer> listenable = dc.getListenable();
         if (listenable != null) {
             lifeCycle.addCloseable(listenable.getChanges().forEach(MAIN_EXECUTOR, (flags) -> {
@@ -309,6 +319,8 @@ public class InvariantDeviceProfile {
                     SHOW_DRAWER_LABELS.getSharedPrefKey().equals(key)) {
                 onConfigChanged();
             } else if (ALLAPPS_THEMED_ICONS.getSharedPrefKey().equals(key)) {
+                onConfigChanged();
+            } else if (KEY_ICON_SIZE.equals(key) || KEY_FONT_SIZE.equals(key)) {
                 onConfigChanged();
             }
         };
