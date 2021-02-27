@@ -150,6 +150,8 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
     public static final String KEY_SHOW_DESKTOP_LABELS = "pref_desktop_show_labels";
     public static final String KEY_SHOW_DRAWER_LABELS = "pref_drawer_show_labels";
     public static final String KEY_ALLAPPS_THEMED_ICONS = "pref_allapps_themed_icons";
+    public static final String KEY_ICON_SIZE = "pref_custom_icon_size";
+    public static final String KEY_FONT_SIZE = "pref_custom_font_size";
 
     private final Context mContext;
     private final DisplayController mDisplayController;
@@ -303,6 +305,12 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
         String gridName = prefs.get(GRID_NAME);
         initGrid(gridName);
         mThemeManager.generateIconShape(iconBitmapSize);
+
+        // Built before the user was unlocked: our size prefs were defaults, re-read them now
+        LockedUserState lockedUserState = LockedUserState.get(context);
+        if (!lockedUserState.isUserUnlocked()) {
+            lockedUserState.runOnUserUnlocked(this::onConfigChanged);
+        }
 
         dc.setPriorityListener(
                 (displayContext, info, flags) -> {
@@ -582,6 +590,8 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
             case KEY_ALLAPPS_THEMED_ICONS:
             case KEY_SHOW_DESKTOP_LABELS:
             case KEY_SHOW_DRAWER_LABELS:
+            case KEY_ICON_SIZE:
+            case KEY_FONT_SIZE:
                 onConfigChanged();
                 break;
         }
@@ -1489,6 +1499,11 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
 
             TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ProfileDisplayOption);
 
+            float iconSizeModifier =
+                    (float) LauncherPrefs.getIntWhenUnlocked(context, KEY_ICON_SIZE, 100) / 100f;
+            float fontSizeModifier =
+                    (float) LauncherPrefs.getIntWhenUnlocked(context, KEY_FONT_SIZE, 100) / 100f;
+
             minWidthDps = a.getFloat(R.styleable.ProfileDisplayOption_minWidthDps, 0);
             minHeightDps = a.getFloat(R.styleable.ProfileDisplayOption_minHeightDps, 0);
 
@@ -1618,7 +1633,7 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
             allAppsBorderSpaces[INDEX_TWO_PANEL_LANDSCAPE] = new PointF(x, y);
 
             iconSizes[INDEX_DEFAULT] =
-                    a.getFloat(R.styleable.ProfileDisplayOption_iconImageSize, 0);
+                    a.getFloat(R.styleable.ProfileDisplayOption_iconImageSize, 0) * iconSizeModifier;
             iconSizes[INDEX_LANDSCAPE] =
                     a.getFloat(R.styleable.ProfileDisplayOption_iconSizeLandscape,
                             iconSizes[INDEX_DEFAULT]);
@@ -1642,7 +1657,7 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
                     allAppsIconSizes[INDEX_DEFAULT]);
 
             textSizes[INDEX_DEFAULT] =
-                    a.getFloat(R.styleable.ProfileDisplayOption_iconTextSize, 0);
+                    a.getFloat(R.styleable.ProfileDisplayOption_iconTextSize, 0) * fontSizeModifier;
             textSizes[INDEX_LANDSCAPE] =
                     a.getFloat(R.styleable.ProfileDisplayOption_iconTextSizeLandscape,
                             textSizes[INDEX_DEFAULT]);
