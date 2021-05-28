@@ -28,6 +28,7 @@ import static com.android.launcher3.graphics.PreloadIconDelegate.extractPreloadD
 import static com.android.launcher3.graphics.PreloadIconDelegate.hasPendingAnimationCompleted;
 import static com.android.launcher3.graphics.PreloadIconDelegate.newPendingIcon;
 import static com.android.launcher3.InvariantDeviceProfile.KEY_ALLAPPS_THEMED_ICONS;
+import static com.android.launcher3.InvariantDeviceProfile.KEY_MAX_LINES;
 import static com.android.launcher3.InvariantDeviceProfile.KEY_SHOW_DESKTOP_LABELS;
 import static com.android.launcher3.InvariantDeviceProfile.KEY_SHOW_DRAWER_LABELS;
 import static com.android.launcher3.icons.BitmapInfo.FLAG_NO_BADGE;
@@ -254,6 +255,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
 
     private boolean mShouldShowLabel;
     private boolean mThemeAllAppsIcons;
+    private int mMaxLines;
 
     private CancellableTask mIconLoadRequest;
 
@@ -325,6 +327,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
             defaultIconSize = mDeviceProfile.getWorkspaceIconProfile().getIconSizePx();
             mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, true);
         }
+        mMaxLines = prefs.getInt(KEY_MAX_LINES, 1);
 
 
         mIconSize = a.getDimensionPixelSize(R.styleable.BubbleTextView_iconSizeOverride,
@@ -667,6 +670,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
                 setTextWithArchivingIcon(label);
             } else {
                 setText(label);
+                setMaxLines(mMaxLines);
             }
         }
         if (contentDescription != null) {
@@ -1123,6 +1127,10 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
 
     public boolean shouldShowLabel() {
         return mShouldShowLabel;
+    }
+
+    public int getMaxLines() {
+        return mMaxLines;
     }
 
     public boolean shouldTextBeVisible() {
