@@ -101,6 +101,7 @@ public class InvariantDeviceProfile implements SafeCloseable, OnSharedPreference
     public static final String KEY_WORKSPACE_LOCK = "pref_workspace_lock";
     public static final String KEY_ICON_SIZE = "pref_custom_icon_size";
     public static final String KEY_FONT_SIZE = "pref_custom_font_size";
+    public static final String KEY_MAX_LINES = "pref_max_lines";
 
     // Constants that affects the interpolation curve between statically defined device profile
     // buckets.
@@ -352,6 +353,7 @@ public class InvariantDeviceProfile implements SafeCloseable, OnSharedPreference
             case KEY_SHOW_DRAWER_LABELS:
             case KEY_ICON_SIZE:
             case KEY_FONT_SIZE:
+            case KEY_MAX_LINES:
                 onConfigChanged(mContext);
                 break;
         }
