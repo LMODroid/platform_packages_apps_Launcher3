@@ -130,6 +130,7 @@ public class InvariantDeviceProfile {
 
     public static final String KEY_ICON_SIZE = "pref_custom_icon_size";
     public static final String KEY_FONT_SIZE = "pref_custom_font_size";
+    public static final String KEY_MAX_LINES = "pref_max_lines";
 
     private final DisplayController mDisplayController;
     private final WindowManagerProxy mWMProxy;
@@ -320,7 +321,8 @@ public class InvariantDeviceProfile {
                 onConfigChanged();
             } else if (ALLAPPS_THEMED_ICONS.getSharedPrefKey().equals(key)) {
                 onConfigChanged();
-            } else if (KEY_ICON_SIZE.equals(key) || KEY_FONT_SIZE.equals(key)) {
+            } else if (KEY_ICON_SIZE.equals(key) || KEY_FONT_SIZE.equals(key)
+                    || KEY_MAX_LINES.equals(key)) {
                 onConfigChanged();
             }
         };

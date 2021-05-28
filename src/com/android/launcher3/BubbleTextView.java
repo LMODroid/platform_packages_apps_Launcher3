@@ -23,6 +23,7 @@ import static android.text.Layout.Alignment.ALIGN_NORMAL;
 import static com.android.launcher3.BubbleTextView.RunningAppState.MINIMIZED;
 import static com.android.launcher3.BubbleTextView.RunningAppState.RUNNING;
 import static com.android.launcher3.Flags.enableContrastTiles;
+import static com.android.launcher3.InvariantDeviceProfile.KEY_MAX_LINES;
 import static com.android.launcher3.Flags.enableScalabilityForDesktopExperience;
 import static com.android.launcher3.LauncherPrefs.SHOW_DESKTOP_LABELS;
 import static com.android.launcher3.LauncherPrefs.SHOW_DRAWER_LABELS;
@@ -310,6 +311,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
     private boolean mShouldShowLabel;
 
     private boolean mThemeAllAppsIcons;
+    private int mMaxLines;
 
     private CancellableTask mIconLoadRequest;
 
@@ -385,6 +387,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
             defaultIconSize = mDeviceProfile.getWorkspaceProfile().getIconSizePx();
             mShouldShowLabel = SHOW_DESKTOP_LABELS.get(context);
         }
+        mMaxLines = LauncherPrefs.getPrefs(context).getInt(KEY_MAX_LINES, 1);
 
 
         mIconSize = a.getDimensionPixelSize(R.styleable.BubbleTextView_iconSizeOverride,
@@ -775,6 +778,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
                 setTextWithArchivingIcon(label);
             } else {
                 setText(label);
+                setMaxLines(mMaxLines);
             }
         }
         if (contentDescription != null) {
