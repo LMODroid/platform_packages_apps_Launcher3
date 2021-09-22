@@ -41,6 +41,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.InvariantDeviceProfile;
+import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
@@ -99,7 +100,15 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) { }
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        switch (key) {
+            case Utilities.KEY_SHOW_HOTSEAT_BG:
+                LauncherAppState.getInstance(getApplicationContext()).setNeedsRestart();
+                break;
+            default:
+                break;
+        }
+    }
 
     private boolean startPreference(String fragment, Bundle args, String key) {
         if (getSupportFragmentManager().isStateSaved()) {
