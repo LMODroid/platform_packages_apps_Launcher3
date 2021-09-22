@@ -157,6 +157,7 @@ public final class Utilities {
 
     public static final String GSA_PACKAGE = "com.google.android.googlequicksearchbox";
     public static final String KEY_DOCK_SEARCH = "pref_dock_search";
+    public static final String KEY_SHOW_HOTSEAT_BG = "pref_show_hotseat_bg";
     public static final String LENS_ACTIVITY = "com.google.android.apps.lens.MainActivity";
     public static final String LENS_URI = "google://lens";
 
@@ -979,4 +980,8 @@ public final class Utilities {
         return prefs.getBoolean(KEY_DOCK_SEARCH, true);
     }
 
+    public static boolean isHotseatBgEnabled(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return prefs.getBoolean(KEY_SHOW_HOTSEAT_BG, false);
+    }
 }
