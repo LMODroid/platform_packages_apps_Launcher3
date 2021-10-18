@@ -156,6 +156,7 @@ public final class Utilities {
     public @interface AdjustmentDirection{}
 
     public static final String GSA_PACKAGE = "com.google.android.googlequicksearchbox";
+    public static final String LENS_SHARE_ACTIVITY = "com.google.android.apps.search.lens.LensShareEntryPointActivity";
 
     public static final String KEY_WORKSPACE_LOCK = "pref_workspace_lock";
     public static final String KEY_DRAWER_OPEN_KEYBOARD = "pref_drawer_open_keyboard";
