@@ -22,6 +22,7 @@ import android.content.pm.ShortcutInfo
 import android.os.UserHandle
 import android.text.TextUtils
 import com.android.launcher3.LauncherModel.ModelUpdateTask
+import com.android.launcher3.Utilities
 import com.android.launcher3.logging.FileLog
 import com.android.launcher3.model.tasks.CacheDataUpdatedTask
 import com.android.launcher3.model.tasks.PackageIncrementalDownloadUpdatedTask
@@ -47,10 +48,12 @@ class ModelLauncherCallbacks(private var taskExecutor: Consumer<ModelUpdateTask>
     override fun onPackageAdded(packageName: String, user: UserHandle) {
         FileLog.d(TAG, "onPackageAdded triggered for packageName=$packageName, user=$user")
         taskExecutor.accept(PackageUpdatedTask(OP_ADD, user, packageName))
+        restartOnGoogleAppChange(packageName)
     }
 
     override fun onPackageChanged(packageName: String, user: UserHandle) {
         taskExecutor.accept(PackageUpdatedTask(OP_UPDATE, user, packageName))
+        restartOnGoogleAppChange(packageName)
     }
 
     override fun onPackageLoadingProgressChanged(
@@ -64,6 +67,7 @@ class ModelLauncherCallbacks(private var taskExecutor: Consumer<ModelUpdateTask>
     override fun onPackageRemoved(packageName: String, user: UserHandle) {
         FileLog.d(TAG, "onPackageRemoved triggered for packageName=$packageName, user=$user")
         taskExecutor.accept(PackageTaskFactory.appsRemoved(user, setOf(packageName)))
+        restartOnGoogleAppChange(packageName)
     }
 
     override fun onPackagesAvailable(
@@ -72,10 +76,12 @@ class ModelLauncherCallbacks(private var taskExecutor: Consumer<ModelUpdateTask>
         replacing: Boolean,
     ) {
         taskExecutor.accept(PackageUpdatedTask(OP_UPDATE, user, *packageNames))
+        restartOnGoogleAppChange(*packageNames)
     }
 
     override fun onPackagesSuspended(vararg packageNames: String, user: UserHandle) {
         taskExecutor.accept(PackageTaskFactory.appsSuspended(user, packageNames.toSet()))
+        restartOnGoogleAppChange(*packageNames)
     }
 
     override fun onPackagesUnavailable(
@@ -85,11 +91,13 @@ class ModelLauncherCallbacks(private var taskExecutor: Consumer<ModelUpdateTask>
     ) {
         if (!replacing) {
             taskExecutor.accept(PackageTaskFactory.appsUnavailable(user, packageNames.toSet()))
+            restartOnGoogleAppChange(*packageNames)
         }
     }
 
     override fun onPackagesUnsuspended(vararg packageNames: String, user: UserHandle) {
         taskExecutor.accept(PackageTaskFactory.appsUnsuspended(user, packageNames.toSet()))
+        restartOnGoogleAppChange(*packageNames)
     }
 
     override fun onShortcutsChanged(
@@ -103,6 +111,14 @@ class ModelLauncherCallbacks(private var taskExecutor: Consumer<ModelUpdateTask>
     fun onPackagesRemoved(user: UserHandle, packages: List<String>) {
         FileLog.d(TAG, "package removed received " + TextUtils.join(",", packages))
         taskExecutor.accept(PackageTaskFactory.appsRemoved(user, packages.toSet()))
+        restartOnGoogleAppChange(*packages.toTypedArray())
+    }
+
+    /** The Google feed client binds to the Google app: restart after the model has updated */
+    private fun restartOnGoogleAppChange(vararg packageNames: String) {
+        if (Utilities.GSA_PACKAGE in packageNames) {
+            taskExecutor.accept { _, _, _ -> Utilities.restart() }
+        }
     }
 
     override fun onSessionFailure(packageName: String, user: UserHandle) {
