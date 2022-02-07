@@ -21,6 +21,7 @@ import com.android.app.animation.Interpolators.FINAL_FRAME
 import com.android.app.animation.Interpolators.INSTANT
 import com.android.app.animation.Interpolators.LINEAR
 import com.android.launcher3.LauncherState
+import com.android.launcher3.LauncherState.MEMINFO
 import com.android.launcher3.anim.AnimatedFloat
 import com.android.launcher3.anim.AnimatorListeners.forSuccessCallback
 import com.android.launcher3.anim.PendingAnimation
@@ -37,6 +38,7 @@ import com.android.launcher3.states.StateAnimationConfig.SKIP_OVERVIEW
 import com.android.quickstep.util.AnimUtils
 import com.android.quickstep.views.AddDesktopButton
 import com.android.quickstep.views.ClearAllButton
+import com.android.quickstep.views.MemInfoView
 import com.android.quickstep.views.RecentsView
 import com.android.quickstep.views.RecentsView.ADJACENT_PAGE_HORIZONTAL_OFFSET
 import com.android.quickstep.views.RecentsView.CONTENT_ALPHA
@@ -299,6 +301,14 @@ class RecentsViewStateController(private val launcher: QuickstepLauncher) :
                 AddDesktopButton.VISIBILITY_ALPHA,
                 if (state.areElementsVisible(launcherUiState, LauncherState.ADD_DESK_BUTTON)) 1f
                 else 0f,
+                LINEAR,
+            )
+        }
+        launcher.memInfoView?.let {
+            propertySetter.setFloat(
+                it,
+                MemInfoView.STATE_CTRL_ALPHA,
+                if (state.areElementsVisible(launcherUiState, MEMINFO)) 1f else 0f,
                 LINEAR,
             )
         }

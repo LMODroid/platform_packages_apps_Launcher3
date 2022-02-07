@@ -85,6 +85,10 @@ public class DeviceProfile {
 
     public static final String KEY_ROW_HEIGHT = "pref_row_height";
 
+    // Meminfo in overview
+    public int memInfoMarginGesturePx;
+    public int memInfoMarginThreeButtonPx;
+
     private static final float MAX_ASPECT_RATIO_FOR_ALTERNATE_EDIT_STATE = 1.5f;
 
     public static final PointF DEFAULT_SCALE = new PointF(1.0f, 1.0f);
@@ -239,6 +243,11 @@ public class DeviceProfile {
         mMetrics = res.getDisplayMetrics();
 
         mIconSizeSteps = new IconSizeSteps(res);
+
+        memInfoMarginGesturePx = res.getDimensionPixelSize(
+                R.dimen.meminfo_bottom_margin_gesture);
+        memInfoMarginThreeButtonPx = res.getDimensionPixelSize(
+                R.dimen.meminfo_bottom_margin_three_button);
 
         mTypeIndex = displayOptionSpec.typeIndex;
 

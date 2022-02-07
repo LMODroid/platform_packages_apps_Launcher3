@@ -2115,8 +2115,12 @@ public abstract class RecentsView<
         mClearAllButton.setFullscreenProgress(fullscreenProgress);
 
         // Fade out the actions view quickly (0.1 range)
-        mActionsView.getFullscreenAlpha().updateValue(
-                mapToRange(fullscreenProgress, 0, 0.1f, 1f, 0f, LINEAR));
+        float fullscreenAlpha = mapToRange(fullscreenProgress, 0, 0.1f, 1f, 0f, LINEAR);
+        mActionsView.getFullscreenAlpha().updateValue(fullscreenAlpha);
+        MemInfoView memInfoView = mContainer.getMemInfoView();
+        if (memInfoView != null) {
+            memInfoView.setAlpha(MemInfoView.ALPHA_FS_PROGRESS, fullscreenAlpha);
+        }
     }
 
     private void updateTaskStackListenerState() {
