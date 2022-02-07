@@ -22,6 +22,7 @@ import com.android.app.animation.Interpolators.INSTANT
 import com.android.app.animation.Interpolators.LINEAR
 import com.android.launcher3.Flags.enableDesktopExplodedView
 import com.android.launcher3.LauncherState
+import com.android.launcher3.LauncherState.MEMINFO
 import com.android.launcher3.anim.AnimatedFloat
 import com.android.launcher3.anim.AnimatorListeners.forSuccessCallback
 import com.android.launcher3.anim.PendingAnimation
@@ -39,6 +40,7 @@ import com.android.launcher3.util.OverviewReleaseFlags.enableGridOnlyOverview
 import com.android.quickstep.util.AnimUtils
 import com.android.quickstep.views.AddDesktopButton
 import com.android.quickstep.views.ClearAllButton
+import com.android.quickstep.views.MemInfoView
 import com.android.quickstep.views.RecentsView
 import com.android.quickstep.views.RecentsView.ADJACENT_PAGE_HORIZONTAL_OFFSET
 import com.android.quickstep.views.RecentsView.CONTENT_ALPHA
@@ -313,6 +315,13 @@ class RecentsViewStateController(private val launcher: QuickstepLauncher) :
                 LINEAR,
             )
         }
+        val memInfoAlpha = if (state.areElementsVisible(launcherUiState, MEMINFO)) 1f else 0f
+        propertySetter.setFloat(
+            launcher.memInfoView,
+            MemInfoView.STATE_CTRL_ALPHA,
+            memInfoAlpha,
+            LINEAR
+        )
     }
 
     private fun getOverviewInterpolator(fromState: LauncherState, toState: LauncherState) =

@@ -109,6 +109,7 @@ import com.android.quickstep.fallback.RecentsState.Companion.MODAL_TASK
 import com.android.quickstep.fallback.RecentsState.Companion.OVERVIEW_SPLIT_SELECT
 import com.android.quickstep.fallback.toLauncherStateOrdinal
 import com.android.quickstep.util.RecentsAtomicAnimationFactory
+import com.android.quickstep.views.MemInfoView
 import com.android.quickstep.util.RecentsWindowProtoLogProxy
 import com.android.quickstep.util.SplitSelectStateController
 import com.android.quickstep.util.TISBindHelper
@@ -176,6 +177,7 @@ constructor(
     private var windowRootView = RecentsWindowRootView(this)
     private var windowView: View? = null
     private var actionsView: OverviewActionsView<*>? = null
+    private var memInfoView: MemInfoView? = null
     private var scrimView: ScrimView? = null
 
     private var callbacks: RecentsAnimationCallbacks? = null
@@ -295,6 +297,7 @@ constructor(
         windowView = layoutInflater.inflate(R.layout.fallback_recents_activity, null)
         windowView?.let {
             actionsView = it.findViewById(R.id.overview_actions_view)
+            memInfoView = it.findViewById(R.id.meminfo)
             recentsView =
                 it.findViewById<FallbackRecentsView<RecentsWindowManager>?>(R.id.overview_panel)
                     ?.apply {
@@ -308,10 +311,15 @@ constructor(
                                 /* depthController= */ null,
                                 desktopState,
                             ),
+                            memInfoView,
                         )
                     }
             actionsView?.apply {
                 updateDimension(getDeviceProfile(), recentsView?.lastComputedTaskSize)
+                updateVerticalMargin(DisplayController.getNavigationMode(this@RecentsWindowManager))
+            }
+            memInfoView?.apply {
+                setDp(getDeviceProfile())
                 updateVerticalMargin(DisplayController.getNavigationMode(this@RecentsWindowManager))
             }
             scrimView = it.findViewById(R.id.scrim_view)
@@ -783,6 +791,8 @@ constructor(
             super.onRootViewDispatchKeyEvent(event)
         }
     }
+
+    override fun getMemInfoView() = memInfoView
 
     override fun getActionsView(): OverviewActionsView<*>? {
         return actionsView

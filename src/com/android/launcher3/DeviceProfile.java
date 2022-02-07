@@ -251,6 +251,10 @@ public class DeviceProfile {
         mAllAppsProfile = new AllAppsProfile(new Point(0, 0), 0, 0, 0f, 0, 0, 0);
     }
 
+    // Meminfo in overview
+    public int memInfoMarginGesturePx;
+    public int memInfoMarginThreeButtonPx;
+
     DeviceProfile(InvariantDeviceProfile inv, Info info,
             WindowManagerProxy wmProxy, WindowBounds windowBounds,
             SparseArray<DotRenderer> dotRendererCache, boolean isExternalDisplay,
@@ -514,6 +518,11 @@ public class DeviceProfile {
                 /*hotseatQsbSpace*/hotseatQsbSpace,
                 /*hotseatBarSizePx*/hotseatBarSizePx
         );
+
+        memInfoMarginGesturePx = res.getDimensionPixelSize(
+                R.dimen.meminfo_bottom_margin_gesture);
+        memInfoMarginThreeButtonPx = res.getDimensionPixelSize(
+                R.dimen.meminfo_bottom_margin_three_button);
 
         updateIconSize(mWorkspaceProfile.getScale(), context);
 
