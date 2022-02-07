@@ -72,6 +72,7 @@ import com.android.quickstep.util.RecentsAtomicAnimationFactory
 import com.android.quickstep.util.RecentsWindowProtoLogProxy
 import com.android.quickstep.util.SplitSelectStateController
 import com.android.quickstep.util.TISBindHelper
+import com.android.quickstep.views.MemInfoView
 import com.android.quickstep.views.OverviewActionsView
 import com.android.quickstep.views.RecentsView
 import com.android.quickstep.views.RecentsViewContainer
@@ -122,6 +123,7 @@ class RecentsWindowManager(context: Context, wallpaperColorHints: Int) :
     private var windowView: View? = null
     private var actionsView: OverviewActionsView<*>? = null
     private var scrimView: ScrimView? = null
+    private var memInfoView: MemInfoView? = null
 
     private var callbacks: RecentsAnimationCallbacks? = null
 
@@ -240,6 +242,7 @@ class RecentsWindowManager(context: Context, wallpaperColorHints: Int) :
         recentsView = windowView?.findViewById(R.id.overview_panel)
         actionsView = windowView?.findViewById(R.id.overview_actions_view)
         scrimView = windowView?.findViewById(R.id.scrim_view)
+        memInfoView = windowView?.findViewById(R.id.meminfo)
         val systemUiProxy = SystemUiProxy.INSTANCE[this]
         val splitSelectStateController =
             SplitSelectStateController(
@@ -251,11 +254,13 @@ class RecentsWindowManager(context: Context, wallpaperColorHints: Int) :
                 RecentsModel.INSTANCE[this],
                 null, /*activityBackCallback*/
             )
-        recentsView?.init(actionsView, splitSelectStateController, null)
+        recentsView?.init(actionsView, splitSelectStateController, null, memInfoView)
         dragLayer = windowView?.findViewById(R.id.drag_layer)
 
         actionsView?.updateDimension(getDeviceProfile(), recentsView?.lastComputedTaskSize)
         actionsView?.updateVerticalMargin(DisplayController.getNavigationMode(this))
+        memInfoView?.setDp(getDeviceProfile());
+        memInfoView?.updateVerticalMargin(DisplayController.getNavigationMode(this));
 
         systemUiController = SystemUiController(windowView)
         recentsWindowTracker.handleCreate(this)
@@ -398,6 +403,10 @@ class RecentsWindowManager(context: Context, wallpaperColorHints: Int) :
 
     override fun getActionsView(): OverviewActionsView<*>? {
         return actionsView
+    }
+
+    override fun getMemInfoView(): MemInfoView? {
+        return memInfoView
     }
 
     override fun addForceInvisibleFlag(flag: Int) {}
