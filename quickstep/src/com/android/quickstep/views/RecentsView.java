@@ -4964,6 +4964,7 @@ public abstract class RecentsView<CONTAINER_TYPE extends Context & RecentsViewCo
                 .addScrimBehindAnim(pendingAnimation, mContainer, getContext());
         FloatingTaskView firstFloatingTaskView =
                 mSplitSelectStateController.getFirstFloatingTaskView();
+        if (firstFloatingTaskView == null) return false;
         firstFloatingTaskView.getBoundsOnScreen(firstTaskStartingBounds);
         firstFloatingTaskView.addConfirmAnimation(pendingAnimation,
                 new RectF(firstTaskStartingBounds), firstTaskEndingBounds,
@@ -5104,8 +5105,10 @@ public abstract class RecentsView<CONTAINER_TYPE extends Context & RecentsViewCo
         mTempRectF.set(mTempRect);
         FloatingTaskView firstFloatingTaskView =
                 mSplitSelectStateController.getFirstFloatingTaskView();
-        firstFloatingTaskView.updateOrientationHandler(getPagedOrientationHandler());
-        firstFloatingTaskView.update(mTempRectF, /*progress=*/1f);
+        if (firstFloatingTaskView != null) {
+            firstFloatingTaskView.updateOrientationHandler(getPagedOrientationHandler());
+            firstFloatingTaskView.update(mTempRectF, /*progress=*/1f);
+        }
 
         RecentsPagedOrientationHandler orientationHandler = getPagedOrientationHandler();
         Pair<FloatProperty<RecentsView>, FloatProperty<RecentsView>> taskViewsFloat =
