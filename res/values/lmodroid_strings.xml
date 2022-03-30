@@ -20,6 +20,11 @@
     <!-- Folder titles -->
     <string name="google_folder_title" translatable="false">Google</string>
 
+    <!-- All apps themed icons -->
+    <string name="pref_themed_icons_title">Use themed icons in drawer</string>
+    <string name="pref_themed_icons_summary">Follow themed icons used on home screen</string>
+    <string name="themed_icons_disabled_summary">Themed icons are turned off in Wallpaper &amp; style</string>
+
     <!-- Categories -->
     <string name="home_category_title">Home screen</string>
     <string name="home_category_summary">Set home panel and more</string>
