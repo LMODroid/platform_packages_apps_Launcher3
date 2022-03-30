@@ -31,6 +31,13 @@
         android:defaultValue="true"
         android:persistent="true" />
 
+    <SwitchPreference
+        android:key="pref_allapps_themed_icons"
+        android:title="@string/pref_themed_icons_title"
+        android:summary="@string/pref_themed_icons_summary"
+        android:defaultValue="false"
+        android:persistent="true" />
+
     <com.android.launcher3.settings.preferences.CustomSeekBarPreference
         android:key="pref_row_height"
         android:title="@string/row_height_title"
