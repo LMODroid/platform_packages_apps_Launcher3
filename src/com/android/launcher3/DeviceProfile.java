@@ -29,6 +29,7 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.Surface;
 
@@ -270,7 +271,9 @@ public class DeviceProfile {
         }
 
         hotseatQsbHeight = res.getDimensionPixelSize(R.dimen.qsb_widget_height);
-        isTaskbarPresent = isTablet && ApiWrapper.TASKBAR_DRAWN_IN_PROCESS
+        boolean isTaskBarEnabled = Settings.System.getInt(context.getContentResolver(),
+                Settings.System.ENABLE_TASKBAR, isTablet ? 1 : 0) == 1;
+        isTaskbarPresent = isTaskBarEnabled && ApiWrapper.TASKBAR_DRAWN_IN_PROCESS
                 && FeatureFlags.ENABLE_TASKBAR.get();
         if (isTaskbarPresent) {
             taskbarSize = res.getDimensionPixelSize(R.dimen.taskbar_size);
