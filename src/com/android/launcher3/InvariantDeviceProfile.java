@@ -328,6 +328,8 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
         if (KEY_SHOW_DESKTOP_LABELS.equals(key) || KEY_SHOW_DRAWER_LABELS.equals(key)) {
             onConfigChanged(mContext);
+        } else if (DeviceProfile.KEY_PHONE_OVERVIEW_GRID.equals(key)) {
+            onConfigChanged(mContext);
         }
     }
 

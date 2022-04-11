@@ -49,6 +49,8 @@ import java.io.PrintWriter;
 @SuppressLint("NewApi")
 public class DeviceProfile {
 
+    public static final String KEY_PHONE_OVERVIEW_GRID = "pref_allow_phone_overview_grid";
+
     private static final int DEFAULT_DOT_SIZE = 100;
     // Ratio of empty space, qsb should take up to appear visually centered.
     private static final float QSB_CENTER_FACTOR = .325f;
@@ -358,7 +360,9 @@ public class DeviceProfile {
                 ? res.getDimensionPixelSize(R.dimen.scalable_grid_qsb_bottom_margin)
                 : 0;
 
-        overviewShowAsGrid = isTablet && FeatureFlags.ENABLE_OVERVIEW_GRID.get();
+        boolean allowPhoneOverviewGrid = Utilities.getPrefs(context).getBoolean(KEY_PHONE_OVERVIEW_GRID, false);
+        overviewShowAsGrid = (isTablet || allowPhoneOverviewGrid) &&
+                FeatureFlags.ENABLE_OVERVIEW_GRID.get();
         overviewTaskMarginPx = overviewShowAsGrid
                 ? res.getDimensionPixelSize(R.dimen.overview_task_margin_focused)
                 : res.getDimensionPixelSize(R.dimen.overview_task_margin);
