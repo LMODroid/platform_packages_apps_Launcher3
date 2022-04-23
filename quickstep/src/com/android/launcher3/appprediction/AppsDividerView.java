@@ -20,6 +20,7 @@ import static com.android.launcher3.util.OnboardingPrefs.ALL_APPS_VISITED_COUNT;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -214,7 +215,11 @@ public class AppsDividerView extends View implements FloatingHeaderRow {
     private Layout getAllAppsLabelLayout() {
         if (mAllAppsLabelLayout == null) {
             mPaint.setAntiAlias(true);
-            mPaint.setTypeface(Typeface.create("variable-title-small", Typeface.NORMAL));
+            int fontId = Resources.getSystem().getIdentifier(
+                    "config_bodyFontFamilyMedium", "string", "android");
+            mPaint.setTypeface(Typeface.create(fontId != 0
+                    ? Resources.getSystem().getString(fontId) : "sans-serif-medium",
+                    Typeface.NORMAL));
             mPaint.setTextSize(
                     getResources().getDimensionPixelSize(R.dimen.all_apps_label_text_size));
 
