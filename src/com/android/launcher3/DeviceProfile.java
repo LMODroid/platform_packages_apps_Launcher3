@@ -43,6 +43,7 @@ import android.content.res.TypedArray;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.os.UserManager;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.Surface;
@@ -838,7 +839,11 @@ public class DeviceProfile {
         // All apps
         final boolean isVerticalLayout = isVerticalBarLayout();
         final float allAppsCellHeightMultiplier =
-                LauncherPrefs.getPrefs(context).getInt(KEY_ROW_HEIGHT, 100) / 100f;
+                LauncherPrefs.getIntWhenUnlocked(context, KEY_ROW_HEIGHT, 100) / 100f;
+        final boolean allAppsLabelsHidden =
+                context.getSystemService(UserManager.class).isUserUnlocked()
+                && !LauncherPrefs.getPrefs(context)
+                        .getBoolean(InvariantDeviceProfile.KEY_SHOW_DRAWER_LABELS, true);
         if (mIsResponsiveGrid) {
             mAllAppsProfile = AllAppsProfile.Factory.createAllAppsWithResponsive(
                     mResponsiveAllAppsCellSpec,
@@ -846,7 +851,8 @@ public class DeviceProfile {
                     mResponsiveAllAppsHeightSpec,
                     mIconSizeSteps,
                     isVerticalBarLayout(),
-                    allAppsCellHeightMultiplier
+                    allAppsCellHeightMultiplier,
+                    allAppsLabelsHidden
             );
             updateAllAppsWithResponsiveMeasures();
         } else {
@@ -859,7 +865,8 @@ public class DeviceProfile {
                     scale,
                     getWorkspaceIconProfile().getIconSizePx(),
                     mWorkspaceProfile.getIconDrawablePaddingOriginalPx(),
-                    allAppsCellHeightMultiplier
+                    allAppsCellHeightMultiplier,
+                    allAppsLabelsHidden
             );
         }
         updateAllAppsContainerWidth();

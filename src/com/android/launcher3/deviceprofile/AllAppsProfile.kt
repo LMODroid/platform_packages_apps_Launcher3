@@ -43,6 +43,8 @@ data class AllAppsProfile @JvmOverloads constructor(
     val cellWidthPx: Int,
     /** User's all apps row height setting, also applied when the cells are resized */
     val cellHeightMultiplier: Float = 1f,
+    /** Drawer labels turned off: square cells without icon padding */
+    val labelsHidden: Boolean = false,
 ) {
 
     /**
@@ -54,6 +56,15 @@ data class AllAppsProfile @JvmOverloads constructor(
     }
 
     companion object Factory {
+
+        /** Square cells (a column's width) when the drawer labels are hidden */
+        private fun AllAppsProfile.withSquareCellsIfLabelsHidden(): AllAppsProfile =
+            if (!labelsHidden) this
+            else
+                copy(
+                    cellHeightPx = ((cellWidthPx + borderSpacePx.x) * cellHeightMultiplier).toInt(),
+                    iconDrawablePaddingPx = 0,
+                )
 
         private fun calculateAllAppsBorderSpacePx(
             inv: InvariantDeviceProfile,
@@ -74,6 +85,7 @@ data class AllAppsProfile @JvmOverloads constructor(
             iconSizePx: Int,
             iconDrawablePaddingOriginalPx: Int,
             cellHeightMultiplier: Float = 1f,
+            labelsHidden: Boolean = false,
         ): AllAppsProfile {
             val allAppsBorderSpacePx = calculateAllAppsBorderSpacePx(inv, metric, typeIndex, scale)
             var allAppsCellHeightPx =
@@ -130,7 +142,9 @@ data class AllAppsProfile @JvmOverloads constructor(
                 maxAllAppsTextLineCount = 1,
                 cellWidthPx = allAppsCellWidthPx,
                 cellHeightMultiplier = cellHeightMultiplier,
+                labelsHidden = labelsHidden,
             )
+                .withSquareCellsIfLabelsHidden()
         }
 
         fun createAllAppsProfileNonScalable(
@@ -140,6 +154,7 @@ data class AllAppsProfile @JvmOverloads constructor(
             typeIndex: Int,
             scale: Float,
             cellHeightMultiplier: Float = 1f,
+            labelsHidden: Boolean = false,
         ): AllAppsProfile {
             val allAppsBorderSpacePx = calculateAllAppsBorderSpacePx(inv, metric, typeIndex, scale)
             val allAppsIconSizePx = max(1, pxFromDp(inv.allAppsIconSize[typeIndex], metric, scale))
@@ -163,7 +178,9 @@ data class AllAppsProfile @JvmOverloads constructor(
                 maxAllAppsTextLineCount = 1,
                 cellWidthPx = allAppsIconSizePx + (2 * allAppsIconDrawablePaddingPx),
                 cellHeightMultiplier = cellHeightMultiplier,
+                labelsHidden = labelsHidden,
             )
+                .withSquareCellsIfLabelsHidden()
         }
 
         fun createAllAppsWithResponsive(
@@ -173,6 +190,7 @@ data class AllAppsProfile @JvmOverloads constructor(
             iconSizeSteps: IconSizeSteps,
             isVerticalBarLayout: Boolean,
             cellHeightMultiplier: Float = 1f,
+            labelsHidden: Boolean = false,
         ): AllAppsProfile {
             var allAppsIconSizePx = responsiveAllAppsCellSpec.iconSize
             var allAppsIconTextSizePx: Float = responsiveAllAppsCellSpec.iconTextSize.toFloat()
@@ -227,6 +245,7 @@ data class AllAppsProfile @JvmOverloads constructor(
                     maxAllAppsTextLineCount = maxAllAppsTextLineCount,
                     cellWidthPx = allAppsCellWidthPx,
                     cellHeightMultiplier = cellHeightMultiplier,
+                    labelsHidden = labelsHidden,
                 )
 
             return when {
@@ -248,6 +267,7 @@ data class AllAppsProfile @JvmOverloads constructor(
                         (textHeight * 2)) * allAppsProfile.cellHeightMultiplier)
                         .toInt()
             )
+                .withSquareCellsIfLabelsHidden()
         }
 
         fun createAllAppsProfile(
@@ -260,6 +280,7 @@ data class AllAppsProfile @JvmOverloads constructor(
             iconSizePx: Int,
             iconDrawablePaddingOriginalPx: Int,
             cellHeightMultiplier: Float = 1f,
+            labelsHidden: Boolean = false,
         ) =
             when {
                 isScalableGrid -> {
@@ -271,6 +292,7 @@ data class AllAppsProfile @JvmOverloads constructor(
                         iconSizePx = iconSizePx,
                         iconDrawablePaddingOriginalPx = iconDrawablePaddingOriginalPx,
                         cellHeightMultiplier = cellHeightMultiplier,
+                        labelsHidden = labelsHidden,
                     )
                 }
 
@@ -282,6 +304,7 @@ data class AllAppsProfile @JvmOverloads constructor(
                         typeIndex,
                         scale,
                         cellHeightMultiplier,
+                        labelsHidden,
                     )
                 }
             }
