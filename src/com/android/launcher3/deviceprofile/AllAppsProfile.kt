@@ -21,6 +21,7 @@ import android.content.res.Resources
 import android.content.res.TypedArray
 import android.graphics.Point
 import android.graphics.Rect
+import android.os.UserManager
 import android.util.DisplayMetrics
 import com.android.launcher3.DeviceProfile.KEY_ROW_HEIGHT
 import com.android.launcher3.InvariantDeviceProfile
@@ -56,6 +57,8 @@ data class AllAppsProfile @JvmOverloads constructor(
     val numShownAllAppsColumns: Int,
     /** User's all apps row height setting, also applied when the cells are resized */
     val cellHeightMultiplier: Float = 1f,
+    /** Drawer labels turned off: square cells without icon padding */
+    val labelsHidden: Boolean = false,
 ) {
 
     /**
@@ -81,6 +84,19 @@ data class AllAppsProfile @JvmOverloads constructor(
 
         private fun getRowHeightMultiplier(context: Context): Float =
             LauncherPrefs.getIntWhenUnlocked(context, KEY_ROW_HEIGHT, 100) / 100f
+
+        private fun areLabelsHidden(context: Context): Boolean =
+            context.getSystemService(UserManager::class.java)!!.isUserUnlocked &&
+                !LauncherPrefs.SHOW_DRAWER_LABELS.get(context)
+
+        /** Square cells (a column's width) when the drawer labels are hidden */
+        private fun AllAppsProfile.withSquareCellsIfLabelsHidden(): AllAppsProfile =
+            if (!labelsHidden) this
+            else
+                copy(
+                    cellHeightPx = ((cellWidthPx + borderSpacePx.x) * cellHeightMultiplier).toInt(),
+                    iconDrawablePaddingPx = 0,
+                )
 
         fun createAllAppsProfileScalableGrid(
             inv: InvariantDeviceProfile,
@@ -178,7 +194,9 @@ data class AllAppsProfile @JvmOverloads constructor(
                 shiftRange =
                     deviceProperties.heightPx - allAppsTopPadding + deviceProperties.insets.top,
                 cellHeightMultiplier = cellHeightMultiplier,
+                labelsHidden = areLabelsHidden(context),
             )
+                .withSquareCellsIfLabelsHidden()
         }
 
         fun calculateNonResponsivePadding(
@@ -275,10 +293,12 @@ data class AllAppsProfile @JvmOverloads constructor(
                     ),
                 numShownAllAppsColumns = numShownAllAppsColumns,
                 cellHeightMultiplier = getRowHeightMultiplier(context),
+                labelsHidden = areLabelsHidden(context),
                 shiftRange =
                     deviceProperties.heightPx - allAppsTopPadding + deviceProperties.insets.top,
                 padding = allAppsPadding,
             )
+                .withSquareCellsIfLabelsHidden()
         }
 
         fun calculateallAppsLeftRightMargin(
@@ -411,6 +431,7 @@ data class AllAppsProfile @JvmOverloads constructor(
                         (textHeight * 2)) * allAppsProfile.cellHeightMultiplier)
                         .toInt()
             )
+                .withSquareCellsIfLabelsHidden()
         }
 
         fun createAllAppsProfile(
