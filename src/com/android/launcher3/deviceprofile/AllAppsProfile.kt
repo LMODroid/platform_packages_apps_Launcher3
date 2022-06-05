@@ -33,7 +33,7 @@ import com.android.launcher3.util.IconSizeSteps
 import kotlin.math.max
 import kotlin.math.min
 
-data class AllAppsProfile(
+data class AllAppsProfile @JvmOverloads constructor(
     val borderSpacePx: Point,
     val cellHeightPx: Int,
     val iconSizePx: Int,
@@ -41,6 +41,8 @@ data class AllAppsProfile(
     val iconDrawablePaddingPx: Int,
     val maxAllAppsTextLineCount: Int,
     val cellWidthPx: Int,
+    /** User's all apps row height setting, also applied when the cells are resized */
+    val cellHeightMultiplier: Float = 1f,
 ) {
 
     /**
@@ -71,10 +73,13 @@ data class AllAppsProfile(
             scale: Float,
             iconSizePx: Int,
             iconDrawablePaddingOriginalPx: Int,
+            cellHeightMultiplier: Float = 1f,
         ): AllAppsProfile {
             val allAppsBorderSpacePx = calculateAllAppsBorderSpacePx(inv, metric, typeIndex, scale)
             var allAppsCellHeightPx =
-                (pxFromDp(inv.allAppsCellSize[typeIndex].y, metric) + allAppsBorderSpacePx.y)
+                ((pxFromDp(inv.allAppsCellSize[typeIndex].y, metric) + allAppsBorderSpacePx.y) *
+                        cellHeightMultiplier)
+                    .toInt()
             var allAppsIconSizePx = pxFromDp(inv.allAppsIconSize[typeIndex], metric)
             val allAppsIconTextSizePx =
                 pxFromSp(inv.allAppsIconTextSize[typeIndex], metric).toFloat()
@@ -124,6 +129,7 @@ data class AllAppsProfile(
                 iconDrawablePaddingPx = allAppsIconDrawablePaddingPx,
                 maxAllAppsTextLineCount = 1,
                 cellWidthPx = allAppsCellWidthPx,
+                cellHeightMultiplier = cellHeightMultiplier,
             )
         }
 
@@ -133,6 +139,7 @@ data class AllAppsProfile(
             metric: DisplayMetrics,
             typeIndex: Int,
             scale: Float,
+            cellHeightMultiplier: Float = 1f,
         ): AllAppsProfile {
             val allAppsBorderSpacePx = calculateAllAppsBorderSpacePx(inv, metric, typeIndex, scale)
             val allAppsIconSizePx = max(1, pxFromDp(inv.allAppsIconSize[typeIndex], metric, scale))
@@ -143,8 +150,9 @@ data class AllAppsProfile(
                 // AllApps cells don't have real space between cells,
                 // so we add the border space to the cell height
                 cellHeightPx =
-                    (pxFromDp(inv.allAppsCellSize.get(typeIndex).y, metric) +
-                        allAppsBorderSpacePx.y),
+                    ((pxFromDp(inv.allAppsCellSize.get(typeIndex).y, metric) +
+                        allAppsBorderSpacePx.y) * cellHeightMultiplier)
+                        .toInt(),
                 iconSizePx = allAppsIconSizePx,
                 // We need the double conversion to keep the original behaviour
                 iconTextSizePx =
@@ -154,6 +162,7 @@ data class AllAppsProfile(
                 iconDrawablePaddingPx = allAppsIconDrawablePaddingPx,
                 maxAllAppsTextLineCount = 1,
                 cellWidthPx = allAppsIconSizePx + (2 * allAppsIconDrawablePaddingPx),
+                cellHeightMultiplier = cellHeightMultiplier,
             )
         }
 
@@ -163,6 +172,7 @@ data class AllAppsProfile(
             responsiveAllAppsHeightSpec: CalculatedResponsiveSpec,
             iconSizeSteps: IconSizeSteps,
             isVerticalBarLayout: Boolean,
+            cellHeightMultiplier: Float = 1f,
         ): AllAppsProfile {
             var allAppsIconSizePx = responsiveAllAppsCellSpec.iconSize
             var allAppsIconTextSizePx: Float = responsiveAllAppsCellSpec.iconTextSize.toFloat()
@@ -216,6 +226,7 @@ data class AllAppsProfile(
                     iconDrawablePaddingPx = allAppsIconDrawablePaddingPx,
                     maxAllAppsTextLineCount = maxAllAppsTextLineCount,
                     cellWidthPx = allAppsCellWidthPx,
+                    cellHeightMultiplier = cellHeightMultiplier,
                 )
 
             return when {
@@ -231,10 +242,11 @@ data class AllAppsProfile(
                     allAppsProfile.maxAllAppsTextLineCount
             return allAppsProfile.copy(
                 cellHeightPx =
-                    allAppsProfile.iconSizePx +
+                    ((allAppsProfile.iconSizePx +
                         allAppsProfile.iconDrawablePaddingPx +
                         textHeight +
-                        (textHeight * 2)
+                        (textHeight * 2)) * allAppsProfile.cellHeightMultiplier)
+                        .toInt()
             )
         }
 
@@ -247,6 +259,7 @@ data class AllAppsProfile(
             scale: Float,
             iconSizePx: Int,
             iconDrawablePaddingOriginalPx: Int,
+            cellHeightMultiplier: Float = 1f,
         ) =
             when {
                 isScalableGrid -> {
@@ -257,11 +270,19 @@ data class AllAppsProfile(
                         scale = scale,
                         iconSizePx = iconSizePx,
                         iconDrawablePaddingOriginalPx = iconDrawablePaddingOriginalPx,
+                        cellHeightMultiplier = cellHeightMultiplier,
                     )
                 }
 
                 else -> {
-                    createAllAppsProfileNonScalable(res, inv, metric, typeIndex, scale)
+                    createAllAppsProfileNonScalable(
+                        res,
+                        inv,
+                        metric,
+                        typeIndex,
+                        scale,
+                        cellHeightMultiplier,
+                    )
                 }
             }
     }

@@ -89,6 +89,8 @@ public class DeviceProfile {
 
     private static final float MIN_WIDGET_PADDING_DP = 6f;
 
+    public static final String KEY_ROW_HEIGHT = "pref_row_height";
+
     private static final float MAX_ASPECT_RATIO_FOR_ALTERNATE_EDIT_STATE = 1.5f;
 
     public static final PointF DEFAULT_SCALE = new PointF(1.0f, 1.0f);
@@ -835,13 +837,16 @@ public class DeviceProfile {
     public void updateIconSize(float scale, Context context) {
         // All apps
         final boolean isVerticalLayout = isVerticalBarLayout();
+        final float allAppsCellHeightMultiplier =
+                LauncherPrefs.getPrefs(context).getInt(KEY_ROW_HEIGHT, 100) / 100f;
         if (mIsResponsiveGrid) {
             mAllAppsProfile = AllAppsProfile.Factory.createAllAppsWithResponsive(
                     mResponsiveAllAppsCellSpec,
                     mResponsiveAllAppsWidthSpec,
                     mResponsiveAllAppsHeightSpec,
                     mIconSizeSteps,
-                    isVerticalBarLayout()
+                    isVerticalBarLayout(),
+                    allAppsCellHeightMultiplier
             );
             updateAllAppsWithResponsiveMeasures();
         } else {
@@ -853,7 +858,8 @@ public class DeviceProfile {
                     mTypeIndex,
                     scale,
                     getWorkspaceIconProfile().getIconSizePx(),
-                    mWorkspaceProfile.getIconDrawablePaddingOriginalPx()
+                    mWorkspaceProfile.getIconDrawablePaddingOriginalPx(),
+                    allAppsCellHeightMultiplier
             );
         }
         updateAllAppsContainerWidth();
