@@ -83,6 +83,8 @@ import javax.inject.Inject;
 @SuppressLint("NewApi")
 public class DeviceProfile {
 
+    public static final String KEY_ROW_HEIGHT = "pref_row_height";
+
     private static final float MAX_ASPECT_RATIO_FOR_ALTERNATE_EDIT_STATE = 1.5f;
 
     public static final PointF DEFAULT_SCALE = new PointF(1.0f, 1.0f);

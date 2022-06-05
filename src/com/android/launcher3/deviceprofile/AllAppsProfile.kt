@@ -22,8 +22,10 @@ import android.content.res.TypedArray
 import android.graphics.Point
 import android.graphics.Rect
 import android.util.DisplayMetrics
+import com.android.launcher3.DeviceProfile.KEY_ROW_HEIGHT
 import com.android.launcher3.InvariantDeviceProfile
 import com.android.launcher3.InvariantDeviceProfile.DisplayOptionSpec
+import com.android.launcher3.LauncherPrefs
 import com.android.launcher3.R
 import com.android.launcher3.Utilities
 import com.android.launcher3.Utilities.getIconVisibleSizePx
@@ -38,7 +40,7 @@ import com.android.launcher3.util.IconSizeSteps
 import kotlin.math.max
 import kotlin.math.min
 
-data class AllAppsProfile(
+data class AllAppsProfile @JvmOverloads constructor(
     val borderSpacePx: Point,
     val cellHeightPx: Int,
     val iconSizePx: Int,
@@ -52,6 +54,8 @@ data class AllAppsProfile(
     val padding: Rect,
     val shiftRange: Int,
     val numShownAllAppsColumns: Int,
+    /** User's all apps row height setting, also applied when the cells are resized */
+    val cellHeightMultiplier: Float = 1f,
 ) {
 
     /**
@@ -75,6 +79,9 @@ data class AllAppsProfile(
                 pxFromDp(inv.allAppsBorderSpaces[typeIndex].y, metric, scale),
             )
 
+        private fun getRowHeightMultiplier(context: Context): Float =
+            LauncherPrefs.getIntWhenUnlocked(context, KEY_ROW_HEIGHT, 100) / 100f
+
         fun createAllAppsProfileScalableGrid(
             inv: InvariantDeviceProfile,
             metric: DisplayMetrics,
@@ -88,8 +95,11 @@ data class AllAppsProfile(
         ): AllAppsProfile {
             val allAppsBorderSpacePx =
                 calculateAllAppsBorderSpacePx(inv, metric, typeIndex, workspaceProfile.scale)
+            val cellHeightMultiplier = getRowHeightMultiplier(context)
             var allAppsCellHeightPx =
-                (pxFromDp(inv.allAppsCellSize[typeIndex].y, metric) + allAppsBorderSpacePx.y)
+                ((pxFromDp(inv.allAppsCellSize[typeIndex].y, metric) + allAppsBorderSpacePx.y) *
+                        cellHeightMultiplier)
+                    .toInt()
             var allAppsIconSizePx = pxFromDp(inv.allAppsIconSize[typeIndex], metric)
             val allAppsIconTextSizePx =
                 pxFromSp(inv.allAppsIconTextSize[typeIndex], metric).toFloat()
@@ -167,6 +177,7 @@ data class AllAppsProfile(
                 numShownAllAppsColumns = numShownAllAppsColumns,
                 shiftRange =
                     deviceProperties.heightPx - allAppsTopPadding + deviceProperties.insets.top,
+                cellHeightMultiplier = cellHeightMultiplier,
             )
         }
 
@@ -240,8 +251,9 @@ data class AllAppsProfile(
                 // AllApps cells don't have real space between cells,
                 // so we add the border space to the cell height
                 cellHeightPx =
-                    (pxFromDp(inv.allAppsCellSize.get(typeIndex).y, metric) +
-                        allAppsBorderSpacePx.y),
+                    ((pxFromDp(inv.allAppsCellSize.get(typeIndex).y, metric) +
+                            allAppsBorderSpacePx.y) * getRowHeightMultiplier(context))
+                        .toInt(),
                 iconSizePx = allAppsIconSizePx,
                 // We need the double conversion to keep the original behaviour
                 iconTextSizePx =
@@ -262,6 +274,7 @@ data class AllAppsProfile(
                         deviceProperties,
                     ),
                 numShownAllAppsColumns = numShownAllAppsColumns,
+                cellHeightMultiplier = getRowHeightMultiplier(context),
                 shiftRange =
                     deviceProperties.heightPx - allAppsTopPadding + deviceProperties.insets.top,
                 padding = allAppsPadding,
@@ -392,10 +405,11 @@ data class AllAppsProfile(
                     allAppsProfile.maxAllAppsTextLineCount
             return allAppsProfile.copy(
                 cellHeightPx =
-                    allAppsProfile.iconSizePx +
+                    ((allAppsProfile.iconSizePx +
                         allAppsProfile.iconDrawablePaddingPx +
                         textHeight +
-                        (textHeight * 2)
+                        (textHeight * 2)) * allAppsProfile.cellHeightMultiplier)
+                        .toInt()
             )
         }
 

@@ -322,7 +322,7 @@ public class InvariantDeviceProfile {
             } else if (ALLAPPS_THEMED_ICONS.getSharedPrefKey().equals(key)) {
                 onConfigChanged();
             } else if (KEY_ICON_SIZE.equals(key) || KEY_FONT_SIZE.equals(key)
-                    || KEY_MAX_LINES.equals(key)) {
+                    || KEY_MAX_LINES.equals(key) || DeviceProfile.KEY_ROW_HEIGHT.equals(key)) {
                 onConfigChanged();
             }
         };
