@@ -231,6 +231,10 @@ public class BaseDepthControllerImpl<
         if (Flags.enableExpressiveFolderExpansion()) {
             wallpaperZoom = Math.max(wallpaperZoom, mWallpaperZoomOnly.value);
         }
+        if (!Utilities.canZoomWallpaper(mContainer)) {
+            // Keep the wallpaper at its natural size
+            wallpaperZoom = 1;
+        }
 
         if (windowToken != null) {
             mWallpaperManager.setWallpaperZoomOut(windowToken, wallpaperZoom);
