@@ -23,7 +23,9 @@ import com.android.app.animation.Interpolators
 import com.android.launcher3.DeviceProfile
 import com.android.launcher3.LauncherState
 import com.android.launcher3.LauncherState.FLAG_CLOSE_POPUPS
+import androidx.core.graphics.ColorUtils
 import com.android.launcher3.R
+import com.android.launcher3.Utilities
 import com.android.launcher3.anim.AnimatorPlaybackController
 import com.android.launcher3.anim.PendingAnimation
 import com.android.launcher3.statehandlers.DepthController.DEPTH_0_PERCENT
@@ -90,7 +92,11 @@ open class RecentsState(@JvmField val ordinal: Int, private val mFlags: Int) :
     fun getScrimColor(context: Context) =
         ScrimColors(
             backgroundColor =
-                if (hasFlag(FLAG_SCRIM)) Themes.getAttrColor(context, R.attr.overviewScrimColor)
+                if (hasFlag(FLAG_SCRIM))
+                    ColorUtils.setAlphaComponent(
+                        Themes.getAttrColor(context, R.attr.overviewScrimColor),
+                        Utilities.getRecentsAlpha(context),
+                    )
                 else Color.TRANSPARENT,
             foregroundColor = Color.TRANSPARENT,
         )

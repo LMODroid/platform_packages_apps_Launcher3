@@ -30,6 +30,7 @@ import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.LauncherUiState;
 import com.android.launcher3.R;
+import com.android.launcher3.Utilities;
 import com.android.launcher3.display.DisplayController;
 import com.android.launcher3.statehandlers.DepthController;
 import com.android.launcher3.uioverrides.QuickstepLauncher;
@@ -168,7 +169,9 @@ public class OverviewState extends LauncherState {
     @Override
     public ScrimColors getWorkspaceScrimColor(Launcher launcher) {
         return new ScrimColors(
-                /* backgroundColor= */ Themes.getAttrColor(launcher, R.attr.overviewScrimColor),
+                /* backgroundColor= */ ColorUtils.setAlphaComponent(
+                        Themes.getAttrColor(launcher, R.attr.overviewScrimColor),
+                        Utilities.getRecentsAlpha(launcher)),
                 /* foregroundColor= */ Color.TRANSPARENT);
     }
 
