@@ -18,9 +18,11 @@ package com.android.launcher3.uioverrides.states;
 import static com.android.launcher3.logging.StatsLogManager.LAUNCHER_STATE_OVERVIEW;
 
 import android.graphics.Color;
+import androidx.core.graphics.ColorUtils;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherState;
 import com.android.launcher3.R;
+import com.android.launcher3.Utilities;
 import com.android.launcher3.util.Themes;
 import com.android.launcher3.views.ActivityContext;
 import com.android.launcher3.views.ScrimColors;
@@ -64,7 +66,9 @@ public class OverviewState extends LauncherState {
     @Override
     public ScrimColors getWorkspaceScrimColor(Launcher launcher) {
         return new ScrimColors(
-                /* backgroundColor */ Themes.getAttrColor(launcher, R.attr.overviewScrimColor),
+                /* backgroundColor */ ColorUtils.setAlphaComponent(
+                        Themes.getAttrColor(launcher, R.attr.overviewScrimColor),
+                        Utilities.getRecentsAlpha(launcher)),
                 /* foregroundColor */ Color.TRANSPARENT);
     }
 }
