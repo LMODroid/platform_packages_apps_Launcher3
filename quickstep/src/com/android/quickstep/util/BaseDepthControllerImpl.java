@@ -135,8 +135,7 @@ public class BaseDepthControllerImpl<
     public BaseDepthControllerImpl(CONTAINER container, ListenableRef<Boolean> blurState) {
         mContainer = container;
         mCrossWindowBlursEnabled = blurState.getValue();
-        mMaxBlurRadius = container.getResources().getDimensionPixelSize(
-                R.dimen.max_depth_blur_radius_enhanced);
+        mMaxBlurRadius = Utilities.getBlurRadius(container);
         mWallpaperManager = container.getSystemService(WallpaperManager.class);
 
         MultiPropertyFactory<BaseDepthControllerImpl<?, ?>> depthProperty =
