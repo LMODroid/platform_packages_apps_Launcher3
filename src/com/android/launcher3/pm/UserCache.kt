@@ -41,6 +41,8 @@ import com.android.launcher3.util.SimpleBroadcastReceiver
 import com.android.launcher3.util.SimpleBroadcastReceiver.Companion.actionsFilter
 import com.android.launcher3.util.UserIconInfo
 import java.util.function.BiConsumer
+import com.libremobileos.app.ParallelSpaceManager
+import com.libremobileos.content.Intent as LMOIntent
 import javax.inject.Inject
 
 /** Class which manages a local cache of user handles to avoid system rpc */
@@ -75,7 +77,9 @@ constructor(@ApplicationContext private val context: Context, tracker: DaggerSin
                 ACTION_PROFILE_LOCKED,
                 ACTION_PROFILE_AVAILABLE,
                 ACTION_PROFILE_UNAVAILABLE,
-            )
+                LMOIntent.ACTION_PARALLEL_SPACE_CHANGED,
+            ),
+            Context.RECEIVER_EXPORTED,
         ) {
             rebuildUserCache()
         }
@@ -95,7 +99,11 @@ constructor(@ApplicationContext private val context: Context, tracker: DaggerSin
     @WorkerThread
     private fun rebuildUserCache(): UserManagerState =
         UserManagerState(
-                fetchSafe(emptyList<UserHandle>()) { userProfiles }
+                (fetchSafe(emptyList<UserHandle>()) { userProfiles } +
+                        fetchSafe(emptyList<UserHandle>()) {
+                            ParallelSpaceManager.getInstance().parallelUserHandles
+                        })
+                    .distinct()
                     .mapNotNull { buildCachedUserInfo(it) }
                     .associateBy { it.iconInfo.user }
             )

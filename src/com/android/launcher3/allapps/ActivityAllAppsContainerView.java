@@ -98,6 +98,8 @@ import com.android.launcher3.views.SpringRelativeLayout;
 import com.android.launcher3.workprofile.PersonalWorkSlidingTabStrip;
 import com.android.systemui.plugins.AllAppsRow;
 
+import com.libremobileos.app.ParallelSpaceManager;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -128,8 +130,7 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
 
     protected final T mActivityContext;
     protected final List<AdapterHolder> mAH;
-    protected final Predicate<ItemInfo> mPersonalMatcher = ItemInfoMatcher.ofUser(
-            Process.myUserHandle());
+    protected Predicate<ItemInfo> mPersonalMatcher;
     protected WorkProfileManager mWorkManager;
     protected final PrivateProfileManager mPrivateProfileManager;
     protected final Point mFastScrollerOffset = new Point();
@@ -214,6 +215,7 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
                 this,
                 mActivityContext.getStatsLogManager(),
                 UserCache.INSTANCE.get(mActivityContext));
+        updateMatcher();
         mPrivateSpaceBottomExtraSpace = context.getResources().getDimensionPixelSize(
                 R.dimen.ps_extra_bottom_padding);
         mAH = Arrays.asList(null, null, null);
@@ -1081,9 +1083,16 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
         // so its header protection is derived from this scrim instead.
     }
 
+    private void updateMatcher() {
+        mPersonalMatcher = ItemInfoMatcher.ofUser(
+                Process.myUserHandle()).or(ItemInfoMatcher.ofUsers(
+                    ParallelSpaceManager.getInstance().getParallelUserHandles()));
+    }
+
     @VisibleForTesting
     public void onAppsUpdated() {
         Log.d(TAG, "onAppsUpdated; number of apps: " + mAllAppsStore.getApps().length);
+        updateMatcher();
         mHasWorkApps = Stream.of(mAllAppsStore.getApps())
                 .anyMatch(mWorkManager.getItemInfoMatcher());
         mHasPrivateApps = Stream.of(mAllAppsStore.getApps())
