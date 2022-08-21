@@ -107,6 +107,7 @@ public class UserCache {
     @WorkerThread
     private void initAsync() {
         mUserChangeReceiver.register(
+                Context.RECEIVER_EXPORTED,
                 Intent.ACTION_MANAGED_PROFILE_AVAILABLE,
                 Intent.ACTION_MANAGED_PROFILE_UNAVAILABLE,
                 Intent.ACTION_MANAGED_PROFILE_REMOVED,
@@ -115,7 +116,8 @@ public class UserCache {
                 ACTION_PROFILE_UNLOCKED,
                 ACTION_PROFILE_LOCKED,
                 ACTION_PROFILE_AVAILABLE,
-                ACTION_PROFILE_UNAVAILABLE);
+                ACTION_PROFILE_UNAVAILABLE,
+                com.libremobileos.content.Intent.ACTION_PARALLEL_SPACE_CHANGED);
         updateCache();
     }
 
