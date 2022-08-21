@@ -99,6 +99,8 @@ import com.android.launcher3.views.SpringRelativeLayout;
 import com.android.launcher3.workprofile.PersonalWorkSlidingTabStrip;
 import com.android.systemui.plugins.AllAppsRow;
 
+import com.libremobileos.app.ParallelSpaceManager;
+
 import kotlin.Unit;
 
 import java.util.ArrayList;
@@ -131,8 +133,7 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
 
     protected final T mActivityContext;
     protected final List<AdapterHolder> mAH;
-    protected final Predicate<ItemInfo> mPersonalMatcher = ItemInfoMatcher.ofUser(
-            Process.myUserHandle());
+    protected Predicate<ItemInfo> mPersonalMatcher;
     protected WorkProfileManager mWorkManager;
     protected final PrivateProfileManager mPrivateProfileManager;
     protected final Point mFastScrollerOffset = new Point();
@@ -214,6 +215,7 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
                 mActivityContext.getUiExecutor(),
                 mActivityContext.getStatsLogManager(),
                 UserCache.INSTANCE.get(mActivityContext));
+        updateMatcher();
         mPrivateSpaceBottomExtraSpace = context.getResources().getDimensionPixelSize(
                 R.dimen.ps_extra_bottom_padding);
         mAH = Arrays.asList(null, null, null);
@@ -1051,9 +1053,16 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
         }
     }
 
+    private void updateMatcher() {
+        mPersonalMatcher = ItemInfoMatcher.ofUser(
+                Process.myUserHandle()).or(ItemInfoMatcher.ofUsers(
+                    ParallelSpaceManager.getInstance().getParallelUserHandles()));
+    }
+
     @VisibleForTesting
     public void onAppsUpdated() {
         Log.d(TAG, "onAppsUpdated; number of apps: " + mAllAppsStore.getApps().length);
+        updateMatcher();
         initProfileStatus();
         if (!isSearching()) {
             rebindAdapters();
