@@ -43,7 +43,7 @@ public class UserManagerState {
      */
     public void init(UserCache userCache, UserManager userManager) {
         mUserCache = userCache;
-        for (UserHandle user : userManager.getUserProfiles()) {
+        for (UserHandle user : userCache.getUserProfiles()) {
             long serialNo = userCache.getSerialNumberForUser(user);
             boolean isUserQuiet = userManager.isQuietModeEnabled(user);
             // Mapping different UserHandles to the same serialNo in allUsers could lead to losing

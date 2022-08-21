@@ -42,6 +42,8 @@ import com.android.launcher3.dagger.ApplicationContext;
 import com.android.launcher3.dagger.LauncherAppComponent;
 import com.android.launcher3.dagger.LauncherAppSingleton;
 
+import com.libremobileos.app.ParallelSpaceManager;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +91,7 @@ public class ApiWrapper {
         UserManager um = mContext.getSystemService(UserManager.class);
         Map<UserHandle, UserIconInfo> users = new ArrayMap<>();
         List<UserHandle> usersActual = um.getUserProfiles();
+        usersActual.addAll(ParallelSpaceManager.getInstance().getParallelUserHandles());
         if (usersActual != null) {
             for (UserHandle user : usersActual) {
                 long serial = um.getSerialNumberForUser(user);
