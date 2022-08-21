@@ -44,6 +44,9 @@
     <!-- for rotating surface by arbitrary degree -->
     <uses-permission android:name="android.permission.ROTATE_SURFACE_FLINGER" />
     <uses-permission android:name="android.permission.DEVICE_POWER" />
+    <!-- for parallel spaces -->
+    <uses-permission android:name="android.permission.MANAGE_PARALLEL_SPACES" />
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
     <!--
     Permissions required for read/write access to the workspace data. These permission name

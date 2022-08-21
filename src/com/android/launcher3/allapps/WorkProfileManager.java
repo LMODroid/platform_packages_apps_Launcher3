@@ -67,8 +67,8 @@ public class WorkProfileManager implements PersonalWorkSlidingTabStrip.OnActiveP
 
     private final AllAppsContainerView mAllApps;
     private final WorkAdapterProvider mAdapterProvider;
-    private final ItemInfoMatcher mMatcher;
 
+    private ItemInfoMatcher mMatcher;
     private WorkModeSwitch mWorkModeSwitch;
 
     @WorkProfileState
@@ -80,7 +80,6 @@ public class WorkProfileManager implements PersonalWorkSlidingTabStrip.OnActiveP
         mUserManager = userManager;
         mAllApps = allApps;
         mAdapterProvider = new WorkAdapterProvider(preferences);
-        mMatcher = mAllApps.mPersonalMatcher.negate();
     }
 
     /**
@@ -161,6 +160,10 @@ public class WorkProfileManager implements PersonalWorkSlidingTabStrip.OnActiveP
 
     public WorkAdapterProvider getAdapterProvider() {
         return mAdapterProvider;
+    }
+
+    public void updateMatcher() {
+        mMatcher = mAllApps.mPersonalMatcher.negate();
     }
 
     public ItemInfoMatcher getMatcher() {

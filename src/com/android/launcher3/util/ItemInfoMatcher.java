@@ -77,6 +77,10 @@ public interface ItemInfoMatcher {
         return (info, cn) -> info.user.equals(user);
     }
 
+    static ItemInfoMatcher ofUsers(Collection<UserHandle> users) {
+        return (info, cn) -> users.contains(info.user);
+    }
+
     static ItemInfoMatcher ofComponents(HashSet<ComponentName> components, UserHandle user) {
         return (info, cn) -> components.contains(cn) && info.user.equals(user);
     }
