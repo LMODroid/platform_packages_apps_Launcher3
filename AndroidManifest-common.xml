@@ -48,6 +48,9 @@
     <uses-permission android:name="android.permission.READ_HOME_APP_SEARCH_DATA" />
     <uses-permission android:name="android.permission.DEVICE_POWER" />
 
+    <!-- Parallel space -->
+    <uses-permission android:name="android.permission.MANAGE_PARALLEL_SPACES" />
+
     <!--
     Permissions required for read/write access to the workspace data. These permission name
     should not conflict with that defined in other apps, as such an app should embed its package
