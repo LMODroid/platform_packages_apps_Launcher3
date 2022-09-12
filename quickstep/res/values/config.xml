@@ -49,7 +49,7 @@
 
     <string name="wellbeing_provider_pkg" translatable="false"/>
 
-    <integer name="max_depth_blur_radius">23</integer>
+    <dimen name="max_depth_blur_radius">23dp</dimen>
 
     <!-- If predicted widgets from prediction service are less than this number, additional
     eligible widgets may be added locally by launcher. When set to 0, no widgets will be added
