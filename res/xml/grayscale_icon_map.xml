@@ -477,6 +477,9 @@
         drawable="@drawable/themed_icon_gallery_go"
         package="com.google.android.apps.photosgo" />
     <icon
+        drawable="@drawable/themed_icon_gallery"
+        package="com.android.gallery3d" />
+    <icon
         drawable="@drawable/themed_icon_picpay"
         package="com.picpay" />
     <icon
@@ -549,6 +552,9 @@
         drawable="@drawable/themed_icon_recorder"
         package="com.google.android.apps.recorder" />
     <icon
+        drawable="@drawable/themed_icon_recorder"
+        package="com.libremobileos.recorder" />
+    <icon
         drawable="@drawable/themed_icon_reddit"
         package="com.reddit.frontpage" />
     <icon
@@ -560,6 +566,9 @@
     <icon
         drawable="@drawable/themed_icon_retro_music"
         package="io.github.muntashirakon.Music.debug" />
+    <icon
+        drawable="@drawable/themed_icon_apple_music"
+        package="com.iven.musicplayergo" />
     <icon
         drawable="@drawable/themed_icon_safety"
         package="com.google.android.apps.safetyhub" />
@@ -1683,6 +1692,9 @@
         drawable="@drawable/themed_icon_camera"
         package="org.codeaurora.snapcaa" />
     <icon
+        drawable="@drawable/themed_icon_camera"
+        package="com.libremobileos.camera" />
+    <icon
         drawable="@drawable/themed_icon_pomodo"
         package="com.ngalamsoftware.pomodo" />
     <icon
@@ -1954,7 +1966,7 @@
         package="com.android.calculator2" />
     <icon
         drawable="@drawable/themed_icon_clock"
-        package="com.android.deskclock " />
+        package="com.android.deskclock" />
     <icon
         drawable="@drawable/themed_icon_messages"
         package="com.android.messaging" />
@@ -2342,4 +2354,7 @@
     <icon
         drawable="@drawable/themed_icon_ic_org_wikipedia"
         package="org.wikipedia" />
+    <icon
+        drawable="@drawable/themed_icon_browser"
+        package="org.eu.droid_ng.jellyfish" />
 </icons>
