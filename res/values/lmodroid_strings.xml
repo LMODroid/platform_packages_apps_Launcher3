@@ -39,4 +39,8 @@
     <!-- Hide labels -->
     <string name="desktop_show_labels">Show icon labels on desktop</string>
     <string name="drawer_show_labels">Show icon labels in drawer</string>
+
+    <!-- Show top shadow -->
+    <string name="show_top_shadow">Show top shadow</string>
+
 </resources>
