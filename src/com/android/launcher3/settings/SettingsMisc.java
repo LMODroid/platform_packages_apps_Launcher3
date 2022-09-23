@@ -21,8 +21,10 @@ import static androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTIO
 import static com.android.launcher3.config.FeatureFlags.IS_STUDIO_BUILD;
 import static com.android.launcher3.states.RotationHelper.ALLOW_ROTATION_PREFERENCE_KEY;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -67,10 +69,13 @@ public class SettingsMisc extends CollapsingToolbarBaseActivity
         implements OnPreferenceStartFragmentCallback, OnPreferenceStartScreenCallback,
         SharedPreferences.OnSharedPreferenceChangeListener{
 
+    private static final String SUGGESTIONS_KEY = "pref_suggestions";
+
     public static final String EXTRA_FRAGMENT_ARG_KEY = ":settings:fragment_args_key";
     public static final String EXTRA_SHOW_FRAGMENT_ARGS = ":settings:show_fragment_args";
     private static final int DELAY_HIGHLIGHT_DURATION_MILLIS = 600;
     public static final String SAVE_HIGHLIGHTED_KEY = "android:preference_highlighted";
+    protected static final String DPS_PACKAGE = "com.google.android.as";
 
     @VisibleForTesting
     static final String EXTRA_FRAGMENT = ":settings:fragment";
@@ -250,9 +255,20 @@ public class SettingsMisc extends CollapsingToolbarBaseActivity
 
                 case Utilities.KEY_BLUR_DEPTH:
                     return BlurUtils.supportsBlursOnWindows();
+                case SUGGESTIONS_KEY:
+                    // Show if Device Personalization Services is present.
+                    return isDPSEnabled(getContext());
             }
 
             return true;
+        }
+
+        public static boolean isDPSEnabled(Context context) {
+            try {
+                return context.getPackageManager().getApplicationInfo(DPS_PACKAGE, 0).enabled;
+            } catch (PackageManager.NameNotFoundException e) {
+                return false;
+            }
         }
 
         @Override
