@@ -59,6 +59,7 @@ import androidx.annotation.XmlRes;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.android.launcher3.config.FeatureFlags;
+import com.android.launcher3.customization.IconDatabase;
 import com.android.launcher3.dagger.ApplicationContext;
 import com.android.launcher3.dagger.LauncherAppComponent;
 import com.android.launcher3.dagger.LauncherAppSingleton;
@@ -166,6 +167,7 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
     public int[] numFolderColumns;
     public float[] iconSize;
     public float[] iconTextSize;
+    public String iconPack;
     public int iconBitmapSize;
     public int fillResIconDpi;
     public @DeviceType int deviceType;
@@ -424,6 +426,7 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
         for (int i = 1; i < iconSize.length; i++) {
             maxIconSize = Math.max(maxIconSize, iconSize[i]);
         }
+        iconPack = IconDatabase.getGlobal(context);
         iconBitmapSize = ResourceUtils.pxFromDp(maxIconSize, metrics);
         fillResIconDpi = getLauncherIconDensity(iconBitmapSize);
 
@@ -537,7 +540,7 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
 
     private Object[] toModelState() {
         return new Object[]{
-                numColumns, numRows, numSearchContainerColumns, numDatabaseHotseatIcons,
+                numColumns, numRows, numSearchContainerColumns, numDatabaseHotseatIcons, iconPack,
                 iconBitmapSize, fillResIconDpi, numDatabaseAllAppsColumns, dbFile, mLocale};
     }
 
@@ -565,6 +568,7 @@ public class InvariantDeviceProfile implements OnSharedPreferenceChangeListener 
             case KEY_FONT_SIZE:
             case KEY_MAX_LINES:
             case DeviceProfile.KEY_ROW_HEIGHT:
+            case IconDatabase.KEY_ICON_PACK:
                 onConfigChanged(mContext);
                 break;
         }
