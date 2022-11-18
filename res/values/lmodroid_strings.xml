@@ -130,4 +130,7 @@
     <!-- App drawer searchbar -->
     <string name="drawer_search_title">App search bar</string>
     <string name="drawer_search_summary">Search bar on top of the app drawer</string>
+
+    <!-- Shake Clear Recents -->
+    <string name="shake_clear_summary">Or Shake phone to clear recents</string>
 </resources>
