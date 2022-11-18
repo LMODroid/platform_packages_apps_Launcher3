@@ -42,6 +42,7 @@ import com.android.launcher3.anim.AnimatedFloat;
 import com.android.launcher3.util.DisplayController;
 import com.android.launcher3.util.MultiValueAlpha;
 import com.android.launcher3.util.NavigationMode;
+import com.android.launcher3.util.ShakeUtils;
 import com.android.quickstep.TaskOverlayFactory.OverlayUICallbacks;
 import com.android.quickstep.util.LayoutUtils;
 
@@ -53,7 +54,7 @@ import java.util.Arrays;
  * View for showing action buttons in Overview
  */
 public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayout
-        implements OnClickListener, Insettable, SharedPreferences.OnSharedPreferenceChangeListener {
+        implements OnClickListener, Insettable, SharedPreferences.OnSharedPreferenceChangeListener, ShakeUtils.OnShakeListener {
     public static final String TAG = "OverviewActionsView";
 
     private final Rect mInsets = new Rect();
@@ -127,6 +128,7 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
      * mActionButtons, since it is the sole button that appears for a grouped task.
      */
     private Button mSaveAppPairButton;
+    private ShakeUtils mShakeUtils;
 
     @ActionsHiddenFlags
     private int mHiddenFlags;
@@ -167,6 +169,24 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
         prefs.registerOnSharedPreferenceChangeListener(this);
     }
 
+    private void bindShake() {
+        mShakeUtils.bindShakeListener(this);
+    }
+
+    private void unBindShake() {
+        mShakeUtils.unBindShakeListener(this);
+    }
+
+    @Override
+    public void onVisibilityAggregated(boolean isVisible) {
+        super.onVisibilityAggregated(isVisible);
+        if (isVisible) {
+            bindShake();
+        } else {
+            unBindShake();
+        }
+    }
+
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -195,6 +215,7 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
         // an ImageButton in go launcher (does not share a common class with Button). Take care when
         // casting this.
         mSaveAppPairButton.setOnClickListener(this);
+        mShakeUtils = new ShakeUtils(getContext());
         updateVisibilities();
     }
 
@@ -213,6 +234,14 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
 
         mSplitButton = findViewById(R.id.action_split);
         mSplitButton.setOnClickListener(this);
+    }
+
+    @Override
+    public void onShake(double speed) {
+        if (mCallbacks != null && findViewById(R.id.action_clear_all).getVisibility() == VISIBLE) {
+            mCallbacks.onClearAllTasksRequested();
+            setCallbacks(null); // Clear the listener after shake
+        }
     }
 
     /**
