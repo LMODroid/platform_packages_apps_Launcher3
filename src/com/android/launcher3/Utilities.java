@@ -160,6 +160,7 @@ public final class Utilities {
     public static final String KEY_APP_DRAWER_OPACITY = "pref_app_drawer_opacity";
     public static final String KEY_BLUR_DEPTH = "pref_blur_depth";
     public static final String KEY_DOCK_SEARCH = "pref_dock_search";
+    public static final String KEY_DRAWER_SEARCH = "pref_drawer_search";
     public static final String KEY_RECENTS_MEMINFO = "pref_recents_meminfo";
     public static final String KEY_RECENTS_OPACITY = "pref_recents_opacity";
     public static final String KEY_SHOW_HOTSEAT_BG = "pref_show_hotseat_bg";
@@ -1022,4 +1023,9 @@ public final class Utilities {
         SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
         return prefs.getBoolean(KEY_RECENTS_MEMINFO, false);
    }
+
+    public static boolean showSearch(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return prefs.getBoolean(KEY_DRAWER_SEARCH, true);
+    }
 }
