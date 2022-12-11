@@ -328,6 +328,7 @@ android_library {
         "cuebarlib",
         "libGoogleFeed",
         "framework-lmodroid.static",
+        "SettingsLib",
     ],
     manifest: "AndroidManifest-common.xml",
     sdk_version: "current",
