@@ -74,7 +74,10 @@ constructor(
 
         var badge: Drawable? = null
         if ((info is ItemInfoWithIcon) && !info.matchingLookupFlag.useLowRes()) {
-            badge = info.bitmap.getBadgeDrawable(context, useTheme)
+            badge =
+                LauncherIcons.obtain(context).use { li ->
+                    info.bitmap.withUser(info.user, li).getBadgeDrawable(context, useTheme)
+                }
         }
 
         if (info is PendingAddShortcutInfo) {
@@ -147,10 +150,13 @@ constructor(
 
         if (badge == null) {
             badge =
-                BitmapInfo.LOW_RES_INFO.withFlags(
-                        userCache.getUserInfo(info.user).applyBitmapInfoFlags(FlagOp.NO_OP)
-                    )
-                    .getBadgeDrawable(context, useTheme) ?: ColorDrawable(Color.TRANSPARENT)
+                LauncherIcons.obtain(context).use { li ->
+                    BitmapInfo.LOW_RES_INFO.withUser(info.user, li)
+                        .withFlags(
+                            userCache.getUserInfo(info.user).applyBitmapInfoFlags(FlagOp.NO_OP)
+                        )
+                        .getBadgeDrawable(context, useTheme)
+                } ?: ColorDrawable(Color.TRANSPARENT)
         }
         return Result(result, badge)
     }

@@ -570,7 +570,9 @@ constructor(
 
     @Synchronized
     private fun getBadgedIcon(bitmap: BitmapInfo?, user: UserHandle): BitmapInfo =
-        bitmap?.withFlags(getUserFlagOpLocked(user)) ?: getDefaultIcon(user)
+        bitmap?.let { b ->
+            iconFactory.use { b.withFlags(getUserFlagOpLocked(user)).withUser(user, it) }
+        } ?: getDefaultIcon(user)
 
     private fun applyCacheEntry(entry: CacheEntry, info: ItemInfoWithIcon) {
         info.title = Utilities.trim(entry.title)
