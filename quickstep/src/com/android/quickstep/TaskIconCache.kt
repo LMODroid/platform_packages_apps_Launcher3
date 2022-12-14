@@ -361,11 +361,15 @@ class TaskIconCache(
                 defaultIcons.valueAt(index)
             } else {
                 val info =
-                    defaultIconBase.withFlags(
-                        UserCache.INSTANCE.get(context)
-                            .getUserInfo(UserHandle.of(userId))
-                            .applyBitmapInfoFlags(FlagOp.NO_OP)
-                    )
+                    iconFactory.use { iconFactory ->
+                        defaultIconBase
+                            .withFlags(
+                                UserCache.INSTANCE.get(context)
+                                    .getUserInfo(UserHandle.of(userId))
+                                    .applyBitmapInfoFlags(FlagOp.NO_OP)
+                            )
+                            .withUser(UserHandle.of(userId), iconFactory)
+                    }
                 defaultIcons[userId] = info
                 info
             }
