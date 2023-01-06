@@ -624,7 +624,8 @@ public class DeviceProfile {
         hotseatQsbVisualHeight = hotseatQsbHeight - 2 * hotseatQsbShadowHeight;
 
         // Whether QSB might be inline in appropriate orientation (e.g. landscape).
-        boolean canQsbInline = (isTwoPanels ? inv.inlineQsb[INDEX_TWO_PANEL_PORTRAIT]
+        boolean showQsb = Utilities.showQSB(context);
+        boolean canQsbInline = showQsb && (isTwoPanels ? inv.inlineQsb[INDEX_TWO_PANEL_PORTRAIT]
                 || inv.inlineQsb[INDEX_TWO_PANEL_LANDSCAPE]
                 : inv.inlineQsb[INDEX_DEFAULT] || inv.inlineQsb[INDEX_LANDSCAPE])
                 && hotseatQsbHeight > 0 && Utilities.showQSB(context);
@@ -665,10 +666,9 @@ public class DeviceProfile {
             mResponsiveWorkspaceCellSpec = workspaceCellSpecs.getCalculatedSpec(
                     responsiveAspectRatio, heightPx);
         } else {
-            hotseatQsbSpace = Utilities.showQSB(context)
-                    ? pxFromDp(inv.hotseatQsbSpace[mTypeIndex], mMetrics) : 0;
-            hotseatBarBottomSpace = Utilities.showQSB(context)
-                    ? pxFromDp(inv.hotseatBarBottomSpace[mTypeIndex], mMetrics) : 0;
+            hotseatQsbSpace = showQsb ? pxFromDp(inv.hotseatQsbSpace[mTypeIndex], mMetrics) : 0;
+            hotseatBarBottomSpace = showQsb || isTaskbarPresent ? pxFromDp(
+                inv.hotseatBarBottomSpace[mTypeIndex], mMetrics) : 0;
             mHotseatBarEdgePaddingPx =
                     isVerticalBarLayout() ? workspacePageIndicatorHeight : 0;
             mHotseatBarWorkspaceSpacePx =
@@ -677,8 +677,7 @@ public class DeviceProfile {
 
         if (!isVerticalBarLayout()) {
             // Have a little space between the inset and the QSB
-            if (Utilities.showQSB(context) &&
-                (mInsets.bottom + minQsbMargin) > hotseatBarBottomSpace) {
+            if (showQsb && mInsets.bottom + minQsbMargin > hotseatBarBottomSpace) {
                 int availableSpace = hotseatQsbSpace - (mInsets.bottom - hotseatBarBottomSpace);
 
                 // Only change the spaces if there is space
