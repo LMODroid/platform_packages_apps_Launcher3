@@ -851,6 +851,9 @@ public abstract class AbsSwipeUpHandler<
         if (!canCreateNewOrUpdateExistingLauncherTransitionController()) {
             return;
         }
+        if (mContainer == null) {
+            return;
+        }
         initTransitionEndpoints(mContainer.getDeviceProfile());
         mAnimationFactory.createContainerInterface(mTransitionDragLength);
     }
