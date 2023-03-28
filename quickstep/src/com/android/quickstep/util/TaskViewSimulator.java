@@ -540,7 +540,7 @@ public class TaskViewSimulator implements TransformParams.BuilderProxy {
                         : Integer.MAX_VALUE - 1000 + app.prefixOrderIndex);
             } else {
                 builder.setLayer(mDrawsBelowRecents
-                        ? Integer.MIN_VALUE + app.prefixOrderIndex
+                        ? Integer.MIN_VALUE + 1
                         : 0);
             }
         }
