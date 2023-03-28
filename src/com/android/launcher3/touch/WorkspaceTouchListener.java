@@ -46,6 +46,7 @@ import com.android.launcher3.dragndrop.DragLayer;
 import com.android.launcher3.logger.LauncherAtom;
 import com.android.launcher3.testing.TestLogging;
 import com.android.launcher3.testing.shared.TestProtocol;
+import com.android.launcher3.util.TouchUtil;
 
 import com.android.launcher3.Utilities;
 
@@ -112,6 +113,11 @@ public class WorkspaceTouchListener extends GestureDetector.SimpleOnGestureListe
             if (handleLongPress) {
                 mLongPressState = STATE_REQUESTED;
                 mTouchDownPoint.set(ev.getX(), ev.getY());
+                // Mouse right button's ACTION_DOWN should immediately show menu
+                if (TouchUtil.isMouseRightClickDownOrMove(ev)) {
+                    maybeShowMenu();
+                    return true;
+                }
             }
 
             mWorkspace.onTouchEvent(ev);
@@ -192,6 +198,10 @@ public class WorkspaceTouchListener extends GestureDetector.SimpleOnGestureListe
 
     @Override
     public void onLongPress(MotionEvent event) {
+        maybeShowMenu();
+    }
+
+    private void maybeShowMenu() {
         if (mLongPressState == STATE_REQUESTED) {
             TestLogging.recordEvent(TestProtocol.SEQUENCE_MAIN, "Workspace.longPress");
             if (canHandleLongPress()) {
