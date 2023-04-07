@@ -119,6 +119,7 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
     private static final String KEY_RECENTS_SCREENSHOT = "pref_recents_screenshot";
     private static final String KEY_RECENTS_CLEAR_ALL = "pref_recents_clear_all";
     private static final String KEY_RECENTS_LENS = "pref_recents_lens";
+    private static final String KEY_RECENTS_SHAKE_CLEAR_ALL = "pref_recents_shake_clear_all";
 
     /** Container for the action buttons below a focused, non-split Overview tile. */
     protected LinearLayout mActionButtons;
@@ -151,6 +152,7 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
     private boolean mScreenshot;
     private boolean mClearAll;
     private boolean mLens;
+    private boolean mShakeClearAll;
 
     public OverviewActionsView(Context context) {
         this(context, null);
@@ -167,23 +169,17 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
         mClearAll = prefs.getBoolean(KEY_RECENTS_CLEAR_ALL, true);
         mLens = prefs.getBoolean(KEY_RECENTS_LENS, false);
         prefs.registerOnSharedPreferenceChangeListener(this);
-    }
-
-    private void bindShake() {
-        mShakeUtils.bindShakeListener(this);
-    }
-
-    private void unBindShake() {
-        mShakeUtils.unBindShakeListener(this);
+        mShakeUtils = new ShakeUtils(context);
+        mShakeClearAll = prefs.getBoolean(KEY_RECENTS_SHAKE_CLEAR_ALL, true);
     }
 
     @Override
     public void onVisibilityAggregated(boolean isVisible) {
         super.onVisibilityAggregated(isVisible);
         if (isVisible) {
-            bindShake();
+            mShakeUtils.bindShakeListener(this);
         } else {
-            unBindShake();
+            mShakeUtils.unBindShakeListener(this);
         }
     }
 
@@ -215,7 +211,6 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
         // an ImageButton in go launcher (does not share a common class with Button). Take care when
         // casting this.
         mSaveAppPairButton.setOnClickListener(this);
-        mShakeUtils = new ShakeUtils(getContext());
         updateVisibilities();
     }
 
@@ -238,9 +233,8 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
 
     @Override
     public void onShake(double speed) {
-        if (mCallbacks != null && findViewById(R.id.action_clear_all).getVisibility() == VISIBLE) {
+        if (mCallbacks != null && mShakeClearAll) {
             mCallbacks.onClearAllTasksRequested();
-            setCallbacks(null); // Clear the listener after shake
         }
     }
 
@@ -293,6 +287,8 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
             mClearAll = prefs.getBoolean(KEY_RECENTS_CLEAR_ALL, true);
         } else if (key.equals(KEY_RECENTS_LENS)) {
             mLens = prefs.getBoolean(KEY_RECENTS_LENS, false);
+        } else if (key.equals(KEY_RECENTS_SHAKE_CLEAR_ALL)) {
+            mShakeClearAll = prefs.getBoolean(KEY_RECENTS_SHAKE_CLEAR_ALL, true);
         }
         updateVisibilities();
     }
