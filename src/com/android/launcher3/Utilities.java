@@ -162,6 +162,7 @@ public final class Utilities {
     public static final String KEY_DOCK_SEARCH = "pref_dock_search";
     public static final String KEY_DRAWER_SEARCH = "pref_drawer_search";
     public static final String KEY_HOTSEAT_OPACITY = "pref_hotseat_opacity";
+    public static final String KEY_LENS = "pref_recents_lens";
     public static final String KEY_RECENTS_MEMINFO = "pref_recents_meminfo";
     public static final String KEY_RECENTS_OPACITY = "pref_recents_opacity";
     public static final String KEY_SHOW_HOTSEAT_BG = "pref_show_hotseat_bg";
