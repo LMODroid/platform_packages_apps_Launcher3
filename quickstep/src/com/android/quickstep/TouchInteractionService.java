@@ -37,6 +37,7 @@ import static com.android.quickstep.InputConsumer.TYPE_CURSOR_HOVER;
 import static com.android.quickstep.InputConsumerUtils.newConsumer;
 import static com.android.quickstep.InputConsumerUtils.tryCreateAssistantInputConsumer;
 import static com.android.systemui.shared.system.ActivityManagerWrapper.CLOSE_SYSTEM_WINDOWS_REASON_RECENTS;
+import static com.android.systemui.shared.system.QuickStepContract.SYSUI_STATE_SCREEN_PINNING;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -643,6 +644,8 @@ public class TouchInteractionService extends Service {
     private DesktopVisibilityController mDesktopVisibilityController;
     private DesktopAppLaunchTransitionManager mDesktopAppLaunchTransitionManager;
 
+    private boolean mCancelGesture = false;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -798,6 +801,17 @@ public class TouchInteractionService extends Service {
             mOverviewComponentObserver.setHomeDisabled(mDeviceState.isHomeDisabled());
             mTaskbarManager.onSystemUiFlagsChanged(systemUiStateFlags);
             mTaskAnimationManager.onSystemUiFlagsChanged(lastSysUIFlags, systemUiStateFlags);
+
+            if ((lastSysUIFlags & SYSUI_STATE_SCREEN_PINNING) !=
+                (systemUiStateFlags & SYSUI_STATE_SCREEN_PINNING)) {
+                if ((systemUiStateFlags & SYSUI_STATE_SCREEN_PINNING) != 0) {
+                    // cancel in-progress gesture, if any. users must not reach recents
+                    mCancelGesture = true;
+                } else {
+                    // If user has tried no gesture since blocking the gesture, we need to reset this
+                    mCancelGesture = false;
+                }
+            }
         }
     }
 
@@ -1030,8 +1044,10 @@ public class TouchInteractionService extends Service {
             }
         }
 
-        boolean cancelGesture = mGestureState.getContainerInterface() != null
-                && mGestureState.getContainerInterface().shouldCancelCurrentGesture();
+        boolean myCancel = mCancelGesture;
+        if (myCancel) mCancelGesture = false;
+        boolean cancelGesture = (mGestureState.getContainerInterface() != null
+                && mGestureState.getContainerInterface().shouldCancelCurrentGesture()) || myCancel;
         boolean cleanUpConsumer = (action == ACTION_UP || action == ACTION_CANCEL || cancelGesture)
                 && mConsumer != null
                 && !mConsumer.getActiveConsumerInHierarchy().isConsumerDetachedFromGesture();
