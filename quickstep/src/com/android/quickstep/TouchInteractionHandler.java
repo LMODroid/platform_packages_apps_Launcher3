@@ -39,6 +39,7 @@ import static com.android.quickstep.InputConsumerUtils.newConsumer;
 import static com.android.quickstep.InputConsumerUtils.tryCreateAssistantInputConsumer;
 import static com.android.quickstep.RecentsAnimationDeviceState.RESET_TO_DEFAULT_GESTURAL_HEIGHT;
 import static com.android.quickstep.dagger.SysUIConnectionComponentKt.CONNECTION_CLEANER;
+import static com.android.systemui.shared.system.QuickStepContract.SYSUI_STATE_SCREEN_PINNING;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -123,6 +124,8 @@ import javax.inject.Named;
  */
 @SysUIConnectionSingleton
 public class TouchInteractionHandler extends ContextWrapper {
+
+    private boolean mCancelGesture = false;
 
     private static final String TAG = "TouchInteractionService";
 
@@ -425,6 +428,13 @@ public class TouchInteractionHandler extends ContextWrapper {
                     mOverviewComponentObserver.get().setHomeDisabled(deviceState.isHomeDisabled());
                 }
                 taskAnimationManager.onSystemUiFlagsChanged(lastSysUIFlags, systemUiStateFlags);
+
+                if ((lastSysUIFlags & SYSUI_STATE_SCREEN_PINNING)
+                        != (systemUiStateFlags & SYSUI_STATE_SCREEN_PINNING)) {
+                    // Pinning started: cancel the gesture in progress, users must not reach
+                    // recents. Unpinned: nothing to cancel anymore.
+                    mCancelGesture = (systemUiStateFlags & SYSUI_STATE_SCREEN_PINNING) != 0;
+                }
             }
         } else if (deviceState != null) {
             mTaskbarManager.onSystemUiFlagsChanged(deviceState.getSysuiStateFlags(), displayId);
@@ -693,9 +703,11 @@ public class TouchInteractionHandler extends ContextWrapper {
             }
         }
 
-        boolean cancelGesture = inputResource.gestureState.getContainerInterface() != null
+        boolean pinningCancel = mCancelGesture;
+        mCancelGesture = false;
+        boolean cancelGesture = (inputResource.gestureState.getContainerInterface() != null
                 && inputResource.gestureState.getContainerInterface()
-                .shouldCancelCurrentGesture(displayId);
+                .shouldCancelCurrentGesture(displayId)) || pinningCancel;
         boolean cleanUpConsumer = (action == ACTION_UP || action == ACTION_CANCEL || cancelGesture)
                 && inputResource.consumer != null
                 && !inputResource.consumer.getActiveConsumerInHierarchy()
