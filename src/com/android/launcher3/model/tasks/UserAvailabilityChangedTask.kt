@@ -22,6 +22,7 @@ import com.android.launcher3.LauncherModel.ModelUpdateTask
 import com.android.launcher3.model.AllAppsList
 import com.android.launcher3.model.BgDataModel
 import com.android.launcher3.model.ModelTaskController
+import com.android.launcher3.model.data.AppsListData.Companion.FLAG_HAS_MULTIPLE_PROFILES
 import com.android.launcher3.model.data.AppsListData.Companion.FLAG_PRIVATE_PROFILE_QUIET_MODE_ENABLED
 import com.android.launcher3.model.data.AppsListData.Companion.FLAG_QUIET_MODE_ENABLED
 import com.android.launcher3.model.data.AppsListData.Companion.FLAG_WORK_PROFILE_QUIET_MODE_ENABLED
@@ -51,13 +52,18 @@ class UserAvailabilityChangedTask(private val user: UserHandle) : ModelUpdateTas
 
         if (Flags.enablePrivateSpace()) {
             if (userInfo.iconInfo.isWork) {
-                apps.setFlags(FLAG_WORK_PROFILE_QUIET_MODE_ENABLED, isUserQuiet)
+                apps.setFlags(FLAG_HAS_MULTIPLE_PROFILES, ums.hasMultipleWorkProfiles)
+                apps.setFlags(
+                    FLAG_WORK_PROFILE_QUIET_MODE_ENABLED,
+                    ums.isAllWorkProfilesQuietModeEnabled,
+                )
             } else if (userInfo.iconInfo.isPrivate) {
                 apps.setFlags(FLAG_PRIVATE_PROFILE_QUIET_MODE_ENABLED, isUserQuiet)
             }
         } else {
             // We are not synchronizing here, as int operations are atomic
-            apps.setFlags(FLAG_QUIET_MODE_ENABLED, ums.isAnyProfileQuietModeEnabled)
+            apps.setFlags(FLAG_QUIET_MODE_ENABLED, ums.isAllProfilesQuietModeEnabled)
+            apps.setFlags(FLAG_HAS_MULTIPLE_PROFILES, ums.hasMultipleProfiles)
         }
         taskController.bindApplicationsIfNeeded()
 

@@ -49,6 +49,28 @@ class UserManagerState(private val userMap: Map<UserHandle, CachedUserInfo>) {
     val isAnyProfileQuietModeEnabled: Boolean
         get() = userMap.any { it.value.isQuietModeEnabled }
 
+    private val profiles: List<CachedUserInfo>
+        get() = userMap.filterKeys { it != Process.myUserHandle() }.values.toList()
+
+    private val workProfiles: List<CachedUserInfo>
+        get() = userMap.values.filter { it.iconInfo.isWork }
+
+    /** Returns true if all profiles (not the parent user) have quiet mode enabled. */
+    val isAllProfilesQuietModeEnabled: Boolean
+        get() = profiles.let { it.isNotEmpty() && it.all { info -> info.isQuietModeEnabled } }
+
+    /** Returns true if all work profiles have quiet mode enabled. */
+    val isAllWorkProfilesQuietModeEnabled: Boolean
+        get() = workProfiles.let { it.isNotEmpty() && it.all { info -> info.isQuietModeEnabled } }
+
+    /** Returns true if there is more than one profile besides the parent user. */
+    val hasMultipleProfiles: Boolean
+        get() = profiles.size > 1
+
+    /** Returns true if there is more than one work profile. */
+    val hasMultipleWorkProfiles: Boolean
+        get() = workProfiles.size > 1
+
     /** Returns the user properties for the provided user or default values */
     fun getUserInfo(user: UserHandle): UserIconInfo = getCachedInfo(user).iconInfo
 

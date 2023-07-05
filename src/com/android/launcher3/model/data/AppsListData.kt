@@ -46,5 +46,8 @@ class AppsListData(
 
         // If quiet mode is enabled for private profile user
         const val FLAG_PRIVATE_PROFILE_QUIET_MODE_ENABLED: Int = 1 shl 4
+
+        // If user has more than one work profile
+        const val FLAG_HAS_MULTIPLE_PROFILES: Int = 1 shl 5
     }
 }
