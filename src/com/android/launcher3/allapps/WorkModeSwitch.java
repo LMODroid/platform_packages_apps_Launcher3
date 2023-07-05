@@ -53,7 +53,7 @@ public class WorkModeSwitch extends LinearLayout implements Insettable,
     // Threshold when user scrolls up/down to determine when should button extend/collapse
     private final int mScrollThreshold;
     private TextView mTextView;
-
+    private boolean mDoPause = true;
 
     public WorkModeSwitch(@NonNull Context context) {
         this(context, null, 0);
@@ -194,10 +194,16 @@ public class WorkModeSwitch extends LinearLayout implements Insettable,
         return mScrollThreshold;
     }
 
-    public void updateStringFromCache(){
+    public void updateStringFromCache() {
         StringCache cache = mActivityContext.getStringCache();
         if (cache != null) {
-            mTextView.setText(cache.workProfilePauseButton);
+            mTextView.setText(mDoPause ? cache.workProfilePauseButton :
+                    cache.workProfileEnableButton);
         }
+    }
+
+    public void setPauseMode(final boolean doPause) {
+        mDoPause = doPause;
+        updateStringFromCache();
     }
 }
