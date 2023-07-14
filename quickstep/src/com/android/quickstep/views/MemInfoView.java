@@ -16,6 +16,8 @@
 
 package com.android.quickstep.views;
 
+import static com.android.launcher3.util.NavigationMode.TWO_BUTTONS;
+import static com.android.launcher3.taskbar.TaskbarManagerImpl.ENABLE_TASKBAR_URI;
 import static com.android.launcher3.util.NavigationMode.THREE_BUTTONS;
 
 import android.app.ActivityManager;
@@ -33,6 +35,7 @@ import com.android.launcher3.anim.AlphaUpdateListener;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.util.MultiValueAlpha;
 import com.android.launcher3.util.NavigationMode;
+import com.android.launcher3.util.SettingsCache;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 
@@ -118,13 +121,21 @@ public class MemInfoView extends TextView {
         LayoutParams lp = (LayoutParams)getLayoutParams();
         int bottomMargin;
 
-        if (mode == THREE_BUTTONS)
+        boolean isTaskbarPresent = isTaskbarPresent();
+        if (!isTaskbarPresent && ((mode == THREE_BUTTONS) || (mode == TWO_BUTTONS)))
             bottomMargin = mDp.memInfoMarginThreeButtonPx;
+        else if (isTaskbarPresent && !((mode == THREE_BUTTONS) || (mode == TWO_BUTTONS)))
+            bottomMargin = mDp.memInfoMarginTransientTaskbarPx;
         else
             bottomMargin = mDp.memInfoMarginGesturePx;
 
         lp.setMargins(lp.leftMargin, lp.topMargin, lp.rightMargin, bottomMargin);
         lp.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
+    }
+
+    private boolean isTaskbarPresent() {
+        return mDp.getDeviceProperties().getTaskbarConfiguration().isTaskbarPresent()
+                && SettingsCache.INSTANCE.get(getContext()).getValue(ENABLE_TASKBAR_URI);
     }
 
     private String unitConvert(long valueMiB, boolean alignToGB) {

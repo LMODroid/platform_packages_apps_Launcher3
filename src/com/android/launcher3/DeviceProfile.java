@@ -88,6 +88,7 @@ public class DeviceProfile {
     // Meminfo in overview
     public int memInfoMarginGesturePx;
     public int memInfoMarginThreeButtonPx;
+    public int memInfoMarginTransientTaskbarPx;
 
     private static final float MAX_ASPECT_RATIO_FOR_ALTERNATE_EDIT_STATE = 1.5f;
 
@@ -248,6 +249,8 @@ public class DeviceProfile {
                 R.dimen.meminfo_bottom_margin_gesture);
         memInfoMarginThreeButtonPx = res.getDimensionPixelSize(
                 R.dimen.meminfo_bottom_margin_three_button);
+        memInfoMarginTransientTaskbarPx = res.getDimensionPixelSize(
+                R.dimen.meminfo_bottom_margin_transient_taskbar);
 
         mTypeIndex = displayOptionSpec.typeIndex;
 
