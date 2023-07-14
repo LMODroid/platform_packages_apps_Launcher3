@@ -41,7 +41,6 @@
     <string name="actions_category_title">Quick actions</string>
 
     <!-- Developer options -->
-    <string name="dev_options_title">Developer options</string>
     <string name="dev_options_summary">Enable some hidden features at your own risk</string>
 
     <!-- Edit workspace -->

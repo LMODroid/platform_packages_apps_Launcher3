@@ -20,6 +20,7 @@ import static com.android.launcher3.uioverrides.flags.FlagsFactory.getDebugFlag;
 import static com.android.launcher3.uioverrides.flags.FlagsFactory.getReleaseFlag;
 
 import android.content.Context;
+import android.os.Build;
 
 import androidx.annotation.VisibleForTesting;
 
@@ -46,7 +47,7 @@ public final class FeatureFlags {
     private FeatureFlags() { }
 
     public static boolean showFlagTogglerUi(Context context) {
-        return BuildConfig.IS_DEBUG_DEVICE && Utilities.isDevelopersOptionsEnabled(context);
+        return !("user".equals(Build.TYPE)) && Utilities.isDevelopersOptionsEnabled(context);
     }
 
     /**
