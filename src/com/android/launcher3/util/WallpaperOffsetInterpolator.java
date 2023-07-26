@@ -1,12 +1,11 @@
 package com.android.launcher3.util;
 
+import static android.content.Intent.ACTION_WALLPAPER_CHANGED;
+
 import static com.android.launcher3.util.Executors.UI_HELPER_EXECUTOR;
 
 import android.app.WallpaperManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
@@ -25,7 +24,7 @@ import com.android.launcher3.anim.Interpolators;
 /**
  * Utility class to handle wallpaper scrolling along with workspace.
  */
-public class WallpaperOffsetInterpolator extends BroadcastReceiver implements
+public class WallpaperOffsetInterpolator implements
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final int[] sTempInt = new int[2];
@@ -34,6 +33,8 @@ public class WallpaperOffsetInterpolator extends BroadcastReceiver implements
 
     private static final String KEY_WALLPAPER_SCROLLING = "pref_allow_wallpaper_scrolling";
 
+    private final SimpleBroadcastReceiver mWallpaperChangeReceiver =
+            new SimpleBroadcastReceiver(i -> onWallpaperChanged());
     private final Workspace<?> mWorkspace;
     private final boolean mIsRtl;
     private final Handler mHandler;
@@ -222,22 +223,20 @@ public class WallpaperOffsetInterpolator extends BroadcastReceiver implements
     public void setWindowToken(IBinder token) {
         mWindowToken = token;
         if (mWindowToken == null && mRegistered) {
-            mWorkspace.getContext().unregisterReceiver(this);
+            mWallpaperChangeReceiver.unregisterReceiverSafely(mWorkspace.getContext());
             mRegistered = false;
         } else if (mWindowToken != null && !mRegistered) {
-            mWorkspace.getContext()
-                    .registerReceiver(this, new IntentFilter(Intent.ACTION_WALLPAPER_CHANGED));
-            onReceive(mWorkspace.getContext(), null);
+            mWallpaperChangeReceiver.register(mWorkspace.getContext(), ACTION_WALLPAPER_CHANGED);
+            onWallpaperChanged();
             mRegistered = true;
         }
     }
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
+    private void onWallpaperChanged() {
         UI_HELPER_EXECUTOR.execute(() -> {
             // Updating the boolean on a background thread is fine as the assignments are atomic
-            mWallpaperIsLiveWallpaper =
-                    WallpaperManager.getInstance(context).getWallpaperInfo() != null;
+            mWallpaperIsLiveWallpaper = WallpaperManager.getInstance(mWorkspace.getContext())
+                    .getWallpaperInfo() != null;
             updateOffset();
         });
     }
