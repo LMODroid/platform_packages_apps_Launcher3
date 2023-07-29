@@ -51,7 +51,7 @@
             style="@style/OverviewActionButton"
             android:layout_width="60dp"
             android:layout_height="36dp"
-            android:foreground="@drawable/ic_split_screen"
+            android:foreground="@drawable/ic_caption_desktop_button_foreground"
             android:foregroundGravity="center"
             android:visibility="gone" />
 
