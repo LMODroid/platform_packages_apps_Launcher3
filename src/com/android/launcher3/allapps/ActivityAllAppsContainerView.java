@@ -322,9 +322,8 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
         int layerFg = getContext().getColor(R.color.blur_shade_panel_fg);
         int layerBg = getContext().getColor(R.color.blur_shade_panel_bg);
         mBottomSheetBackgroundColorOverBlur = ColorUtils.compositeColors(layerFg, layerBg);
-        mBottomSheetBackgroundColorBlurFallback = getContext().getColor(
-                Utilities.isDarkTheme(getContext()) ? android.R.color.system_accent2_800
-                        : android.R.color.system_accent2_200);
+        mBottomSheetBackgroundColorBlurFallback =
+                Themes.getAttrColor(getContext(), R.attr.allAppsScrimColor);
 
         mSearchUiManager.initializeSearch(this);
         if (useModelRepositoryBinding()) {
@@ -825,7 +824,6 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
             mTabsProtectionAlpha = tabsAlpha;
             invalidateHeader();
         }
-        getSearchView().setBackgroundResource(R.drawable.bg_all_apps_searchbox);
         if (mSearchUiManager.getEditText() == null) {
             return;
         }
@@ -846,9 +844,11 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
     }
 
     int getBackgroundColor() {
-        return isBackgroundBlurEnabled()
+        // App drawer opacity setting
+        return ColorUtils.setAlphaComponent(isBackgroundBlurEnabled()
                 ? mBottomSheetBackgroundColorOverBlur
-                : mBottomSheetBackgroundColorBlurFallback;
+                : mBottomSheetBackgroundColorBlurFallback,
+                Utilities.getAllAppsAlpha(getContext()));
     }
 
     boolean isBackgroundBlurEnabled() {
