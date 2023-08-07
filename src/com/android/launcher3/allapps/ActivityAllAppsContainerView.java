@@ -323,12 +323,13 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
             int layerFg = getContext().getColor(R.color.blur_shade_panel_fg);
             int layerBg = getContext().getColor(R.color.blur_shade_panel_bg);
             mBottomSheetBackgroundColorOverBlur = ColorUtils.compositeColors(layerFg, layerBg);
-            mBottomSheetBackgroundColorBlurFallback = getContext().getColor(
-                    Utilities.isDarkTheme(getContext()) ? android.R.color.system_accent2_800
-                            : android.R.color.system_accent2_200);
+            // Our app drawer colour (its opacity is applied in getBottomSheetBackgroundColor())
+            mBottomSheetBackgroundColorBlurFallback =
+                    Themes.getAttrColor(getContext(), R.attr.allAppsScrimColor);
         }
 
-        mBottomSheetBackgroundColorLegacy = getContext().getColor(R.color.materialColorSurfaceDim);
+        mBottomSheetBackgroundColorLegacy =
+                Themes.getAttrColor(getContext(), R.attr.allAppsScrimColor);
 
         updateBackgroundVisibility(mActivityContext.getDeviceProfile());
         mSearchUiManager.initializeSearch(this);
@@ -859,11 +860,16 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
     }
 
     int getBottomSheetBackgroundColor() {
+        // App drawer opacity setting
+        return ColorUtils.setAlphaComponent(getBottomSheetBaseColor(),
+                Utilities.getAllAppsAlpha(getContext()));
+    }
+
+    private int getBottomSheetBaseColor() {
         if (!Flags.allAppsBlur()) {
             return mBottomSheetBackgroundColorLegacy;
         }
         if (!mActivityContext.isAllAppsBackgroundBlurEnabled()) {
-            // Don't apply any alpha if the blur is disabled.
             return mBottomSheetBackgroundColorBlurFallback;
         }
         return mBottomSheetBackgroundColorOverBlur;
