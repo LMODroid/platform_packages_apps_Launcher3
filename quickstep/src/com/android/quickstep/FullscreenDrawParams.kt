@@ -39,6 +39,7 @@ constructor(
     private var taskCornerRadius = 0f
     private var windowCornerRadius = 0f
     var currentCornerRadius = 0f
+    private var prevProgress = 0f
 
     init {
         updateCornerRadius(context)
@@ -51,11 +52,16 @@ constructor(
     }
 
     /** Sets the progress in range [0, 1] */
-    fun setProgress(fullscreenProgress: Float, parentScale: Float, taskViewScale: Float) {
+    fun setProgress(fullscreenProgress: Float, parentScale: Float, taskViewScale: Float,
+            isSplitScreen: Boolean) {
+        // Remove the rounded corners only in the splitted task. (i.e split screen)
+        val maxCornerRadius = if (isSplitScreen && (prevProgress <= fullscreenProgress))
+                0f else windowCornerRadius
         currentCornerRadius =
-            Utilities.mapRange(fullscreenProgress, taskCornerRadius, windowCornerRadius) /
+            Utilities.mapRange(fullscreenProgress, taskCornerRadius, maxCornerRadius) /
                 parentScale /
                 taskViewScale
+        prevProgress = fullscreenProgress
     }
 
     override fun close() {}
