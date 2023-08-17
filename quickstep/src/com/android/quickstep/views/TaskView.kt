@@ -2069,7 +2069,11 @@ constructor(
     }
 
     protected open fun updateFullscreenParams() {
-        updateFullscreenParams(thumbnailFullscreenParams)
+        updateFullscreenParams(false  /* isSplitScreen */)
+    }
+
+    protected open fun updateFullscreenParams(isSplitScreen: Boolean) {
+        updateFullscreenParams(thumbnailFullscreenParams, isSplitScreen)
         taskContainers.forEach {
             if (enableRefactorTaskContentView()) {
                 (it.taskContentView as TaskContentView).cornerRadius =
@@ -2084,7 +2088,14 @@ constructor(
     }
 
     protected fun updateFullscreenParams(fullscreenParams: FullscreenDrawParams) {
-        recentsView?.let { fullscreenParams.setProgress(fullscreenProgress, it.scaleX, scaleX) }
+        updateFullscreenParams(fullscreenParams, false /* isSplitScreen */)
+    }
+
+    protected fun updateFullscreenParams(fullscreenParams: FullscreenDrawParams,
+            isSplitScreen: Boolean) {
+        recentsView?.let {
+            fullscreenParams.setProgress(fullscreenProgress, it.scaleX, scaleX, isSplitScreen)
+        }
     }
 
     private fun onModalnessUpdated(modalness: Float) {
