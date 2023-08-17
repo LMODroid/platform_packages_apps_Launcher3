@@ -311,6 +311,11 @@ class GroupedTaskView @JvmOverloads constructor(context: Context, attrs: Attribu
         else INVALID_TASK_ID
     }
 
+    // A grouped task is a split screen: its window corners go square when launched
+    override fun updateFullscreenParams() {
+        updateFullscreenParams(true /* isSplitScreen */)
+    }
+
     override fun getLastSelectedChildTaskIndex(): Int {
         if (recentsView?.splitSelectController?.isDismissingFromSplitPair == true) {
             // return the container index of the task that wasn't initially selected to split
