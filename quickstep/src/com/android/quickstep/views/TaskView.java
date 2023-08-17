@@ -1631,16 +1631,19 @@ public class TaskView extends FrameLayout implements Reusable {
     }
 
     protected void updateSnapshotRadius() {
-        updateCurrentFullscreenParams(mSnapshotView.getPreviewPositionHelper());
+        updateCurrentFullscreenParams(mSnapshotView.getPreviewPositionHelper(),
+                false /* split screen */);
         mSnapshotView.setFullscreenParams(mCurrentFullscreenParams);
     }
 
-    void updateCurrentFullscreenParams(PreviewPositionHelper previewPositionHelper) {
+    void updateCurrentFullscreenParams(PreviewPositionHelper previewPositionHelper,
+            boolean isSplitScreen) {
         if (getRecentsView() == null) {
             return;
         }
         mCurrentFullscreenParams.setProgress(mFullscreenProgress, getRecentsView().getScaleX(),
-                getScaleX(), getWidth(), mActivity.getDeviceProfile(), previewPositionHelper);
+                getScaleX(), getWidth(), mActivity.getDeviceProfile(),
+                previewPositionHelper, isSplitScreen);
     }
 
     /**
@@ -1785,6 +1788,7 @@ public class TaskView extends FrameLayout implements Reusable {
 
         private final float mCornerRadius;
         private final float mWindowCornerRadius;
+        private float mPrevProgress = 0f;
 
         public float mCurrentDrawnCornerRadius;
 
@@ -1799,10 +1803,15 @@ public class TaskView extends FrameLayout implements Reusable {
          * Sets the progress in range [0, 1]
          */
         public void setProgress(float fullscreenProgress, float parentScale, float taskViewScale,
-                int previewWidth, DeviceProfile dp, PreviewPositionHelper pph) {
+                int previewWidth, DeviceProfile dp, PreviewPositionHelper pph,
+                boolean isSplitScreen) {
+            // Remove the rounded corners only in the splitted task. (i.e split screen)
+            float maxCornerRadius = (isSplitScreen && (mPrevProgress <= fullscreenProgress))
+                    ? 0f : mWindowCornerRadius;
             mCurrentDrawnCornerRadius =
-                    Utilities.mapRange(fullscreenProgress, mCornerRadius, mWindowCornerRadius)
+                    Utilities.mapRange(fullscreenProgress, mCornerRadius, maxCornerRadius)
                             / parentScale / taskViewScale;
+            mPrevProgress = fullscreenProgress;
         }
     }
 
