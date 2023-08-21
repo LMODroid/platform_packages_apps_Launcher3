@@ -185,22 +185,7 @@ public class TaskMenuView extends AbstractFloatingView {
         LayoutParams lp = (LayoutParams) menuOptionView.getLayoutParams();
         mTaskView.getPagedOrientationHandler().setLayoutParamsForTaskMenuOptionItem(lp,
                 menuOptionView, mActivity.getDeviceProfile());
-        menuOptionView.setOnClickListener(view -> {
-            RecentsView recentsView = mTaskView.getRecentsView();
-            // TODO: find the reason why this is no-op on landscape
-            if (!recentsView.getLandScape()) {
-                recentsView.switchToScreenshot(null,
-                        () -> recentsView.finishRecentsAnimation(true /* toRecents */,
-                                false /* shouldPip */,
-                                () -> menuOption.onClick(view)));
-                recentsView.onGestureAnimationEnd();
-                recentsView.onSwipeUpAnimationSuccess();
-	    } else {
-	    	// finishRecentsAnimation causes white snapshots on click, 
-	    	// finish the animation on AbsSwipeUPHandler instead as WA
-	        menuOption.onClick(view);
-	    }
-        });
+        menuOptionView.setOnClickListener(menuOption::onClick);
         mOptionLayout.addView(menuOptionView);
     }
 

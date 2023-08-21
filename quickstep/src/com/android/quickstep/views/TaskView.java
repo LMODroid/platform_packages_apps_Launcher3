@@ -1064,23 +1064,17 @@ public class TaskView extends FrameLayout implements Reusable {
                     return;
                 }
                 RecentsView recentsView = getRecentsView();
-                // TODO: find the reason why this is no-op on landscape
-                if (!recentsView.getLandScape()) {
-                    recentsView.switchToScreenshot(
-                            () -> recentsView.finishRecentsAnimation(true /* toRecents */,
-                                    false /* shouldPip */,
-                                    () -> showTaskMenu(iconView)));
-                    recentsView.onGestureAnimationEnd();
-                    recentsView.onSwipeUpAnimationSuccess();
-		} else {
-	    	    // finishRecentsAnimation causes white snapshots on click, 
-	    	    // finish the animation on AbsSwipeUPHandler instead as WA
-		    showTaskMenu(iconView);
-		}
+                recentsView.switchToScreenshot(
+                        () -> recentsView.finishRecentsAnimation(true /* toRecents */,
+                                false /* shouldPip */,
+                                () -> showTaskMenu(iconView)));
+                recentsView.onGestureAnimationEnd();
+                recentsView.onSwipeUpAnimationSuccess();
             });
             iconView.setOnLongClickListener(v -> {
                 requestDisallowInterceptTouchEvent(true);
-                return showTaskMenu(iconView);
+                iconView.callOnClick();
+                return true;
             });
         } else {
             iconView.setDrawable(null);
