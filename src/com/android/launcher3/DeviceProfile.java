@@ -244,6 +244,8 @@ public class DeviceProfile {
     // not enough space, the hotseat will adjust itself for the bubble bar.
     private final int mBubbleBarSpaceThresholdPx;
 
+    private boolean mShowQsb;
+
     // Bottom sheets
     public int bottomSheetTopPadding;
     public int bottomSheetOpenDuration;
@@ -629,8 +631,8 @@ public class DeviceProfile {
         hotseatQsbVisualHeight = hotseatQsbHeight - 2 * hotseatQsbShadowHeight;
 
         // Whether QSB might be inline in appropriate orientation (e.g. landscape).
-        boolean showQsb = Utilities.showQSB(context);
-        boolean canQsbInline = showQsb && (isTwoPanels ? inv.inlineQsb[INDEX_TWO_PANEL_PORTRAIT]
+        mShowQsb = Utilities.showQSB(context);
+        boolean canQsbInline = mShowQsb && (isTwoPanels ? inv.inlineQsb[INDEX_TWO_PANEL_PORTRAIT]
                 || inv.inlineQsb[INDEX_TWO_PANEL_LANDSCAPE]
                 : inv.inlineQsb[INDEX_DEFAULT] || inv.inlineQsb[INDEX_LANDSCAPE])
                 && hotseatQsbHeight > 0 && Utilities.showQSB(context);
@@ -671,8 +673,8 @@ public class DeviceProfile {
             mResponsiveWorkspaceCellSpec = workspaceCellSpecs.getCalculatedSpec(
                     responsiveAspectRatio, heightPx);
         } else {
-            hotseatQsbSpace = showQsb ? pxFromDp(inv.hotseatQsbSpace[mTypeIndex], mMetrics) : 0;
-            hotseatBarBottomSpace = showQsb || isTaskbarPresent ? pxFromDp(
+            hotseatQsbSpace = mShowQsb ? pxFromDp(inv.hotseatQsbSpace[mTypeIndex], mMetrics) : 0;
+            hotseatBarBottomSpace = mShowQsb || isTaskbarPresent ? pxFromDp(
                 inv.hotseatBarBottomSpace[mTypeIndex], mMetrics) : 0;
             mHotseatBarEdgePaddingPx =
                     isVerticalBarLayout() ? workspacePageIndicatorHeight : 0;
@@ -1402,9 +1404,11 @@ public class DeviceProfile {
      * This method calculates the space between the icons to achieve a certain width.
      */
     private int calculateHotseatBorderSpace(float hotseatWidthPx, int numExtraBorder) {
+        // Calculate hotseat border space only if QSB available.
+        if(!mShowQsb) return 0;
+
         int numBorders = (numShownHotseatIcons - 1 + numExtraBorder);
         if (numBorders <= 0) return 0;
-
         float hotseatIconsTotalPx = iconSizePx * numShownHotseatIcons;
         int hotseatBorderSpacePx = (int) (hotseatWidthPx - hotseatIconsTotalPx) / numBorders;
         return Math.min(hotseatBorderSpacePx, mMaxHotseatIconSpacePx);
