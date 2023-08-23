@@ -3090,6 +3090,10 @@ public abstract class RecentsView<
         }
 
         mCurrentGestureEndTarget = null;
+
+        switchToScreenshot(
+            () -> finishRecentsAnimation(true /* toRecents */, false /* shouldPip */,
+                    null));
     }
 
     /**
