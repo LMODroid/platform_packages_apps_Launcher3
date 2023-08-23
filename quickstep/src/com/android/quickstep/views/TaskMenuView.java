@@ -185,6 +185,8 @@ public class TaskMenuView extends AbstractFloatingView {
         LayoutParams lp = (LayoutParams) menuOptionView.getLayoutParams();
         mTaskView.getPagedOrientationHandler().setLayoutParamsForTaskMenuOptionItem(lp,
                 menuOptionView, mActivity.getDeviceProfile());
+        // Set an onClick listener on each menu option. The onClick method is responsible for
+        // ending LiveTile mode on the thumbnail if needed.
         menuOptionView.setOnClickListener(menuOption::onClick);
         mOptionLayout.addView(menuOptionView);
     }

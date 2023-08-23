@@ -1063,18 +1063,11 @@ public class TaskView extends FrameLayout implements Reusable {
                 if (confirmSecondSplitSelectApp()) {
                     return;
                 }
-                RecentsView recentsView = getRecentsView();
-                recentsView.switchToScreenshot(
-                        () -> recentsView.finishRecentsAnimation(true /* toRecents */,
-                                false /* shouldPip */,
-                                () -> showTaskMenu(iconView)));
-                recentsView.onGestureAnimationEnd();
-                recentsView.onSwipeUpAnimationSuccess();
+                showTaskMenu(iconView);
             });
             iconView.setOnLongClickListener(v -> {
                 requestDisallowInterceptTouchEvent(true);
-                iconView.callOnClick();
-                return true;
+                return showTaskMenu(iconView);
             });
         } else {
             iconView.setDrawable(null);
