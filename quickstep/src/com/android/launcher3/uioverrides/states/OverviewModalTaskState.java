@@ -16,6 +16,7 @@
 package com.android.launcher3.uioverrides.states;
 
 import static com.android.launcher3.Flags.enableGridOnlyOverview;
+import static com.android.launcher3.Utilities.isRecentsOverviewClearAllEnabled;
 import static com.android.launcher3.logging.StatsLogManager.LAUNCHER_STATE_OVERVIEW;
 
 import android.graphics.Rect;
@@ -45,7 +46,11 @@ public class OverviewModalTaskState extends OverviewState {
 
     @Override
     public int getVisibleElements(Launcher launcher) {
-        return OVERVIEW_ACTIONS | MEMINFO;
+        int elements = OVERVIEW_ACTIONS | MEMINFO;
+        if (!isRecentsOverviewClearAllEnabled(launcher)) {
+            elements |= CLEAR_ALL_BUTTON;
+        }
+        return elements;
     }
 
     @Override

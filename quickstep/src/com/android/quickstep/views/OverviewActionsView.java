@@ -17,6 +17,7 @@
 package com.android.quickstep.views;
 
 import static com.android.launcher3.Utilities.KEY_RECENTS_LENS;
+import static com.android.launcher3.Utilities.KEY_RECENTS_CLEAR_ALL;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -122,7 +123,6 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
     private static final int GROUP_ACTIONS_ALPHAS = 1;
 
     private static final String KEY_RECENTS_SCREENSHOT = "pref_recents_screenshot";
-    private static final String KEY_RECENTS_CLEAR_ALL = "pref_recents_clear_all";
     private static final String KEY_RECENTS_SHAKE_CLEAR_ALL = "pref_recents_shake_clear_all";
 
     /** Container for the action buttons below a focused, non-split Overview tile. */
