@@ -132,7 +132,7 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
     protected final T mActivityContext;
     protected final List<AdapterHolder> mAH;
     protected Predicate<ItemInfo> mPersonalMatcher;
-    protected final WorkProfileManager mWorkManager;
+    protected WorkProfileManager mWorkManager;
     protected final Point mFastScrollerOffset = new Point();
     protected final int mScrimColor;
     protected final float mHeaderThreshold;
@@ -994,14 +994,15 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
         mWorkManager.updateMatcher();
     }
 
-    private void onAppsUpdated() {
+    @VisibleForTesting
+    public void onAppsUpdated() {
         updateMatcher();
-        mHasWorkApps = Stream.of(mAllAppsStore.getApps()).anyMatch(mWorkManager.getMatcher());
+        mHasWorkApps = mWorkManager.hasWorkApps();
         if (!isSearching()) {
             rebindAdapters();
-            if (mHasWorkApps) {
-                mWorkManager.reset();
-            }
+        }
+        if (mHasWorkApps) {
+            mWorkManager.reset();
         }
 
         mActivityContext.getStatsLogManager().logger()
@@ -1250,6 +1251,11 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
                 }
             }
         }
+    }
+
+    @VisibleForTesting
+    public void setWorkManager(WorkProfileManager workManager) {
+        mWorkManager = workManager;
     }
 
     @VisibleForTesting
