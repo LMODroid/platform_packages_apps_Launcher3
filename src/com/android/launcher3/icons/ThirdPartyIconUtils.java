@@ -31,7 +31,8 @@ class ThirdPartyIconUtils {
 
             // Google Clock goes second, but only if the icon pack does not override it.
             if (icon == null && key.componentName.equals(DESK_CLOCK)) {
-                return DynamicClock.getClock(context, iconDpi);
+                String packageName = key.componentName.getPackageName();
+                return ClockDrawableWrapper.forPackage(context, packageName, iconDpi);
             }
         }
 
