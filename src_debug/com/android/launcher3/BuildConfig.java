@@ -30,5 +30,5 @@ public final class BuildConfig {
      * Flag to control various developer centric features
      */
     public static final boolean IS_DEBUG_DEVICE = false;
-    public static final boolean IS_USERDEBUG = false;
+    public static final boolean IS_USERDEBUG = true;
 }

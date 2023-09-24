@@ -47,7 +47,7 @@ public final class FeatureFlags {
     private FeatureFlags() { }
 
     public static boolean showFlagTogglerUi(Context context) {
-        return !("user".equals(Build.TYPE)) && Utilities.isDevelopersOptionsEnabled(context);
+        return BuildConfig.IS_USERDEBUG && Utilities.isDevelopersOptionsEnabled(context);
     }
 
     /**
