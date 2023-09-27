@@ -153,6 +153,7 @@ public class PackageUpdatedTask implements ModelUpdateTask {
                     removedComponents.add(a.componentName);
                 })) {
                     for (int i = 0; i < N; i++) {
+                        if (DEBUG) Log.d(TAG, "mAllAppsList.updatePackage " + packages[i]);
                         if (isTargetPackage(packages[i])) {
                             needsRestart = true;
                         }
@@ -187,11 +188,6 @@ public class PackageUpdatedTask implements ModelUpdateTask {
                 flagOp = FlagOp.NO_OP.setFlag(
                         WorkspaceItemInfo.FLAG_DISABLED_SUSPENDED, mOp == OP_SUSPEND);
                 appsList.updateDisabledFlags(matcher, flagOp);
-                for (int i = 0; i < N; i++) {
-                    if (isTargetPackage(packages[i])) {
-                        needsRestart = true;
-                    }
-                }
                 break;
             case OP_USER_AVAILABILITY_CHANGE: {
                 UserManagerState ums = new UserManagerState();
