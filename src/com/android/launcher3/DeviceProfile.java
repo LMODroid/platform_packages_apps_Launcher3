@@ -623,7 +623,8 @@ public class DeviceProfile {
         boolean canQsbInline = deviceProperties.isTwoPanels() ? twoPanelCanInline : tabletInlineQsb;
         canQsbInline = canQsbInline && hotseatProfile.getQsbHeight() > 0;
 
-        return (isScalableGrid && inv.inlineQsb[mTypeIndex] && canQsbInline)
+        return ((isScalableGrid || (isTaskbarPresent && !deviceProperties.isLandscape()))
+                && inv.inlineQsb[mTypeIndex] && canQsbInline)
                 || inv.isFixedLandscape;
     }
 
@@ -710,7 +711,7 @@ public class DeviceProfile {
      * necessary.
      */
     public void recalculateHotseatWidthAndBorderSpace() {
-        if (!mIsScalableGrid) return;
+        if (!(mIsScalableGrid || (isTaskbarPresent && !mDeviceProperties.isLandscape()))) return;
 
         updateHotseatWidthAndBorderSpace(inv.numColumns);
         int numWorkspaceColumns = getPanelCount() * inv.numColumns;
