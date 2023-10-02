@@ -147,7 +147,7 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
                 return;
             String pkgName = intent.getData().getSchemeSpecificPart();
             if ((mWidgetInfo != null && mWidgetInfo.provider.getPackageName().equals(pkgName))
-                || getSearchWidgetPackageName(context).equals(pkgName)) {
+                || (pkgName != null && pkgName.equals(getSearchWidgetPackageName(context)))) {
                 rebindFragment();
             }
         }
