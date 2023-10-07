@@ -275,8 +275,8 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
         LauncherPrefs.getPrefs(getContext()).registerOnSharedPreferenceChangeListener(this);
         if (isQsbEnabled()) {
             mQsbWidgetHost.startListening();
-            addView(createQsb(this));
         }
+        rebindFragment();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_PACKAGE_ADDED);
         intentFilter.addAction(ACTION_PACKAGE_CHANGED);
@@ -291,7 +291,6 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
         getContext().unregisterReceiver(mReceiver);
         LauncherPrefs.getPrefs(getContext()).unregisterOnSharedPreferenceChangeListener(this);
         mQsbWidgetHost.stopListening();
-        removeAllViews();
     }
 
     private void rebindFragment() {
