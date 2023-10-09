@@ -336,19 +336,19 @@ object TaskOverlayModule {
     ): List<TaskShortcutFactory> =
         listOf(
             TaskShortcutFactory.APP_INFO,
-            TaskShortcutFactory.KILL_APP,
             TaskShortcutFactory.SPLIT_SELECT,
-            TaskShortcutFactory.UNINSTALL,
-            TaskShortcutFactory.PIN,
-            TaskShortcutFactory.INSTALL,
-            TaskShortcutFactory.FREE_FORM,
             TaskShortcutFactory.FLOATING,
+            TaskShortcutFactory.FREE_FORM,
             desktopShortcutFactory,
             externalDisplayShortcutFactory,
             aspectRatioSystemShortcutFactory,
             wellbeingShortcutFactory,
+            TaskShortcutFactory.PIN,
+            TaskShortcutFactory.INSTALL,
             TaskShortcutFactory.SAVE_APP_PAIR,
             TaskShortcutFactory.SCREENSHOT,
+            TaskShortcutFactory.KILL_APP,
+            TaskShortcutFactory.UNINSTALL,
             TaskShortcutFactory.MODAL,
         )
 }
