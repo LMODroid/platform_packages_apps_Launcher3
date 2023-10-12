@@ -28,7 +28,6 @@ import static com.android.launcher3.model.BgDataModel.Callbacks.FLAG_QUIET_MODE_
 import static com.android.launcher3.util.Executors.UI_HELPER_EXECUTOR;
 
 import android.os.Build;
-import android.os.Process;
 import android.os.UserHandle;
 import android.os.UserManager;
 import android.util.Log;
@@ -46,6 +45,7 @@ import com.android.launcher3.Utilities;
 import com.android.launcher3.allapps.BaseAllAppsAdapter.AdapterItem;
 import com.android.launcher3.logging.StatsLogManager;
 import com.android.launcher3.model.data.ItemInfo;
+import com.android.launcher3.pm.UserCache;
 import com.android.launcher3.workprofile.PersonalWorkSlidingTabStrip;
 
 import java.lang.annotation.Retention;
@@ -86,15 +86,19 @@ public class WorkProfileManager implements PersonalWorkSlidingTabStrip.OnActiveP
 
     private WorkModeSwitch mWorkModeSwitch;
 
+    private final UserCache mUserCache;
+
     @WorkProfileState
     private int mCurrentState;
 
     public WorkProfileManager(
             UserManager userManager, ActivityAllAppsContainerView allApps,
-            StatsLogManager statsLogManager) {
+            StatsLogManager statsLogManager, UserCache userCache) {
         mUserManager = userManager;
         mAllApps = allApps;
         mStatsLogManager = statsLogManager;
+        mUserCache = userCache;
+        mMatcher = info -> info != null && mUserCache.getUserInfo(info.user).isWork();
     }
 
     /**
@@ -104,11 +108,11 @@ public class WorkProfileManager implements PersonalWorkSlidingTabStrip.OnActiveP
     public void setWorkProfileEnabled(boolean enabled) {
         updateCurrentState(STATE_TRANSITION);
         UI_HELPER_EXECUTOR.post(() -> {
-            for (UserHandle userProfile : mUserManager.getUserProfiles()) {
-                if (Process.myUserHandle().equals(userProfile)) {
-                    continue;
+            for (UserHandle userProfile : mUserCache.getUserProfiles()) {
+                if (mUserCache.getUserInfo(userProfile).isWork()) {
+                    mUserManager.requestQuietModeEnabled(!enabled, userProfile);
+                    break;
                 }
-                mUserManager.requestQuietModeEnabled(!enabled, userProfile);
             }
         });
     }

@@ -177,10 +177,11 @@ public class PackageUpdatedTask extends BaseModelUpdateTask {
                 break;
             case OP_USER_AVAILABILITY_CHANGE: {
                 UserManagerState ums = new UserManagerState();
-                ums.init(UserCache.INSTANCE.get(context),
-                        context.getSystemService(UserManager.class));
+                UserManager userManager = context.getSystemService(UserManager.class);
+                ums.init(UserCache.INSTANCE.get(context), userManager);
+                boolean isUserQuiet =  ums.isUserQuiet(mUser);
                 flagOp = FlagOp.NO_OP.setFlag(
-                        WorkspaceItemInfo.FLAG_DISABLED_QUIET_USER, ums.isUserQuiet(mUser));
+                        WorkspaceItemInfo.FLAG_DISABLED_QUIET_USER, isUserQuiet);
                 appsList.updateDisabledFlags(matcher, flagOp);
 
                 // We are not synchronizing here, as int operations are atomic

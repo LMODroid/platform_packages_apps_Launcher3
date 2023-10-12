@@ -52,6 +52,7 @@ import android.util.LongSparseArray;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.InvariantDeviceProfile;
@@ -135,7 +136,7 @@ public class LoaderTask implements Runnable {
     private final InstallSessionHelper mSessionHelper;
     private final IconCache mIconCache;
 
-    private final UserManagerState mUserManagerState = new UserManagerState();
+    private final UserManagerState mUserManagerState;
 
     protected final Map<ComponentKey, AppWidgetProviderInfo> mWidgetProvidersMap = new ArrayMap<>();
     private Map<ShortcutKey, ShortcutInfo> mShortcutKeyToPinnedShortcuts;
@@ -148,6 +149,13 @@ public class LoaderTask implements Runnable {
 
     public LoaderTask(@NonNull LauncherAppState app, AllAppsList bgAllAppsList, BgDataModel bgModel,
             ModelDelegate modelDelegate, @NonNull LauncherBinder launcherBinder) {
+        this(app, bgAllAppsList, bgModel, modelDelegate, launcherBinder, new UserManagerState());
+    }
+
+    @VisibleForTesting
+    LoaderTask(@NonNull LauncherAppState app, AllAppsList bgAllAppsList, BgDataModel bgModel,
+            ModelDelegate modelDelegate, @NonNull LauncherBinder launcherBinder,
+            UserManagerState userManagerState) {
         mApp = app;
         mBgAllAppsList = bgAllAppsList;
         mBgDataModel = bgModel;
@@ -156,9 +164,10 @@ public class LoaderTask implements Runnable {
 
         mLauncherApps = mApp.getContext().getSystemService(LauncherApps.class);
         mUserManager = mApp.getContext().getSystemService(UserManager.class);
-        mUserCache = UserCache.INSTANCE.get(mApp.getContext());
+        mUserCache = UserCache.getInstance(mApp.getContext());
         mSessionHelper = InstallSessionHelper.INSTANCE.get(mApp.getContext());
         mIconCache = mApp.getIconCache();
+        mUserManagerState = userManagerState;
     }
 
     protected synchronized void waitForIdle() {

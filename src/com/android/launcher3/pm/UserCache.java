@@ -59,6 +59,11 @@ public class UserCache implements SafeCloseable {
     public static final MainThreadInitializedObject<UserCache> INSTANCE =
             new MainThreadInitializedObject<>(UserCache::new);
 
+    /** Returns an instance of UserCache bound to the context provided. */
+    public static UserCache getInstance(Context context) {
+        return INSTANCE.get(context);
+    }
+
     private final List<BiConsumer<UserHandle, String>> mUserEventListeners = new ArrayList<>();
     private final SimpleBroadcastReceiver mUserChangeReceiver =
             new SimpleBroadcastReceiver(this::onUsersChanged);

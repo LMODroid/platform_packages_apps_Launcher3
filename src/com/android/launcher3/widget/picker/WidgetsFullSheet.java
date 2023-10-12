@@ -100,6 +100,7 @@ public class WidgetsFullSheet extends BaseWidgetSheet
     private static final String KEY_WIDGETS_EDUCATION_DIALOG_SEEN =
             "launcher.widgets_education_dialog_seen";
 
+    private final UserCache mUserCache;
     private final UserManagerState mUserManagerState = new UserManagerState();
     private final UserHandle mCurrentUser = Process.myUserHandle();
     private final Predicate<WidgetsListBaseEntry> mPrimaryWidgetsFilter =
@@ -191,6 +192,7 @@ public class WidgetsFullSheet extends BaseWidgetSheet
                 ? resources.getDimensionPixelSize(R.dimen.all_apps_header_pill_height)
                 : 0;
 
+        mUserCache = UserCache.INSTANCE.get(context);
         mUserManagerState.init(UserCache.INSTANCE.get(context),
                 context.getSystemService(UserManager.class));
     }
@@ -310,7 +312,9 @@ public class WidgetsFullSheet extends BaseWidgetSheet
         if (adapterHolder.mAdapterType == AdapterHolder.SEARCH) {
             mNoWidgetsView.setText(R.string.no_search_results);
         } else if (adapterHolder.mAdapterType == AdapterHolder.WORK
-                && mUserManagerState.isAnyProfileQuietModeEnabled()
+                && mUserCache.getUserProfiles().stream()
+                .filter(userHandle -> mUserCache.getUserInfo(userHandle).isWork())
+                .anyMatch(mUserManagerState::isUserQuiet)
                 && mActivityContext.getStringCache() != null) {
             mNoWidgetsView.setText(mActivityContext.getStringCache().workProfilePausedTitle);
         } else {
