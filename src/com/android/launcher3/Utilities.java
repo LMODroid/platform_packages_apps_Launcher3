@@ -60,7 +60,6 @@ import android.os.Build.VERSION_CODES;
 import android.os.DeadObjectException;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Process;
 import android.os.TransactionTooLargeException;
 import android.provider.Settings;
 import android.text.Spannable;
@@ -86,12 +85,15 @@ import androidx.core.graphics.ColorUtils;
 import com.android.launcher3.LauncherModel;
 import com.android.launcher3.dragndrop.FolderAdaptiveIcon;
 import com.android.launcher3.graphics.TintedDrawableSpan;
+import com.android.launcher3.icons.BaseIconFactory;
+import com.android.launcher3.icons.BitmapInfo;
 import com.android.launcher3.icons.LauncherIcons;
 import com.android.launcher3.icons.ShortcutCachingLogic;
 import com.android.launcher3.icons.ThemedIconDrawable;
 import com.android.launcher3.model.data.ItemInfo;
 import com.android.launcher3.model.data.ItemInfoWithIcon;
 import com.android.launcher3.pm.ShortcutConfigActivityInfo;
+import com.android.launcher3.pm.UserCache;
 import com.android.launcher3.shortcuts.ShortcutKey;
 import com.android.launcher3.shortcuts.ShortcutRequest;
 import com.android.launcher3.testing.shared.ResourceUtils;
@@ -711,11 +713,15 @@ public final class Utilities {
         }
 
         if (badge == null) {
-            badge = Process.myUserHandle().equals(info.user)
-                    ? new ColorDrawable(Color.TRANSPARENT)
-                    : context.getDrawable(useTheme
-                            ? R.drawable.ic_work_app_badge_themed
-                            : R.drawable.ic_work_app_badge);
+            try (LauncherIcons li = LauncherIcons.obtain(context)) {
+                badge = BitmapInfo.LOW_RES_INFO.withFlags(
+                                li.getBitmapFlagOp(new BaseIconFactory.IconOptions().setUser(
+                                        UserCache.INSTANCE.get(context).getUserInfo(info.user))))
+                        .getBadgeDrawable(context, useTheme);
+            }
+            if (badge == null) {
+                badge = new ColorDrawable(Color.TRANSPARENT);
+            }
         }
         return Pair.create(result, badge);
     }
