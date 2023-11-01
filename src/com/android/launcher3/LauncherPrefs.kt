@@ -23,7 +23,6 @@ import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.android.launcher3.LauncherFiles.DEVICE_PREFERENCES_KEY
 import com.android.launcher3.LauncherFiles.SHARED_PREFERENCES_KEY
-import com.android.launcher3.allapps.WorkProfileManager
 import com.android.launcher3.model.DeviceGridState
 import com.android.launcher3.pm.InstallSessionHelper
 import com.android.launcher3.provider.RestoreDbTask
@@ -280,7 +279,7 @@ class LauncherPrefs(private val encryptedContext: Context) {
             nonRestorableItem(LauncherAppState.KEY_ALL_APPS_OVERVIEW_THRESHOLD, 180, true)
         @JvmField val THEMED_ICONS = backedUpItem(Themes.KEY_THEMED_ICONS, false, true)
         @JvmField val PROMISE_ICON_IDS = backedUpItem(InstallSessionHelper.PROMISE_ICON_IDS, "")
-        @JvmField val WORK_EDU_STEP = backedUpItem(WorkProfileManager.KEY_WORK_EDU_STEP, 0)
+        @JvmField val WORK_EDU_STEP = backedUpItem("showed_work_profile_edu", 0)
         @JvmField val WORKSPACE_SIZE = backedUpItem(DeviceGridState.KEY_WORKSPACE_SIZE, "", true)
         @JvmField val HOTSEAT_COUNT = backedUpItem(DeviceGridState.KEY_HOTSEAT_COUNT, -1, true)
         @JvmField val TASKBAR_PINNING = backedUpItem(TASKBAR_PINNING_KEY, false)
