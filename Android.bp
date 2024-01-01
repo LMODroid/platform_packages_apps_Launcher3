@@ -450,6 +450,7 @@ android_library {
         "launcher-executor-qualifiers",
         "launcher-executors-module",
         "libGoogleFeed",
+        "framework-lmodroid.static",
     ],
     manifest: "AndroidManifest-common.xml",
     sdk_version: "current",
