@@ -678,9 +678,6 @@
         drawable="@drawable/themed_icon_tw"
         package="com.teamviewer.teamviewer.market.mobile" />
     <icon
-        drawable="@drawable/themed_icon_twitter"
-        package="com.twitter.android" />
-    <icon
         drawable="@drawable/themed_icon_uber"
         package="com.ubercab" />
     <icon
