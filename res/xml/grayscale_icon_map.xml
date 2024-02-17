@@ -585,9 +585,6 @@
         drawable="@drawable/themed_icon_sberbank"
         package="ru.sberbankmobile" />
     <icon
-        drawable="@drawable/themed_icon_settings"
-        package="com.android.settings" />
-    <icon
         drawable="@drawable/themed_icon_sheets"
         package="com.google.android.apps.docs.editors.sheets" />
     <icon
