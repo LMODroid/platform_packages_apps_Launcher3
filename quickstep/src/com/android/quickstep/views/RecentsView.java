@@ -6222,7 +6222,7 @@ public abstract class RecentsView<CONTAINER_TYPE extends Context & RecentsViewCo
     }
 
     private void doScrollScale() {
-        if (showAsGrid())
+        if (showAsGrid() || mContainer.getDeviceProfile().isTablet)
             return;
 
         boolean isInLandscape = mOrientationState.getTouchRotation() != ROTATION_0
