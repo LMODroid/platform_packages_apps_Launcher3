@@ -173,10 +173,13 @@ android_library {
     name: "Launcher3CommonDepsLib",
     srcs: ["src_build_config/**/*.java"],
     static_libs: [
+        "SystemUI-statsd",
         "Launcher3ResLib",
         "launcher-testing-shared",
         "animationlib",
-        "framework-lmodroid.static"
+        "com_android_launcher3_flags_lib",
+        "com_android_wm_shell_flags_lib",
+        "framework-lmodroid.static",
     ],
     sdk_version: "current",
     min_sdk_version: min_launcher3_sdk_version,
@@ -258,6 +261,7 @@ android_library {
         "Launcher3ResLib",
         "lottie",
         "SystemUISharedLib",
+        "SettingsLibSettingsTheme",
         "SystemUI-statsd",
         "animationlib",
     ],
