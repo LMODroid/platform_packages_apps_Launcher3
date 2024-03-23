@@ -34,6 +34,8 @@ import com.android.launcher3.Utilities;
 import com.android.launcher3.util.UserIconInfo;
 import com.android.quickstep.util.FadeOutRemoteTransition;
 
+import com.libremobileos.app.ParallelSpaceManager;
+
 import java.util.List;
 import java.util.Map;
 
@@ -69,6 +71,7 @@ public class ApiWrapper {
         UserManager um = context.getSystemService(UserManager.class);
         Map<UserHandle, UserIconInfo> users = new ArrayMap<>();
         List<UserHandle> usersActual = um.getUserProfiles();
+        usersActual.addAll(ParallelSpaceManager.getInstance().getParallelUserHandles());
         if (usersActual != null) {
             for (UserHandle user : usersActual) {
                 if (android.os.Flags.allowPrivateProfile() && Flags.enablePrivateSpace()) {

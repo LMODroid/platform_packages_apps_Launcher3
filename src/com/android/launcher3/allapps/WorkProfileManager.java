@@ -60,7 +60,6 @@ public class WorkProfileManager extends UserProfileManager
     private final ActivityAllAppsContainerView<?> mAllApps;
     private WorkModeSwitch mWorkModeSwitch;
     private final Predicate<UserHandle> mWorkProfileMatcher;
-    private Predicate<ItemInfo> mMatcher;
 
     public WorkProfileManager(
             UserManager userManager, ActivityAllAppsContainerView allApps,
@@ -160,14 +159,6 @@ public class WorkProfileManager extends UserProfileManager
             mAllApps.removeView(mWorkModeSwitch);
         }
         mWorkModeSwitch = null;
-    }
-
-    public void updateMatcher() {
-        mMatcher = mAllApps.mPersonalMatcher.negate();
-    }
-
-    public Predicate<ItemInfo> getMatcher() {
-        return mMatcher;
     }
 
     @Nullable

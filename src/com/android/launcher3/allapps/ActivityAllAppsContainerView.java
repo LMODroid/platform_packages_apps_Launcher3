@@ -1041,7 +1041,6 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
         mPersonalMatcher = ItemInfoMatcher.ofUser(
                 Process.myUserHandle()).or(ItemInfoMatcher.ofUsers(
                     ParallelSpaceManager.getInstance().getParallelUserHandles()));
-        mWorkManager.updateMatcher();
     }
 
     @VisibleForTesting
