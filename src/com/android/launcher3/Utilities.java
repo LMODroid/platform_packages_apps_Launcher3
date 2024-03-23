@@ -959,4 +959,8 @@ public final class Utilities {
         SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
         return prefs.getBoolean(KEY_SINGLE_PAGE_CENTER, false);
     }
+
+    public static boolean isDebugDevice() {
+        return !Build.IS_USER;
+    }
 }

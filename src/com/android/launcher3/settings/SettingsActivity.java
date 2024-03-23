@@ -16,29 +16,20 @@
 
 package com.android.launcher3.settings;
 
-import static android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED;
-
 import static androidx.preference.PreferenceFragmentCompat.ARG_PREFERENCE_ROOT;
-
-import static com.android.launcher3.BuildConfig.IS_DEBUG_DEVICE;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import androidx.core.view.WindowCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceFragmentCompat.OnPreferenceStartFragmentCallback;
 import androidx.preference.PreferenceFragmentCompat.OnPreferenceStartScreenCallback;
@@ -46,12 +37,9 @@ import androidx.preference.PreferenceGroup.PreferencePositionCallback;
 import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.launcher3.BuildConfig;
 import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
-import com.android.launcher3.model.WidgetsModel;
-import com.android.launcher3.util.SettingsCache;
 
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
 
@@ -99,7 +87,8 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
                     getString(R.string.settings_fragment_name));
             f.setArguments(args);
             // Display the fragment as the main content.
-            fm.beginTransaction().replace(com.android.settingslib.widget.R.id.content_frame, f).commit();
+            fm.beginTransaction().replace(
+                    com.android.settingslib.collapsingtoolbar.R.id.content_frame, f).commit();
         }
     }
 
@@ -146,26 +135,12 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
     /**
      * This fragment shows the launcher preferences.
      */
-    public static class LauncherSettingsFragment extends PreferenceFragmentCompat implements
-            SettingsCache.OnChangeListener {
-
-        protected boolean mDeveloperOptionsEnabled = false;
+    public static class LauncherSettingsFragment extends PreferenceFragmentCompat {
 
         private boolean mRestartOnResume = false;
 
         private String mHighLightKey;
         private boolean mPreferenceHighlighted = false;
-
-        @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            if (BuildConfig.IS_DEBUG_DEVICE) {
-                Uri devUri = Settings.Global.getUriFor(DEVELOPMENT_SETTINGS_ENABLED);
-                SettingsCache settingsCache = SettingsCache.INSTANCE.get(getContext());
-                mDeveloperOptionsEnabled = settingsCache.getValue(devUri);
-                settingsCache.register(devUri, this);
-            }
-            super.onCreate(savedInstanceState);
-        }
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -222,21 +197,6 @@ public class SettingsActivity extends CollapsingToolbarBaseActivity
 
             if (mRestartOnResume) {
                 recreateActivityNow();
-            }
-        }
-
-        @Override
-        public void onSettingsChanged(boolean isEnabled) {
-            // Developer options changed, try recreate
-            tryRecreateActivity();
-        }
-
-        @Override
-        public void onDestroy() {
-            super.onDestroy();
-            if (IS_DEBUG_DEVICE) {
-                SettingsCache.INSTANCE.get(getContext())
-                        .unregister(Settings.Global.getUriFor(DEVELOPMENT_SETTINGS_ENABLED), this);
             }
         }
 
