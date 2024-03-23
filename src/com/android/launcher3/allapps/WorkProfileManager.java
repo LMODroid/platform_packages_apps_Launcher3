@@ -153,10 +153,6 @@ public class WorkProfileManager extends UserProfileManager
         mWorkModeSwitch = null;
     }
 
-    public void updateMatcher() {
-        mMatcher = mAllApps.mPersonalMatcher.negate();
-    }
-
     @Nullable
     public WorkModeSwitch getWorkModeSwitch() {
         return mWorkModeSwitch;
