@@ -563,9 +563,9 @@ public class DeviceProfile {
                             responsiveAspectRatio, DimensionType.WIDTH, widthPx)
                             : hotseatSpecsProvider.getCalculatedSpec(responsiveAspectRatio,
                                     DimensionType.HEIGHT, heightPx);
-            hotseatQsbSpace = mResponsiveHotseatSpec.getHotseatQsbSpace();
+            hotseatQsbSpace = showQsb ? mResponsiveHotseatSpec.getHotseatQsbSpace() : 0;
             hotseatBarBottomSpace =
-                    isVerticalBarLayout() ? 0 : mResponsiveHotseatSpec.getEdgePadding();
+                    isVerticalBarLayout() || !showQsb ? 0 : mResponsiveHotseatSpec.getEdgePadding();
             mHotseatBarEdgePaddingPx =
                     isVerticalBarLayout() ? mResponsiveHotseatSpec.getEdgePadding() : 0;
             mHotseatBarWorkspaceSpacePx = 0;
@@ -578,7 +578,8 @@ public class DeviceProfile {
                     responsiveAspectRatio, heightPx);
         } else {
             hotseatQsbSpace = showQsb ? pxFromDp(inv.hotseatQsbSpace[mTypeIndex], mMetrics) : 0;
-            hotseatBarBottomSpace = pxFromDp(inv.hotseatBarBottomSpace[mTypeIndex], mMetrics);
+            hotseatBarBottomSpace =
+                    showQsb ? pxFromDp(inv.hotseatBarBottomSpace[mTypeIndex], mMetrics) : 0;
             mHotseatBarEdgePaddingPx =
                     isVerticalBarLayout() ? workspacePageIndicatorHeight : 0;
             mHotseatBarWorkspaceSpacePx =
