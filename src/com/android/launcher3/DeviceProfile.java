@@ -565,7 +565,8 @@ public class DeviceProfile {
                                     DimensionType.HEIGHT, heightPx);
             hotseatQsbSpace = showQsb ? mResponsiveHotseatSpec.getHotseatQsbSpace() : 0;
             hotseatBarBottomSpace =
-                    isVerticalBarLayout() || !showQsb ? 0 : mResponsiveHotseatSpec.getEdgePadding();
+                    isVerticalBarLayout() || !showQsb || !isTaskbarPresent
+                            ? 0 : mResponsiveHotseatSpec.getEdgePadding();
             mHotseatBarEdgePaddingPx =
                     isVerticalBarLayout() ? mResponsiveHotseatSpec.getEdgePadding() : 0;
             mHotseatBarWorkspaceSpacePx = 0;
@@ -578,8 +579,8 @@ public class DeviceProfile {
                     responsiveAspectRatio, heightPx);
         } else {
             hotseatQsbSpace = showQsb ? pxFromDp(inv.hotseatQsbSpace[mTypeIndex], mMetrics) : 0;
-            hotseatBarBottomSpace =
-                    showQsb ? pxFromDp(inv.hotseatBarBottomSpace[mTypeIndex], mMetrics) : 0;
+            hotseatBarBottomSpace = showQsb || isTaskbarPresent ? pxFromDp(
+                    inv.hotseatBarBottomSpace[mTypeIndex], mMetrics) : 0;
             mHotseatBarEdgePaddingPx =
                     isVerticalBarLayout() ? workspacePageIndicatorHeight : 0;
             mHotseatBarWorkspaceSpacePx =
