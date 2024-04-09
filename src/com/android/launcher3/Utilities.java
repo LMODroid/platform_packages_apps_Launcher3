@@ -168,6 +168,7 @@ public final class Utilities {
     public static final String KEY_DRAWER_SEARCH = "pref_drawer_search";
     public static final String KEY_HOTSEAT_OPACITY = "pref_hotseat_opacity";
     public static final String KEY_LENS = "pref_recents_lens";
+    public static final String KEY_RECENTS_CHIPS = "pref_recents_chips";
     public static final String KEY_RECENTS_MEMINFO = "pref_recents_meminfo";
     public static final String KEY_RECENTS_OPACITY = "pref_recents_opacity";
     public static final String KEY_SHORT_PARALLAX = "pref_short_parallax";
