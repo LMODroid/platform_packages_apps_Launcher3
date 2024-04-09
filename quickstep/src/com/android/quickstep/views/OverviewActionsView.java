@@ -16,8 +16,9 @@
 
 package com.android.quickstep.views;
 
-import static com.android.launcher3.Utilities.KEY_RECENTS_LENS;
+import static com.android.launcher3.Utilities.KEY_RECENTS_CHIPS;
 import static com.android.launcher3.Utilities.KEY_RECENTS_CLEAR_ALL;
+import static com.android.launcher3.Utilities.KEY_RECENTS_LENS;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -125,7 +126,6 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
     /** Index used for grouped-task actions in the mMultiValueAlphas array */
     private static final int GROUP_ACTIONS_ALPHAS = 1;
 
-    private static final String KEY_RECENTS_CHIPS = "pref_recents_chips";
     private static final String KEY_RECENTS_SCREENSHOT = "pref_recents_screenshot";
     private static final String KEY_RECENTS_SHAKE_CLEAR_ALL = "pref_recents_shake_clear_all";
 
