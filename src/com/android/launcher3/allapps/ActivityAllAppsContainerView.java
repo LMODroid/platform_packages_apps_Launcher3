@@ -96,6 +96,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * All apps container view with search support for use in a dragging activity.
@@ -598,7 +599,7 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
         } else {
             mainRecyclerView = findViewById(R.id.apps_list_view);
             workRecyclerView = null;
-            mAH.get(AdapterHolder.MAIN).setup(mainRecyclerView, null);
+            mAH.get(AdapterHolder.MAIN).setup(mainRecyclerView, mPersonalMatcher);
             mAH.get(AdapterHolder.WORK).mRecyclerView = null;
         }
         setUpCustomRecyclerViewPool(
@@ -1001,7 +1002,8 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
     @VisibleForTesting
     public void onAppsUpdated() {
         updateMatcher();
-        mHasWorkApps = mWorkManager.hasWorkApps();
+        mHasWorkApps = Stream.of(mAllAppsStore.getApps())
+                .anyMatch(mWorkManager.getItemInfoMatcher());
         if (!isSearching()) {
             rebindAdapters();
         }
