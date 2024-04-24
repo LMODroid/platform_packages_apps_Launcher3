@@ -20,6 +20,7 @@ import android.os.UserHandle
 import android.os.UserManager
 import com.android.launcher3.pm.UserCache.CachedUserInfo
 import com.android.launcher3.util.UserIconInfo
+import com.libremobileos.app.ParallelSpaceManager
 
 /** Current snapshot of UserManager information */
 class UserManagerState(private val userMap: Map<UserHandle, CachedUserInfo>) {
@@ -48,8 +49,15 @@ class UserManagerState(private val userMap: Map<UserHandle, CachedUserInfo>) {
     val isAnyProfileQuietModeEnabled: Boolean
         get() = userMap.any { it.value.isQuietModeEnabled }
 
+    /** Profiles of the parent user, without parallel users */
     private val profiles: List<CachedUserInfo>
-        get() = userMap.filterKeys { it != Process.myUserHandle() }.values.toList()
+        get() {
+            val parallelUsers = ParallelSpaceManager.getInstance().parallelUserHandles
+            return userMap
+                .filterKeys { it != Process.myUserHandle() && it !in parallelUsers }
+                .values
+                .toList()
+        }
 
     private val workProfiles: List<CachedUserInfo>
         get() = userMap.values.filter { it.iconInfo.isWork }
