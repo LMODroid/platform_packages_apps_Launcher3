@@ -161,7 +161,7 @@
         <activity
             android:name="com.android.launcher3.settings.SettingsActivity"
             android:label="@string/settings_title"
-            android:theme="@style/HomeSettings.Theme"
+            android:theme="@style/Theme.SubSettingsBase"
             android:exported="true"
             android:autoRemoveFromRecents="true">
             <intent-filter>
@@ -174,7 +174,7 @@
         <activity
             android:name="com.android.launcher3.settings.SettingsIcons"
             android:label="@string/icons_category_title"
-            android:theme="@style/HomeSettings.Theme"
+            android:theme="@style/Theme.SubSettingsBase"
             android:exported="true"
             android:autoRemoveFromRecents="true" />
 
@@ -182,7 +182,7 @@
         <activity
             android:name="com.android.launcher3.settings.SettingsAppDrawer"
             android:label="@string/app_drawer_category_title"
-            android:theme="@style/HomeSettings.Theme"
+            android:theme="@style/Theme.SubSettingsBase"
             android:exported="true"
             android:autoRemoveFromRecents="true" />
 
@@ -190,7 +190,7 @@
         <activity
             android:name="com.android.launcher3.settings.SettingsHomescreen"
             android:label="@string/home_category_title"
-            android:theme="@style/HomeSettings.Theme"
+            android:theme="@style/Theme.SubSettingsBase"
             android:exported="true"
             android:autoRemoveFromRecents="true" />
 
@@ -198,7 +198,7 @@
         <activity
             android:name="com.android.launcher3.settings.SettingsMisc"
             android:label="@string/misc_category_title"
-            android:theme="@style/HomeSettings.Theme"
+            android:theme="@style/Theme.SubSettingsBase"
             android:exported="true"
             android:autoRemoveFromRecents="true" />
 
@@ -206,7 +206,7 @@
         <activity
             android:name="com.android.launcher3.settings.SettingsRecents"
             android:label="@string/recents_category_title"
-            android:theme="@style/HomeSettings.Theme"
+            android:theme="@style/Theme.SubSettingsBase"
             android:exported="true"
             android:autoRemoveFromRecents="true" />
 
@@ -214,7 +214,7 @@
         <activity
             android:name="com.android.launcher3.icons.pack.IconPackSettingsActivity"
             android:label="@string/icon_pack_title"
-            android:theme="@style/HomeSettings.Theme"
+            android:theme="@style/Theme.SubSettingsBase"
             android:exported="true"
             android:autoRemoveFromRecents="true"  />
 
