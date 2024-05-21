@@ -175,9 +175,6 @@
         drawable="@drawable/themed_icon_companion"
         package="io.homeassistant.companion.android" />
     <icon
-        drawable="@drawable/themed_icon_contacts"
-        package="com.google.android.contacts" />
-    <icon
         drawable="@drawable/themed_icon_cvv"
         package="eu.spaggiari.classevivastudente" />
     <icon
@@ -192,12 +189,6 @@
     <icon
         drawable="@drawable/themed_icon_deezer"
         package="deezer.android.app" />
-    <icon
-        drawable="@drawable/themed_icon_dialer"
-        package="com.google.android.dialer" />
-    <icon
-        drawable="@drawable/themed_icon_dialer"
-        package="com.android.dialer" />
     <icon
         drawable="@drawable/themed_icon_digital_wellbeing"
         package="com.google.android.apps.wellbeing" />
@@ -380,9 +371,6 @@
     <icon
         drawable="@drawable/themed_icon_mega"
         package="mega.privacy.android.app" />
-    <icon
-        drawable="@drawable/themed_icon_messages"
-        package="com.google.android.apps.messaging" />
     <icon
         drawable="@drawable/themed_icon_messenger"
         package="com.facebook.orca" />
@@ -1743,9 +1731,6 @@
         drawable="@drawable/themed_icon_coinvero"
         package="com.candlestick_app" />
     <icon
-        drawable="@drawable/themed_icon_dialer"
-        package="com.android.dialer" />
-    <icon
         drawable="@drawable/themed_icon_ps"
         package="air.com.adobe.pstouch" />
     <icon
@@ -1961,12 +1946,6 @@
     <icon
         drawable="@drawable/themed_icon_clock"
         package="com.android.deskclock" />
-    <icon
-        drawable="@drawable/themed_icon_messages"
-        package="com.android.messaging" />
-    <icon
-        drawable="@drawable/themed_icon_contacts"
-        package="com.android.contacts" />
     <icon
         drawable="@drawable/themed_icon_one_dm_plus"
         package="idm.internet.download.manager" />
