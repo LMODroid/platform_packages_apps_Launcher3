@@ -56,6 +56,9 @@
     <uses-permission android:name="com.android.permission.MANAGE_PARALLEL_SPACES" />
     <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
+    <!-- LMOFreeform -->
+    <uses-permission android:name="com.libremobileos.permission.START_FREEFORM" />
+
     <permission
         android:name="${applicationId}.permission.GRID_CONTROL"
         android:knownCerts="@array/grid_control_known_signers"
