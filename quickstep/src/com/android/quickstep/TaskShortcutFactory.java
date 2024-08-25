@@ -270,7 +270,7 @@ public interface TaskShortcutFactory {
     class FloatingSystemShortcut extends SystemShortcut<BaseDraggingActivity> {
         private static final Intent sFreeformIntent =
                 new Intent("com.libremobileos.freeform")
-                .setPackage("com.libremobileos.freeform.START_FREEFORM")
+                .setPackage("com.libremobileos.freeform.START_FREEFORM");
 
         private final TaskView mTaskView;
 
