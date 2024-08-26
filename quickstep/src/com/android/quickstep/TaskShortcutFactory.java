@@ -268,9 +268,8 @@ public interface TaskShortcutFactory {
     }
 
     class FloatingSystemShortcut extends SystemShortcut<BaseDraggingActivity> {
-        private static final Intent sFreeformIntent =
-                new Intent("com.libremobileos.freeform")
-                .setPackage("com.libremobileos.freeform.START_FREEFORM");
+        private static final String FREEFORM_PACKAGE = "com.libremobileos.freeform";
+        private static final String FREEFORM_INTENT = "com.libremobileos.freeform.START_FREEFORM";
 
         private final TaskView mTaskView;
 
@@ -295,7 +294,8 @@ public interface TaskShortcutFactory {
         }
 
         private void startLmoFreeform() {
-            final Intent intent = sFreeformIntent
+            final Intent intent = new Intent(FREEFORM_INTENT)
+                    .setPackage(FREEFORM_PACKAGE)
                     .putExtra("packageName", mTaskView.getTask().key.getPackageName())
                     .putExtra("activityName", mTaskView.getTask().getTopComponent().getClassName())
                     .putExtra("userId", mTaskView.getTask().key.userId);
