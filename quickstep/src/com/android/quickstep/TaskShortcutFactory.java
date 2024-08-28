@@ -298,7 +298,8 @@ public interface TaskShortcutFactory {
                     .setPackage(FREEFORM_PACKAGE)
                     .putExtra("packageName", mTaskView.getTask().key.getPackageName())
                     .putExtra("activityName", mTaskView.getTask().getTopComponent().getClassName())
-                    .putExtra("userId", mTaskView.getTask().key.userId);
+                    .putExtra("userId", mTaskView.getTask().key.userId)
+                    .putExtra("taskId", mTaskView.getTask().key.id);
             mTarget.getApplicationContext().sendBroadcast(intent);
         }
     }
