@@ -137,7 +137,7 @@
 
     <!-- Memory info -->
     <string name="meminfo_text">%1$s در دسترس | %2$s همه</string>
-    <string name="recents_meminfo_title">اصلاعات حافظه</string>
+    <string name="recents_meminfo_title">اطلاعات حافظه</string>
 
     <!-- App drawer searchbar -->
     <string name="drawer_search_title">نوار جستجوی برنامه</string>
