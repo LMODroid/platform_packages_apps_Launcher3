@@ -405,6 +405,7 @@ android_library {
         "libGoogleFeed",
         "framework-lmodroid.static",
         "SettingsLib",
+        "VendorSupport-preference",
     ],
     manifest: "AndroidManifest-common.xml",
     sdk_version: "current",
