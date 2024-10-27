@@ -85,10 +85,6 @@ public class DeviceProfile {
 
     public static final String KEY_ROW_HEIGHT = "pref_row_height";
 
-    // Meminfo in overview
-    public int memInfoMarginGesturePx;
-    public int memInfoMarginThreeButtonPx;
-    public int memInfoMarginTransientTaskbarPx;
 
     private static final float MAX_ASPECT_RATIO_FOR_ALTERNATE_EDIT_STATE = 1.5f;
 
@@ -202,6 +198,9 @@ public class DeviceProfile {
         mSysuiProfile = new SysuiProfile(0, 0, false);
     }
 
+    // Meminfo in overview
+    public int memInfoHeight;
+
     DeviceProfile(
             InvariantDeviceProfile inv,
             LauncherDisplayInfo info,
@@ -245,12 +244,6 @@ public class DeviceProfile {
 
         mIconSizeSteps = new IconSizeSteps(res);
 
-        memInfoMarginGesturePx = res.getDimensionPixelSize(
-                R.dimen.meminfo_bottom_margin_gesture);
-        memInfoMarginThreeButtonPx = res.getDimensionPixelSize(
-                R.dimen.meminfo_bottom_margin_three_button);
-        memInfoMarginTransientTaskbarPx = res.getDimensionPixelSize(
-                R.dimen.meminfo_bottom_margin_transient_taskbar);
 
         mTypeIndex = displayOptionSpec.typeIndex;
 
@@ -423,6 +416,8 @@ public class DeviceProfile {
             );
         }
 
+        memInfoHeight = Utilities.isShowMeminfo(context) ? res.getDimensionPixelSize(
+                R.dimen.meminfo_claimed_height) : 0;
 
         final boolean isVerticalLayout = isVerticalBarLayout();
         if (isVerticalLayout && !mIsResponsiveGrid) {
@@ -1091,7 +1086,7 @@ public class DeviceProfile {
         int overviewActionsSpace = mDeviceProperties.isLargeScreen()
                 ? 0
                 : (overviewProfile.getActionsTopMarginPx() + overviewProfile.getActionsHeight());
-        return overviewActionsSpace + getOverviewActionsClaimedSpaceBelow();
+        return overviewActionsSpace + memInfoHeight + getOverviewActionsClaimedSpaceBelow();
     }
 
     /**
