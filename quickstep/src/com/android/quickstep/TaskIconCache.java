@@ -23,6 +23,8 @@ import android.annotation.Nullable;
 import android.app.ActivityManager;
 import android.app.ActivityManager.TaskDescription;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -37,6 +39,7 @@ import android.util.SparseArray;
 import androidx.annotation.WorkerThread;
 
 import com.android.launcher3.Flags;
+import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.icons.BaseIconFactory;
@@ -64,7 +67,7 @@ import java.util.function.Consumer;
 /**
  * Manages the caching of task icons and related data.
  */
-public class TaskIconCache implements DisplayInfoChangeListener {
+public class TaskIconCache implements DisplayInfoChangeListener, OnSharedPreferenceChangeListener {
 
     public static final int FLAG_THEMED = 1 << 0;
 
@@ -96,12 +99,24 @@ public class TaskIconCache implements DisplayInfoChangeListener {
         mIconCache = new TaskKeyLruCache<>(cacheSize);
 
         DisplayController.INSTANCE.get(mContext).addChangeListener(this);
+        LauncherPrefs.get(mContext).addListener(this, LauncherPrefs.THEMED_ICONS);
         mThemedIconsEnabled = Themes.isThemedIconEnabled(mContext);
     }
 
     @Override
     public void onDisplayInfoChanged(Context context, Info info, int flags) {
         if ((flags & CHANGE_DENSITY) != 0) {
+            clearCache();
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        if (Themes.KEY_THEMED_ICONS.equals(key)) {
+            mThemedIconsEnabled = Themes.isThemedIconEnabled(mContext);
+            if (mIconFactory != null) {
+                mIconFactory.setMonoIconEnabled(mThemedIconsEnabled);
+            }
             clearCache();
         }
     }
