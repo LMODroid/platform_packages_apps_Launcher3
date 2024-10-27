@@ -329,9 +329,7 @@ public class DeviceProfile {
     public int flingToDeleteThresholdVelocity;
 
     // Meminfo in overview
-    public int memInfoMarginGesturePx;
-    public int memInfoMarginTransientTaskbarPx;
-    public int memInfoMarginThreeButtonPx;
+    public int memInfoHeight;
 
     /** TODO: Once we fully migrate to staged split, remove "isMultiWindowMode" */
     DeviceProfile(Context context, InvariantDeviceProfile inv, Info info, WindowBounds windowBounds,
@@ -761,12 +759,8 @@ public class DeviceProfile {
             isLeftRightSplit = isLandscape;
         }
 
-        memInfoMarginGesturePx = res.getDimensionPixelSize(
-                R.dimen.meminfo_bottom_margin_gesture);
-        memInfoMarginTransientTaskbarPx = res.getDimensionPixelSize(
-                R.dimen.meminfo_bottom_margin_transient_taskbar);
-        memInfoMarginThreeButtonPx = res.getDimensionPixelSize(
-                R.dimen.meminfo_bottom_margin_three_button);
+        memInfoHeight = Utilities.isShowMeminfo(context) ? res.getDimensionPixelSize(
+                R.dimen.meminfo_claimed_height) : 0;
 
         // Calculate all of the remaining variables.
         extraSpace = updateAvailableDimensions(context);
@@ -2005,7 +1999,7 @@ public class DeviceProfile {
         int overviewActionsSpace = isTablet && Flags.enableGridOnlyOverview()
                 ? 0
                 : (overviewActionsTopMarginPx + overviewActionsHeight);
-        return overviewActionsSpace + getOverviewActionsClaimedSpaceBelow();
+        return overviewActionsSpace + memInfoHeight + getOverviewActionsClaimedSpaceBelow();
     }
 
     /**
