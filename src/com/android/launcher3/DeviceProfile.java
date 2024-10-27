@@ -252,9 +252,7 @@ public class DeviceProfile {
     }
 
     // Meminfo in overview
-    public int memInfoMarginGesturePx;
-    public int memInfoMarginTransientTaskbarPx;
-    public int memInfoMarginThreeButtonPx;
+    public int memInfoHeight;
 
     DeviceProfile(InvariantDeviceProfile inv, Info info,
             WindowManagerProxy wmProxy, WindowBounds windowBounds,
@@ -525,12 +523,8 @@ public class DeviceProfile {
                 /*hotseatBarSizePx*/hotseatBarSizePx
         );
 
-        memInfoMarginGesturePx = res.getDimensionPixelSize(
-                R.dimen.meminfo_bottom_margin_gesture);
-        memInfoMarginTransientTaskbarPx = res.getDimensionPixelSize(
-                R.dimen.meminfo_bottom_margin_transient_taskbar);
-        memInfoMarginThreeButtonPx = res.getDimensionPixelSize(
-                R.dimen.meminfo_bottom_margin_three_button);
+        memInfoHeight = Utilities.isShowMeminfo(context) ? res.getDimensionPixelSize(
+                R.dimen.meminfo_claimed_height) : 0;
 
         updateIconSize(mWorkspaceProfile.getScale(), context);
 
@@ -1439,7 +1433,7 @@ public class DeviceProfile {
         int overviewActionsSpace = mDeviceProperties.isTablet() && enableGridOnlyOverview()
                 ? 0
                 : (overviewProfile.getActionsTopMarginPx() + overviewProfile.getActionsHeight());
-        return overviewActionsSpace + getOverviewActionsClaimedSpaceBelow();
+        return overviewActionsSpace + memInfoHeight + getOverviewActionsClaimedSpaceBelow();
     }
 
     /**
