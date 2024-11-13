@@ -768,14 +768,17 @@ public class LoaderTask implements Runnable {
         }
 
         if (Flags.enablePrivateSpace()) {
-            mBgAllAppsList.setFlags(FLAG_WORK_PROFILE_QUIET_MODE_ENABLED, isWorkProfileQuiet);
+            mBgAllAppsList.setFlags(FLAG_HAS_MULTIPLE_PROFILES,
+                    mUserManagerState.hasMultipleWorkProfiles());
+            mBgAllAppsList.setFlags(FLAG_WORK_PROFILE_QUIET_MODE_ENABLED,
+                    mUserManagerState.isAllWorkProfilesQuietModeEnabled());
             mBgAllAppsList.setFlags(FLAG_PRIVATE_PROFILE_QUIET_MODE_ENABLED, isPrivateProfileQuiet);
         } else {
             mBgAllAppsList.setFlags(FLAG_QUIET_MODE_ENABLED,
                     mUserManagerState.isAllProfilesQuietModeEnabled());
+            mBgAllAppsList.setFlags(FLAG_HAS_MULTIPLE_PROFILES,
+                    mUserManagerState.hasMultipleProfiles());
         }
-        mBgAllAppsList.setFlags(FLAG_HAS_MULTIPLE_PROFILES,
-                mUserManagerState.hasMultipleProfiles());
         mBgAllAppsList.setFlags(FLAG_HAS_SHORTCUT_PERMISSION,
                 hasShortcutsPermission(mApp.getContext()));
         mBgAllAppsList.setFlags(FLAG_QUIET_MODE_CHANGE_PERMISSION,
