@@ -722,8 +722,7 @@ public class DeviceProfile {
                     - hotseatBorderSpace * numShownHotseatIcons;
         } else {
             int columns = inv.hotseatColumnSpan[mTypeIndex];
-            return getIconToIconWidthForColumns(columns)
-                    - hotseatBorderSpace;
+            return getIconToIconWidthForColumns(columns);
         }
     }
 
@@ -792,8 +791,6 @@ public class DeviceProfile {
      * necessary.
      */
     public void recalculateHotseatWidthAndBorderSpace() {
-        if (!(mIsScalableGrid || (isTaskbarPresent && !isLandscape))) return;
-
         int columns = inv.hotseatColumnSpan[mTypeIndex];
         float hotseatWidthPx = getIconToIconWidthForColumns(columns);
         hotseatBorderSpace = calculateHotseatBorderSpace(hotseatWidthPx, /* numExtraBorder= */ 0);
