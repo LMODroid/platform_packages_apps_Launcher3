@@ -22,5 +22,5 @@
     <dimen name="theme_icon_size">24dp</dimen>
 
     <!-- Hotseat QSB -->
-    <dimen name="hotseat_qsb_extra_horizontal_margin">8dp</dimen>
+    <dimen name="hotseat_qsb_excess_horizontal_margin">8dp</dimen>
 </resources>
