@@ -523,6 +523,8 @@ public class DeviceProfile {
      * necessary.
      */
     public void recalculateHotseatWidthAndBorderSpace(int hotseatIcons) {
+        if (isVerticalBarLayout()) return;
+
         mHotseatProfile.recalculateHotseatWidthAndBorderSpace(
                 inv,
                 this,
