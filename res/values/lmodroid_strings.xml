@@ -155,7 +155,7 @@
     <string name="icon_pack_no_market">There\'s no available app store</string>
 
     <!-- LMOFreeform -->
-    <string name="floating_window">Floating</string>
+    <string name="floating_window">Floating window</string>
 
     <!-- Open keyboard -->
     <string name="drawer_open_keyboard_title">Swipe to start search</string>
