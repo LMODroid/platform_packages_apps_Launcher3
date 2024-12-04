@@ -31,7 +31,6 @@ import android.app.ActivityManagerNative;
 import android.app.ActivityOptions;
 import android.app.IActivityManager;
 import android.content.ComponentName;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -52,6 +51,7 @@ import androidx.annotation.Nullable;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.R;
 import com.android.launcher3.SecondaryDropTarget;
+import com.android.launcher3.Utilities;
 import com.android.launcher3.logging.StatsLogManager.LauncherEvent;
 import com.android.launcher3.model.WellbeingModel;
 import com.android.launcher3.popup.SystemShortcut;
@@ -327,14 +327,11 @@ public interface TaskShortcutFactory {
         }
     }
 
-    class FloatingSystemShortcut extends SystemShortcut<RecentsViewContainer> {
-        private static final String FREEFORM_PACKAGE = "com.libremobileos.freeform";
-        private static final String FREEFORM_INTENT = "com.libremobileos.freeform.START_FREEFORM";
+    class FloatingTaskShortcut extends SystemShortcut<RecentsViewContainer> {
 
         private final TaskView mTaskView;
 
-        public FloatingSystemShortcut(RecentsViewContainer container, TaskContainer taskContainer) {
-            // TODO new icon?
+        public FloatingTaskShortcut(RecentsViewContainer container, TaskContainer taskContainer) {
             super(R.drawable.picture_in_picture_mobile_24px, R.string.floating_window,
                     container, taskContainer.getItemInfo(), taskContainer.getTaskView());
             mTaskView = taskContainer.getTaskView();
@@ -343,24 +340,15 @@ public interface TaskShortcutFactory {
         @Override
         public void onClick(View view) {
             dismissTaskMenuView();
+            Task task = mTaskView.getFirstTask();
             RecentsView rv = mTarget.getOverviewPanel();
             rv.switchToScreenshot(() -> {
                 rv.finishRecentsAnimation(true /* toRecents */, false /* shouldPip */, () -> {
                     mTarget.returnToHomescreen();
-                    rv.getHandler().post(this::startLmoFreeform);
+                    rv.getHandler().post(() -> Utilities.startLmoFreeform(view.getContext(),
+                            task.getTopComponent(), task.key.userId, task.key.id));
                 });
             });
-        }
-
-        private void startLmoFreeform() {
-            final Task task = mTaskView.getFirstTask();
-            final Intent intent = new Intent(FREEFORM_INTENT)
-                    .setPackage(FREEFORM_PACKAGE)
-                    .putExtra("packageName", task.key.getPackageName())
-                    .putExtra("activityName", task.getTopComponent().getClassName())
-                    .putExtra("userId", task.key.userId)
-                    .putExtra("taskId", task.key.id);
-            mTarget.asContext().sendBroadcast(intent);
         }
     }
 
@@ -508,7 +496,7 @@ public interface TaskShortcutFactory {
                 return null;
             }
 
-            return Collections.singletonList(new FloatingSystemShortcut(container, taskContainer));
+            return Collections.singletonList(new FloatingTaskShortcut(container, taskContainer));
         }
     };
 

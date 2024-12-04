@@ -154,6 +154,6 @@
     <string name="qsb_disabled">None</string>
 
     <!-- LMOFreeform -->
-    <string name="floating_window">Floating</string>
+    <string name="floating_window">Floating window</string>
 
 </resources>
