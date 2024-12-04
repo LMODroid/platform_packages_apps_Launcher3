@@ -32,8 +32,11 @@ import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.app.Person;
 import android.app.WallpaperManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -52,6 +55,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.UserManager;
 import android.os.TransactionTooLargeException;
+import android.os.UserHandle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -139,6 +143,9 @@ public final class Utilities {
     public @interface AdjustmentDirection{}
 
     public static final String GSA_PACKAGE = "com.google.android.googlequicksearchbox";
+
+    private static final String FREEFORM_PACKAGE = "com.libremobileos.freeform";
+    private static final String FREEFORM_INTENT = "com.libremobileos.freeform.START_FREEFORM";
     public static final String LENS_SHARE_ACTIVITY = "com.google.android.apps.search.lens.LensShareEntryPointActivity";
 
     public static final String KEY_DRAWER_OPEN_KEYBOARD = "pref_drawer_open_keyboard";
@@ -1050,5 +1057,36 @@ public final class Utilities {
     public static boolean showAllappsSuggestions(Context context) {
         SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
         return prefs.getBoolean(KEY_ALLAPPS_SUGGESTIONS, true);
+    }
+
+    public static boolean isResizeableActivity(Context context, ComponentName activity) {
+        if (activity == null) return false;
+        final ActivityInfo info;
+        try {
+            info = context.getPackageManager().getActivityInfo(activity, /* flags */ 0);
+        } catch (Exception e) {
+            Log.e(TAG, "failed to check isResizeableActivity:", e);
+            return false;
+        }
+        return ActivityInfo.isResizeableMode(info.resizeMode);
+    }
+
+    public static void startLmoFreeform(Context context, ComponentName activity,
+            int userId, int taskId) {
+        final Intent intent = new Intent(FREEFORM_INTENT)
+                .setPackage(FREEFORM_PACKAGE)
+                .putExtra("packageName", activity.getPackageName())
+                .putExtra("activityName", activity.getClassName())
+                .putExtra("userId", userId)
+                .putExtra("taskId", taskId);
+        context.sendBroadcast(intent);
+    }
+
+    public static void startLmoFreeform(Context context, ComponentName activity, int userId) {
+        startLmoFreeform(context, activity, userId, -1);
+    }
+
+    public static void startLmoFreeform(Context context, ComponentName activity) {
+        startLmoFreeform(context, activity, UserHandle.myUserId());
     }
 }
