@@ -66,8 +66,7 @@ import java.util.List;
  * Settings activity for Launcher.
  */
 public class SettingsMisc extends CollapsingToolbarBaseActivity
-        implements OnPreferenceStartFragmentCallback, OnPreferenceStartScreenCallback,
-        SharedPreferences.OnSharedPreferenceChangeListener{
+        implements OnPreferenceStartFragmentCallback, OnPreferenceStartScreenCallback {
 
     private static final String SUGGESTIONS_KEY = "pref_suggestions";
 
@@ -110,7 +109,6 @@ public class SettingsMisc extends CollapsingToolbarBaseActivity
                     .replace(com.android.settingslib.collapsingtoolbar.R.id.content_frame, f)
                     .commit();
         }
-        LauncherPrefs.getPrefs(getApplicationContext()).registerOnSharedPreferenceChangeListener(this);
     }
 
     /**
@@ -121,17 +119,6 @@ public class SettingsMisc extends CollapsingToolbarBaseActivity
      */
     private String getPreferenceFragment() {
         return getString(R.string.misc_settings_fragment_name);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) { 
-        switch (key) {
-            case Utilities.KEY_BLUR_DEPTH:
-                LauncherAppState.getInstance(getApplicationContext()).setNeedsRestart();
-                break;
-            default:
-                break;
-        }
     }
 
     private boolean startPreference(String fragment, Bundle args, String key) {
@@ -178,7 +165,8 @@ public class SettingsMisc extends CollapsingToolbarBaseActivity
     /**
      * This fragment shows the launcher preferences.
      */
-    public static class MiscSettingsFragment extends PreferenceFragmentCompat {
+    public static class MiscSettingsFragment extends PreferenceFragmentCompat
+            implements SharedPreferences.OnSharedPreferenceChangeListener {
 
         private String mHighLightKey;
         private boolean mPreferenceHighlighted = false;
@@ -224,6 +212,29 @@ public class SettingsMisc extends CollapsingToolbarBaseActivity
                         bottomPadding + insets.getSystemWindowInsetBottom());
                 return insets.consumeSystemWindowInsets();
             });
+        }
+
+        @Override
+        public void onStart() {
+            super.onStart();
+            LauncherPrefs.getPrefs(getContext()).registerOnSharedPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
+            LauncherPrefs.getPrefs(getContext()).unregisterOnSharedPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            switch (key) {
+                case Utilities.KEY_BLUR_DEPTH:
+                    LauncherAppState.getInstance(getContext()).setNeedsRestart();
+                    break;
+                default:
+                    break;
+            }
         }
 
         @Override
