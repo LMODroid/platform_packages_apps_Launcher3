@@ -2561,6 +2561,11 @@ public abstract class RecentsView<ACTIVITY_TYPE extends StatefulActivity<STATE_T
             // Let system take care of the rotation
             return;
         }
+        if (mPendingAnimation != null) {
+            Log.w(TAG, "already pending animation, do not animate rotation");
+            setLayoutRotation(newRotation, mOrientationState.getDisplayRotation());
+            return;
+        }
         AnimatorSet pa = setRecentsChangedOrientation(true);
         pa.addListener(AnimatorListeners.forSuccessCallback(() -> {
             setLayoutRotation(newRotation, mOrientationState.getDisplayRotation());
