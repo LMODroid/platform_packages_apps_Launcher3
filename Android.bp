@@ -548,10 +548,7 @@ android_app {
     name: "Launcher3QuickStep",
     static_libs: ["Launcher3QuickStepLib"],
     optimize: {
-        proguard_flags_files: [":launcher-proguard-rules"],
-        enabled: true,
-        shrink_resources: true,
-        ignore_warnings: false,
+        enabled: false,
     },
 
     platform_apis: true,
@@ -601,7 +598,6 @@ android_app {
     optimize: {
         proguard_flags_files: ["proguard.flags"],
         enabled: true,
-        shrink_resources: true,
         ignore_warnings: false,
     },
 
@@ -643,7 +639,6 @@ android_app {
     optimize: {
         proguard_flags_files: ["proguard.flags"],
         enabled: true,
-        shrink_resources: true,
         ignore_warnings: false,
     },
 
