@@ -2525,6 +2525,7 @@ public class Launcher extends StatefulActivity<LauncherState>
                     View v = cl.getChildAt(presenterPos.cellX, presenterPos.cellY);
                     if (v == null) {
                         Log.e(TAG, "bindItems failed when removing colliding item=" + item);
+                        continue;
                     }
                     Object tag = v.getTag();
                     String desc = "Collision while binding workspace item: " + item
