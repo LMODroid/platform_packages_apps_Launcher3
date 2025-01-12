@@ -61,6 +61,7 @@ import androidx.annotation.WorkerThread;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.LauncherAppState;
+import com.android.launcher3.LauncherModel;
 import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.LauncherSettings;
 import com.android.launcher3.dagger.LauncherComponentProvider;
@@ -345,58 +346,18 @@ public class PreviewSurfaceRenderer {
     @WorkerThread
     private void loadModelData() {
         final Context inflationContext = getPreviewContext();
-        if (!mGridName.equals(LauncherPrefs.INSTANCE.get(mContext).get(GRID_NAME))
-                || !mShapeKey.equals(LauncherPrefs.INSTANCE.get(mContext).get(PREF_ICON_SHAPE))
-                || !TextUtils.isEmpty(mLayoutXml)) {
-
-            boolean isCustomLayout = extendibleThemeManager() &&  !TextUtils.isEmpty(mLayoutXml);
-            int widgetHostId = isCustomLayout ? APPWIDGET_HOST_ID + mCallingPid : APPWIDGET_HOST_ID;
-
-            // Start the migration
-            PreviewContext previewContext = new PreviewContext(
-                    inflationContext, mGridName, mShapeKey, widgetHostId, mLayoutXml);
-            PreviewAppComponent appComponent =
-                    (PreviewAppComponent) LauncherComponentProvider.get(previewContext);
-
-            if (extendibleThemeManager() && isCustomLayout && !mDeletingHostOnExit) {
-                mDeletingHostOnExit = true;
-                mLifeCycleTracker.add(() -> {
-                    AppWidgetHost host = new AppWidgetHost(mContext, widgetHostId);
-                    // Start listening here, so that any previous active host is disabled
-                    host.startListening();
-                    host.stopListening();
-                    host.deleteHost();
-                });
+        final LauncherModel model = LauncherAppState.getInstance(mContext).getModel();
+        model.getModelDbController().tryMigrateDB(null /* restoreEventLogger */,
+                model.getModelDelegate());
+        model.loadAsync(dataModel -> {
+            if (dataModel != null) {
+                MAIN_EXECUTOR.execute(() -> renderView(inflationContext, dataModel,
+                        APPWIDGET_HOST_ID, null, null,
+                        LauncherAppState.getIDP(inflationContext)));
+            } else {
+                Log.e(TAG, "Model loading failed");
             }
-
-            LoaderTask task = appComponent.getLoaderTaskFactory().newLoaderTask(
-                    appComponent.getBaseLauncherBinderFactory().createBinder(new Callbacks[0]),
-                    new UserManagerState());
-
-            InvariantDeviceProfile idp = appComponent.getIDP();
-            DeviceProfile deviceProfile = idp.getDeviceProfile(previewContext);
-            String query = deviceProfile.isTwoPanels
-                    ? selectionForWorkspaceScreen(FIRST_SCREEN_ID, SECOND_SCREEN_ID)
-                    : selectionForWorkspaceScreen(FIRST_SCREEN_ID);
-            Map<ComponentKey, AppWidgetProviderInfo> widgetProviderInfoMap = new HashMap<>();
-            task.loadWorkspaceForPreview(query, widgetProviderInfoMap);
-            final SparseArray<Size> spanInfo = getLoadedLauncherWidgetInfo();
-            MAIN_EXECUTOR.execute(() -> {
-                renderView(previewContext, appComponent.getDataModel(), widgetHostId,
-                        widgetProviderInfoMap, spanInfo, idp);
-                mLifeCycleTracker.add(previewContext::onDestroy);
-            });
-        } else {
-            LauncherAppState.getInstance(inflationContext).getModel().loadAsync(dataModel -> {
-                if (dataModel != null) {
-                    MAIN_EXECUTOR.execute(() -> renderView(inflationContext, dataModel,
-                            APPWIDGET_HOST_ID, null, null,
-                            LauncherAppState.getIDP(inflationContext)));
-                } else {
-                    Log.e(TAG, "Model loading failed");
-                }
-            });
-        }
+        });
     }
 
     @UiThread
