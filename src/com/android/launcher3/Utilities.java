@@ -195,6 +195,7 @@ public final class Utilities {
     public static final String KEY_SHORT_PARALLAX = "pref_short_parallax";
     public static final String KEY_SINGLE_PAGE_CENTER = "pref_single_page_center";
     public static final String KEY_RECENTS_CHIPS = "pref_recents_chips";
+    public static final String KEY_DRAWER_OPEN_KEYBOARD = "pref_drawer_open_keyboard";
 
     /**
      * Returns true if theme is dark.
