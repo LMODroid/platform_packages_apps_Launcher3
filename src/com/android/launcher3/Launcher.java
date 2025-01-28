@@ -67,6 +67,7 @@ import static com.android.launcher3.LauncherState.NORMAL;
 import static com.android.launcher3.LauncherState.NO_OFFSET;
 import static com.android.launcher3.LauncherState.NO_SCALE;
 import static com.android.launcher3.LauncherState.SPRING_LOADED;
+import static com.android.launcher3.Utilities.KEY_DRAWER_OPEN_KEYBOARD;
 import static com.android.launcher3.Utilities.postAsyncCallback;
 import static com.android.launcher3.Utilities.shouldEnableMouseInteractionChanges;
 import static com.android.launcher3.Workspace.mapOverCellLayouts;
@@ -1183,6 +1184,9 @@ public class Launcher extends StatefulActivity<LauncherState>
             getAppsView().reset(false /* animate */, true /* clearScrim */);
             getAllAppsExitEvent().ifPresent(getStatsLogManager().logger()::log);
             mAllAppsSessionLogId = null;
+        } else if (ALL_APPS.equals(state)
+                && mSharedPrefs.getBoolean(KEY_DRAWER_OPEN_KEYBOARD, false)) {
+            getAppsView().getSearchUiManager().focusSearchField();
         }
         setTitle(state);
     }
