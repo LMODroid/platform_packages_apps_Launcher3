@@ -134,6 +134,8 @@ public final class Utilities {
 
     public static final String GSA_PACKAGE = "com.google.android.googlequicksearchbox";
 
+    public static final String KEY_DRAWER_OPEN_KEYBOARD = "pref_drawer_open_keyboard";
+
     /**
      * Returns true if theme is dark.
      */
