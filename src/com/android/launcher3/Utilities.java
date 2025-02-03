@@ -24,7 +24,7 @@ import static com.android.launcher3.icons.BitmapInfo.FLAG_THEMED;
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_POSITION_BOTTOM_OR_RIGHT;
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_POSITION_TOP_OR_LEFT;
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_TYPE_MAIN;
-import static com.android.launcher3.util.Executors.MODEL_EXECUTOR;
+import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 import com.android.launcher3.icons.IconProvider;
 
 import android.annotation.SuppressLint;
@@ -142,7 +142,7 @@ public final class Utilities {
     public static final boolean ATLEAST_V = Build.VERSION.SDK_INT
             >= VERSION_CODES.VANILLA_ICE_CREAM;
 
-    private static final long WAIT_BEFORE_RESTART = 250;
+    private static final long WAIT_BEFORE_RESTART = 500; // ms
 
     /**
      * Set on a motion event dispatched from the nav bar. See {@link MotionEvent#setEdgeFlags(int)}.
@@ -976,14 +976,10 @@ public final class Utilities {
         }
     }
 
-    public static void restart(final Context context) {
-        MODEL_EXECUTOR.execute(() -> {
-            try {
-                Thread.sleep(WAIT_BEFORE_RESTART);
-            } catch (Exception ignored) {
-            }
-            android.os.Process.killProcess(android.os.Process.myPid());
-        });
+    public static void restart() {
+        MAIN_EXECUTOR.getHandler().postDelayed(() -> {
+            System.exit(0);
+        }, WAIT_BEFORE_RESTART);
     }
 
     public static boolean showQSB(Context context) {
