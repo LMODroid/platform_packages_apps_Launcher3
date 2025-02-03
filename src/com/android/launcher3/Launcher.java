@@ -1302,6 +1302,10 @@ public class Launcher extends StatefulActivity<LauncherState>
 
         // Set screen title for Talkback
         setTitle(state.getTitle());
+
+        if (state == LauncherState.NORMAL) {
+            LauncherAppState.getInstance(this).checkIfRestartNeeded();
+        }
     }
 
     /**
@@ -1321,8 +1325,6 @@ public class Launcher extends StatefulActivity<LauncherState>
         } else {
             mOverlayManager.onActivityResumed();
         }
-                        
-        LauncherAppState.getInstance(this).checkIfRestartNeeded();
 
         DragView.removeAllViews(this);
         TraceHelper.INSTANCE.endSection();
