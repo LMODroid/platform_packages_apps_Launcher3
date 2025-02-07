@@ -1275,6 +1275,7 @@ public class Launcher extends StatefulActivity<LauncherState>
                 // Making sure mAllAppsSessionLogId is not null to avoid double logging.
                 && mAllAppsSessionLogId != null) {
             getAppsView().reset(false);
+            hideKeyboard();
             getAllAppsExitEvent().ifPresent(getStatsLogManager().logger()::log);
             mAllAppsSessionLogId = null;
         }
