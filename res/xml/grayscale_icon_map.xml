@@ -2327,7 +2327,4 @@
     <icon
         drawable="@drawable/themed_icon_ic_org_wikipedia"
         package="org.wikipedia" />
-    <icon
-        drawable="@drawable/themed_icon_browser"
-        package="org.eu.droid_ng.jellyfish" />
 </icons>
