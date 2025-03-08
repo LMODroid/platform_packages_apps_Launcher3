@@ -422,6 +422,7 @@ public class Launcher extends StatefulActivity<LauncherState>
     private final List<BackPressHandler> mBackPressedHandlers = new ArrayList<>();
 
     private boolean mIsNaturalScrollingEnabled;
+    private boolean mIsKeyboardShown;
 
     private final SettingsCache.OnChangeListener mNaturalScrollingChangedListener =
             enabled -> mIsNaturalScrollingEnabled = enabled;
@@ -1157,6 +1158,16 @@ public class Launcher extends StatefulActivity<LauncherState>
             Animations.Companion.cancelOngoingAnimation(getWorkspace());
             Animations.Companion.cancelOngoingAnimation(getHotseat());
         }
+
+        // Show or hide the keyboard as soon as we start entering or exiting app drawer
+        if ((mIsKeyboardShown || ALL_APPS.equals(mPrevLauncherState)) && !ALL_APPS.equals(state)) {
+            hideKeyboard();
+            mIsKeyboardShown = false;
+        } else if (!mPrevLauncherState.equals(ALL_APPS) && state.equals(ALL_APPS)
+                && mSharedPrefs.getBoolean(KEY_DRAWER_OPEN_KEYBOARD, false)) {
+            mIsKeyboardShown = getAppsView().getSearchUiManager().focusSearchField();
+        }
+
         updateDisallowBack();
     }
 
@@ -1198,9 +1209,10 @@ public class Launcher extends StatefulActivity<LauncherState>
             getAppsView().reset(false /* animate */, true /* clearScrim */);
             getAllAppsExitEvent().ifPresent(getStatsLogManager().logger()::log);
             mAllAppsSessionLogId = null;
-        } else if (ALL_APPS.equals(state)
+        } else if (ALL_APPS.equals(state) && !mIsKeyboardShown
                 && mSharedPrefs.getBoolean(KEY_DRAWER_OPEN_KEYBOARD, false)) {
-            getAppsView().getSearchUiManager().focusSearchField();
+            // double check in case it didn't work in onStateSetStart()
+            mIsKeyboardShown = getAppsView().getSearchUiManager().focusSearchField();
         }
         setTitle(state);
     }
