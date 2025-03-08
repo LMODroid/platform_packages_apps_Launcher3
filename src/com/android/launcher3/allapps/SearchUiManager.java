@@ -39,7 +39,7 @@ public interface SearchUiManager {
     /**
      * Notifies the search manager to focus search field and open keyboard.
      */
-    void focusSearchField();
+    boolean focusSearchField();
 
     /**
      * Returns whether or not the search query is empty.
