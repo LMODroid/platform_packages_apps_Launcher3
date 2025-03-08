@@ -39,7 +39,7 @@ public interface SearchUiManager {
     /**
      * Notifies the search manager to focus search field and open keyboard.
      */
-    void focusSearchField();
+    boolean focusSearchField();
 
     /**
      * Called before dispatching a key event, in case the search manager wants to initialize
