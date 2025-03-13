@@ -217,6 +217,12 @@ class SystemUiProxy @Inject constructor(@ApplicationContext private val context:
         executeWithErrorLog({ "Failed call onImeSwitcherLongPress" }) {
             systemUiProxy?.onImeSwitcherLongPress()
         }
+    
+    fun injectLongPress(keyCode: Int) {
+        executeWithErrorLog({ "Failed call injectLongPress" }) {
+            systemUiProxy?.injectLongPress(keyCode)
+        }
+    }
 
     fun updateContextualEduStats(isTrackpadGesture: Boolean, gestureType: GestureType) =
         executeWithErrorLog({ "Failed call updateContextualEduStats" }) {
