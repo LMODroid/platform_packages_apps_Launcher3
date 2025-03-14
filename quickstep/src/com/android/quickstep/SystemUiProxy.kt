@@ -224,6 +224,12 @@ class SystemUiProxy @Inject constructor(@ApplicationContext private val context:
         }
     }
 
+    fun injectDoublePress(keyCode: Int) {
+        executeWithErrorLog({ "Failed call injectDoublePress" }) {
+            systemUiProxy?.injectDoublePress(keyCode)
+        }
+    }
+
     fun updateContextualEduStats(isTrackpadGesture: Boolean, gestureType: GestureType) =
         executeWithErrorLog({ "Failed call updateContextualEduStats" }) {
             systemUiProxy?.updateContextualEduStats(isTrackpadGesture, gestureType.name)
