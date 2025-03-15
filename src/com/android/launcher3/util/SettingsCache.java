@@ -34,6 +34,8 @@ import com.android.launcher3.dagger.ApplicationContext;
 import com.android.launcher3.dagger.LauncherAppSingleton;
 import com.android.launcher3.dagger.LauncherBaseAppComponent;
 
+import com.libremobileos.providers.LMOSettings;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
