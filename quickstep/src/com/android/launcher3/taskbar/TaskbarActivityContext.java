@@ -41,6 +41,7 @@ import static com.android.launcher3.taskbar.TaskbarAutohideSuspendController.FLA
 import static com.android.launcher3.taskbar.TaskbarAutohideSuspendController.FLAG_AUTOHIDE_SUSPEND_FULLSCREEN;
 import static com.android.launcher3.taskbar.TaskbarDesktopExperienceFlags.enableAutoStashConnectedDisplayTaskbar;
 import static com.android.launcher3.taskbar.TaskbarManagerImpl.ENABLE_TASKBAR;
+import static com.android.launcher3.taskbar.TaskbarManagerImpl.NAVIGATION_BAR_HINT;
 import static com.android.launcher3.taskbar.TaskbarStashController.FLAG_IN_SECONDARY_LAUNCHER_ON_CD;
 import static com.android.launcher3.taskbar.TaskbarStashController.FLAG_STASHED_IN_APP_AUTO;
 import static com.android.launcher3.taskbar.TaskbarStashController.SHOULD_BUBBLES_FOLLOW_DEFAULT_VALUE;
@@ -1468,6 +1469,10 @@ public class TaskbarActivityContext extends BaseTaskbarContext {
      */
     public int getDefaultTaskbarWindowSize() {
         Resources resources = getResources();
+
+        if (isGestureNav() && !SettingsCache.INSTANCE.get(this).getValue(NAVIGATION_BAR_HINT)) {
+            return 0;
+        }
 
         if (isPhoneMode()) {
             return isThreeButtonNav() ?
