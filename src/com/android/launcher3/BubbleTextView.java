@@ -244,6 +244,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
         mCenterVertically = a.getBoolean(R.styleable.BubbleTextView_centerVertically, false);
 
         SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, true);
 
         mDisplay = a.getInteger(R.styleable.BubbleTextView_iconDisplay, DISPLAY_WORKSPACE);
         final int defaultIconSize;
@@ -252,7 +253,6 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
             setCompoundDrawablePadding(mDeviceProfile.iconDrawablePaddingPx);
             defaultIconSize = mDeviceProfile.iconSizePx;
             setCenterVertically(mDeviceProfile.iconCenterVertically);
-            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, true);
         } else if (displayIsAppDrawer()) {
             setTextSize(TypedValue.COMPLEX_UNIT_PX, mDeviceProfile.allAppsIconTextSizePx);
             setCompoundDrawablePadding(mDeviceProfile.allAppsIconDrawablePaddingPx);
@@ -263,21 +263,18 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
             setTextSize(TypedValue.COMPLEX_UNIT_PX, mDeviceProfile.folderChildTextSizePx);
             setCompoundDrawablePadding(mDeviceProfile.folderChildDrawablePaddingPx);
             defaultIconSize = mDeviceProfile.folderChildIconSizePx;
-            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, true);
         } else if (mDisplay == DISPLAY_SEARCH_RESULT) {
             setTextSize(TypedValue.COMPLEX_UNIT_PX, mDeviceProfile.allAppsIconTextSizePx);
             defaultIconSize = getResources().getDimensionPixelSize(R.dimen.search_row_icon_size);
-            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, true);
         } else if (mDisplay == DISPLAY_SEARCH_RESULT_SMALL) {
             defaultIconSize = getResources().getDimensionPixelSize(
                     R.dimen.search_row_small_icon_size);
-            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, true);
         } else if (mDisplay == DISPLAY_TASKBAR) {
             defaultIconSize = mDeviceProfile.taskbarIconSize;
         } else {
             // widget_selection or shortcut_popup
             defaultIconSize = mDeviceProfile.iconSizePx;
-            mShouldShowLabel = prefs.getBoolean(KEY_SHOW_DESKTOP_LABELS, true);
+            mShouldShowLabel = true;
         }
         mMaxLines = prefs.getInt(KEY_MAX_LINES, 1);
 
@@ -494,7 +491,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
      * Only if actual text can be displayed in two line, the {@code true} value will be effective.
      */
     protected boolean shouldUseTwoLine() {
-        return isCurrentLanguageEnglish() && (mDisplay == DISPLAY_ALL_APPS
+        return mShouldShowLabel && isCurrentLanguageEnglish() && (mDisplay == DISPLAY_ALL_APPS
                 || mDisplay == DISPLAY_PREDICTION_ROW) && (Flags.enableTwolineToggle()
                 && LauncherPrefs.ENABLE_TWOLINE_ALLAPPS_TOGGLE.get(getContext()));
     }
