@@ -599,6 +599,11 @@ public class TaskbarActivityContext extends BaseTaskbarContext {
         return isPhoneMode() && !isThreeButtonNav();
     }
 
+    /** Returns whether Taskbar draws its own background, vs being translucent for apps to draw. */
+    public boolean drawsTaskbarBackground() {
+        return !isPhoneMode();
+    }
+
     /** Returns {@code true} iff a tiny version of taskbar is shown on phone. */
     public boolean isTinyTaskbar() {
         return enableTinyTaskbar() && mDeviceProfile.isPhone && mDeviceProfile.isTaskbarPresent;

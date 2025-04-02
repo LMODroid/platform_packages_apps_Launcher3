@@ -215,7 +215,7 @@ public class TaskbarDragLayerController implements TaskbarControllers.LoggableTa
     }
 
     private void updateBackgroundAlpha() {
-        if (mActivity.isPhoneMode() || mActivity.isDestroyed()) {
+        if (!mActivity.drawsTaskbarBackground() || mActivity.isDestroyed()) {
             return;
         }
 
