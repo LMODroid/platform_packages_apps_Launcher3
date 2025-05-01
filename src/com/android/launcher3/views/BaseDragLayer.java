@@ -38,7 +38,6 @@ import android.view.accessibility.AccessibilityEvent;
 import android.widget.FrameLayout;
 
 import com.android.launcher3.AbstractFloatingView;
-import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.InsettableFrameLayout;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.testing.shared.ResourceUtils;
@@ -553,20 +552,13 @@ public abstract class BaseDragLayer<T extends Context & ActivityContext>
     @Override
     public WindowInsets dispatchApplyWindowInsets(WindowInsets insets) {
         Insets gestureInsets = insets.getMandatorySystemGestureInsets();
-        int gestureInsetBottom = gestureInsets.bottom;
-        Insets imeInset = insets.getInsets(WindowInsets.Type.ime());
-        DeviceProfile dp = mContainer.getDeviceProfile();
-        if (dp.isTaskbarPresent) {
+        mSystemGestureRegion.set(gestureInsets.left, gestureInsets.top, gestureInsets.right,
+                gestureInsets.bottom);
+        if (mContainer.getDeviceProfile().isTaskbarPresent) {
             // Ignore taskbar gesture insets to avoid interfering with TouchControllers.
-            gestureInsetBottom = ResourceUtils.getNavbarSize(
+            mSystemGestureRegion.bottom = ResourceUtils.getNavbarSize(
                     ResourceUtils.NAVBAR_BOTTOM_GESTURE_SIZE, getResources());
         }
-        mSystemGestureRegion.set(
-                Math.max(gestureInsets.left, imeInset.left),
-                Math.max(gestureInsets.top, imeInset.top),
-                Math.max(gestureInsets.right, imeInset.right),
-                Math.max(gestureInsetBottom, imeInset.bottom)
-        );
         return super.dispatchApplyWindowInsets(insets);
     }
 }
