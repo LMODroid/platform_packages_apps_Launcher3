@@ -381,7 +381,7 @@
             launcher:minWidthDps="406"
             launcher:minHeightDps="694"
             launcher:iconImageSize="48"
-            launcher:iconTextSize="13.0"
+            launcher:iconTextSize="12.0"
             launcher:allAppsBorderSpace="14"
             launcher:allAppsCellHeight="104"
             launcher:canBeDefault="true" />
@@ -403,8 +403,10 @@
             launcher:name="Large Phone"
             launcher:minWidthDps="406"
             launcher:minHeightDps="694"
-            launcher:iconImageSize="48"
-            launcher:iconTextSize="13.0"
+            launcher:iconImageSize="28"
+            launcher:iconTextSize="9.0"
+            launcher:allAppsIconSize="48"
+            launcher:allAppsIconTextSize="12.0"
             launcher:allAppsBorderSpace="14"
             launcher:allAppsCellHeight="104"
             launcher:canBeDefault="true" />
