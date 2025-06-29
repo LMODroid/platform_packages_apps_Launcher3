@@ -24,11 +24,14 @@ import android.os.Handler;
 import androidx.annotation.AnyThread;
 
 import com.android.launcher3.LauncherAppState;
+import com.android.launcher3.allapps.PrivateProfileManager;
 import com.android.launcher3.allapps.BaseAllAppsAdapter.AdapterItem;
 import com.android.launcher3.model.data.AppInfo;
+import com.android.launcher3.pm.UserCache;
 import com.android.launcher3.search.SearchAlgorithm;
 import com.android.launcher3.search.SearchCallback;
 import com.android.launcher3.search.StringMatcherUtility;
+import com.android.launcher3.views.ActivityContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +41,8 @@ import java.util.List;
  */
 public class DefaultAppSearchAlgorithm implements SearchAlgorithm<AdapterItem> {
 
+    private final Context mContext;
+    private final ActivityContext mActivityContext;
     private final LauncherAppState mAppState;
     private final Handler mResultHandler;
     private final boolean mAddNoResultsMessage;
@@ -47,6 +52,8 @@ public class DefaultAppSearchAlgorithm implements SearchAlgorithm<AdapterItem> {
     }
 
     public DefaultAppSearchAlgorithm(Context context, boolean addNoResultsMessage) {
+        mContext = context;
+        mActivityContext = ActivityContext.lookupContext(context);
         mAppState = LauncherAppState.getInstance(context);
         mResultHandler = new Handler(MAIN_EXECUTOR.getLooper());
         mAddNoResultsMessage = addNoResultsMessage;
@@ -83,7 +90,7 @@ public class DefaultAppSearchAlgorithm implements SearchAlgorithm<AdapterItem> {
      * Filters {@link AppInfo}s matching specified query
      */
     @AnyThread
-    public static ArrayList<AdapterItem> getTitleMatchResult(List<AppInfo> apps, String query) {
+    public ArrayList<AdapterItem> getTitleMatchResult(List<AppInfo> apps, String query) {
         // Do an intersection of the words in the query and each title, and filter out all the
         // apps that don't match all of the words in the query.
         final String queryTextLower = query.toLowerCase();
@@ -94,10 +101,17 @@ public class DefaultAppSearchAlgorithm implements SearchAlgorithm<AdapterItem> {
         int total = apps.size();
         for (int i = 0; i < total; i++) {
             AppInfo info = apps.get(i);
-            if (StringMatcherUtility.matches(queryTextLower, info.title.toString(), matcher)) {
+            if (StringMatcherUtility.matches(queryTextLower, info.title.toString(), matcher)
+                    && !shouldSkipPrivateApp(info)) {
                 result.add(AdapterItem.asApp(info));
             }
         }
         return result;
+    }
+
+    private boolean shouldSkipPrivateApp(AppInfo info) {
+        PrivateProfileManager ppm = mActivityContext.getAppsView().getPrivateProfileManager();
+        return ppm != null && !ppm.isEnabled() && UserCache.getInstance(mContext)
+                .getUserInfo(info.user).isPrivate();
     }
 }
