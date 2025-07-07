@@ -76,9 +76,9 @@ public class LauncherIcons extends BaseIconFactory implements AutoCloseable {
     }
 
     @Override
-    protected Drawable getMonochromeDrawable(AdaptiveIconDrawable base) {
-        Drawable mono = super.getMonochromeDrawable(base);
-        if (mono != null || !Flags.forceMonochromeAppIcons()) {
+    protected Drawable getMonochromeDrawable(AdaptiveIconDrawable base, boolean isDynamicShortcut) {
+        Drawable mono = super.getMonochromeDrawable(base, isDynamicShortcut);
+        if (mono != null || isDynamicShortcut || !Flags.forceMonochromeAppIcons()) {
             return mono;
         }
         if (mMonochromeIconFactory == null) {
