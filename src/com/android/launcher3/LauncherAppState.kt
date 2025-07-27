@@ -16,6 +16,7 @@
 package com.android.launcher3
 
 import android.content.Context
+import com.android.launcher3.Utilities
 import com.android.launcher3.dagger.ApplicationContext
 import com.android.launcher3.icons.IconCache
 import com.android.launcher3.icons.LauncherIconProvider
@@ -35,8 +36,18 @@ constructor(
     val invariantDeviceProfile: InvariantDeviceProfile,
     @Named("SAFE_MODE") val isSafeModeEnabled: Boolean,
 ) {
+    fun setNeedsRestart() {
+        needsRestart = true
+    }
+
+    fun maybeRestartLauncher() {
+        if (needsRestart) {
+            Utilities.restart()
+        }
+    }
 
     companion object {
+        private var needsRestart = false
 
         @JvmField var INSTANCE = DaggerSingletonObject { it.launcherAppState }
 
