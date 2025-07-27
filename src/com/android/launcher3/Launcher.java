@@ -368,6 +368,7 @@ public class Launcher extends StatefulActivity<LauncherState>
     private Runnable mOnDeferredActivityLaunchCallback;
     private OnPreDrawListener mOnInitialBindListener;
 
+    private LauncherAppState mAppState;
     private LauncherModel mModel;
     private ModelWriter mModelWriter;
     private LauncherAccessibilityDelegate mAccessibilityDelegate;
@@ -445,6 +446,7 @@ public class Launcher extends StatefulActivity<LauncherState>
         mWallpaperThemeManager = new WallpaperThemeManager(this);
 
         LauncherAppState app = LauncherAppState.getInstance(this);
+        mAppState = app;
         mModel = app.getModel();
 
         mRotationHelper = new RotationHelper(this);
@@ -1176,6 +1178,9 @@ public class Launcher extends StatefulActivity<LauncherState>
 
             // Clear any rotation locks when going to normal state
             getRotationHelper().setCurrentStateRequest(REQUEST_NONE);
+
+            // Check whether launcher restart needed
+            mAppState.maybeRestartLauncher();
         }
 
         if (ALL_APPS.equals(mPrevLauncherState) && !ALL_APPS.equals(state)

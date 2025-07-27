@@ -23,6 +23,7 @@ import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.ICON_OVER
 import static com.android.launcher3.graphics.ShapeDelegate.DEFAULT_PATH_SIZE;
 import static com.android.launcher3.icons.BitmapInfo.FLAG_THEMED;
 import static com.android.launcher3.icons.IconNormalizer.ICON_VISIBLE_AREA_FACTOR;
+import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_POSITION_BOTTOM_OR_RIGHT;
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_POSITION_TOP_OR_LEFT;
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_TYPE_MAIN;
@@ -1067,6 +1068,11 @@ public final class Utilities {
         } else {
             return deviceProperties.isLandscape();
         }
+    }
+
+    public static void restart() {
+        Log.d(TAG, "scheduling launcher restart");
+        MAIN_EXECUTOR.getHandler().postDelayed(() -> System.exit(0), 500);
     }
 
     public static boolean isWorkspaceEditAllowed(Context context) {
