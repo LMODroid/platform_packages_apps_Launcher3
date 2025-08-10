@@ -332,6 +332,9 @@ public class DeviceProfile {
                 .createDropTargetProfile(res, shouldApplyWidePortraitDimens);
 
         numShownHotseatIcons = displayOptionSpec.numShownHotseatIcons;
+
+        // Hotseat search bar can be turned off
+        final boolean showQsb = Utilities.showQSB(context);
         mHotseatColumnSpan = inv.numColumns;
 
         numShownAllAppsColumns = displayOptionSpec.numAllAppsColumns;
@@ -360,8 +363,9 @@ public class DeviceProfile {
             mResponsiveWorkspaceCellSpec = workspaceCellSpecs.getCalculatedSpec(
                     responsiveAspectRatio, mDeviceProperties.getHeightPx());
         } else {
-            hotseatQsbSpace = pxFromDp(inv.hotseatQsbSpace[mTypeIndex], mMetrics);
-            hotseatBarBottomSpace = pxFromDp(inv.hotseatBarBottomSpace[mTypeIndex], mMetrics);
+            hotseatQsbSpace = showQsb ? pxFromDp(inv.hotseatQsbSpace[mTypeIndex], mMetrics) : 0;
+            hotseatBarBottomSpace = showQsb || isTaskbarPresent ? pxFromDp(
+                inv.hotseatBarBottomSpace[mTypeIndex], mMetrics) : 0;
         }
 
         hotseatProfile = HotseatProfile.Factory.createHotseatProfile(
@@ -383,12 +387,13 @@ public class DeviceProfile {
                 inv,
                 hotseatProfile,
                 mDeviceProperties,
-                mIsScalableGrid
+                mIsScalableGrid,
+                showQsb
         );
 
         if (!isVerticalBarLayout()) {
             // Have a little space between the inset and the QSB
-            if (mInsets.bottom + minQsbMargin > hotseatBarBottomSpace) {
+            if (showQsb && mInsets.bottom + minQsbMargin > hotseatBarBottomSpace) {
                 int availableSpace = hotseatQsbSpace - (mInsets.bottom - hotseatBarBottomSpace);
 
                 // Only change the spaces if there is space
@@ -611,7 +616,8 @@ public class DeviceProfile {
             InvariantDeviceProfile inv,
             HotseatProfile hotseatProfile,
             DeviceProperties deviceProperties,
-            boolean isScalableGrid
+            boolean isScalableGrid,
+            boolean showQsb
     ) {
         // For foldable (two panel), we inline the qsb if we have the screen open and we are in
         // either Landscape or Portrait. This cal also be disabled in the device_profile.xml
@@ -621,7 +627,7 @@ public class DeviceProfile {
         // In tablets we inline in both orientations but only if we have enough space in the QSB
         boolean tabletInlineQsb = inv.inlineQsb[INDEX_DEFAULT] || inv.inlineQsb[INDEX_LANDSCAPE];
         boolean canQsbInline = deviceProperties.isTwoPanels() ? twoPanelCanInline : tabletInlineQsb;
-        canQsbInline = canQsbInline && hotseatProfile.getQsbHeight() > 0;
+        canQsbInline = showQsb && canQsbInline && hotseatProfile.getQsbHeight() > 0;
 
         return ((isScalableGrid || (isTaskbarPresent && !deviceProperties.isLandscape()))
                 && inv.inlineQsb[mTypeIndex] && canQsbInline)
@@ -711,8 +717,6 @@ public class DeviceProfile {
      * necessary.
      */
     public void recalculateHotseatWidthAndBorderSpace() {
-        if (!(mIsScalableGrid || (isTaskbarPresent && !mDeviceProperties.isLandscape()))) return;
-
         updateHotseatWidthAndBorderSpace(inv.numColumns);
         int numWorkspaceColumns = getPanelCount() * inv.numColumns;
         if (mDeviceProperties.isTwoPanels()) {
@@ -1259,7 +1263,9 @@ public class DeviceProfile {
                 endSpacing = mDeviceProperties.getAvailableWidthPx() - hotseatWidth - startSpacing
                         + hotseatBorderSpace;
             } else {
-                startSpacing = (mDeviceProperties.getAvailableWidthPx() - hotseatWidth) / 2;
+                startSpacing = mDeviceProperties.isTablet()
+                        ? (mDeviceProperties.getAvailableWidthPx() - hotseatWidth) / 2
+                        : (mDeviceProperties.getAvailableWidthPx() - hotseatQsbWidth) / 2;
                 endSpacing = startSpacing;
             }
             startSpacing += getAdditionalQsbSpace();
@@ -1292,7 +1298,7 @@ public class DeviceProfile {
             // workspace cell vs a hotseat cell.
             float workspaceCellWidth = (float) mDeviceProperties.getWidthPx() / inv.numColumns;
             float hotseatCellWidth = (float) mDeviceProperties.getWidthPx() / numShownHotseatIcons;
-            int hotseatAdjustment = Math.round((workspaceCellWidth - hotseatCellWidth) / 2);
+            int hotseatAdjustment = hotseatBorderSpace / 2;
             hotseatBarPadding.set(
                     hotseatAdjustment + mWorkspaceProfile.getWorkspacePadding().left
                             + mWorkspaceProfile.getCellLayoutPaddingPx().left
@@ -1342,7 +1348,7 @@ public class DeviceProfile {
     }
 
     private int getAdditionalQsbSpace() {
-        return isQsbInline ? hotseatQsbWidth + hotseatBorderSpace : 0;
+        return mDeviceProperties.isTablet() && isQsbInline ? hotseatQsbWidth + hotseatBorderSpace : 0;
     }
 
     /**

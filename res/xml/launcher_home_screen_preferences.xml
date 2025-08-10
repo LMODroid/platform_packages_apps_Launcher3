@@ -117,4 +117,15 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="@string/search_bar_category_title">
+
+        <SwitchPreference
+            android:key="pref_dock_search"
+            android:title="@string/dock_search_title"
+            android:summary="@string/dock_search_summary"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>
+
 </androidx.preference.PreferenceScreen>

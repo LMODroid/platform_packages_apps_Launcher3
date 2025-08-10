@@ -48,6 +48,7 @@ import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.lmodroid.LMOUtils;
 import com.android.launcher3.model.WidgetsModel;
+import com.android.launcher3.qsb.QsbContainerView;
 
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
 
@@ -107,6 +108,7 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
             case Utilities.KEY_HOTSEAT_OPACITY:
             case Utilities.KEY_SHORT_PARALLAX:
             case Utilities.KEY_SINGLE_PAGE_CENTER:
+            case Utilities.KEY_DOCK_SEARCH:
                 LauncherAppState.getInstance(getApplicationContext()).setNeedsRestart();
                 break;
             default:
@@ -167,6 +169,7 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
         private static final String SEARCH_PACKAGE = "com.google.android.googlequicksearchbox";
 
         private Preference mShowGoogleAppPref;
+        private Preference mShowGoogleBarPref;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -192,6 +195,7 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
             }
 
             mShowGoogleAppPref = screen.findPreference(KEY_MINUS_ONE);
+            mShowGoogleBarPref = screen.findPreference(Utilities.KEY_DOCK_SEARCH);
             updateIsGoogleAppEnabled();
 
             if (getActivity() != null && !TextUtils.isEmpty(getPreferenceScreen().getTitle())) {
@@ -228,6 +232,10 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
             if (mShowGoogleAppPref != null) {
                 mShowGoogleAppPref.setEnabled(
                         LMOUtils.isPackageEnabled(getContext(), SEARCH_PACKAGE));
+            }
+            if (mShowGoogleBarPref != null) {
+                mShowGoogleBarPref.setEnabled(
+                        QsbContainerView.getSearchWidgetPackageName(getContext()) != null);
             }
         }
 
