@@ -144,4 +144,11 @@
     <string name="icon_pack_default_label">Default</string>
     <string name="icon_pack_add">Install more</string>
     <string name="icon_pack_no_market">There\'s no available app store</string>
+
+    <!-- Hotseat searchbar -->
+    <string name="label_search">Search</string>
+    <string name="search_bar_category_title">Search bar</string>
+    <string name="dock_search_title">Google search bar</string>
+    <string name="dock_search_summary">Search bar in the bottom dock</string>
+
 </resources>
