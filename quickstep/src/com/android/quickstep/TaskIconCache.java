@@ -16,6 +16,7 @@
 package com.android.quickstep;
 
 import static com.android.launcher3.Flags.enableOverviewIconMenu;
+import static com.android.launcher3.customization.IconDatabase.KEY_ICON_PACK;
 import static com.android.launcher3.util.DisplayController.CHANGE_DENSITY;
 import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 
@@ -99,7 +100,7 @@ public class TaskIconCache implements DisplayInfoChangeListener, OnSharedPrefere
         mIconCache = new TaskKeyLruCache<>(cacheSize);
 
         DisplayController.INSTANCE.get(mContext).addChangeListener(this);
-        LauncherPrefs.get(mContext).addListener(this, LauncherPrefs.THEMED_ICONS);
+        LauncherPrefs.getPrefs(context).registerOnSharedPreferenceChangeListener(this);
         mThemedIconsEnabled = Themes.isThemedIconEnabled(mContext);
     }
 
@@ -117,6 +118,8 @@ public class TaskIconCache implements DisplayInfoChangeListener, OnSharedPrefere
             if (mIconFactory != null) {
                 mIconFactory.setMonoIconEnabled(mThemedIconsEnabled);
             }
+            clearCache();
+        } else if (KEY_ICON_PACK.equals(key)) {
             clearCache();
         }
     }
