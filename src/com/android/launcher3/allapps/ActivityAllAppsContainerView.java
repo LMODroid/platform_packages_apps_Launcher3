@@ -16,6 +16,7 @@
 package com.android.launcher3.allapps;
 
 import static com.android.launcher3.Flags.enableExpandingPauseWorkButton;
+import static com.android.launcher3.Utilities.KEY_APP_DRAWER_OPACITY;
 import static com.android.launcher3.allapps.ActivityAllAppsContainerView.AdapterHolder.MAIN;
 import static com.android.launcher3.allapps.ActivityAllAppsContainerView.AdapterHolder.SEARCH;
 import static com.android.launcher3.allapps.ActivityAllAppsContainerView.AdapterHolder.WORK;
@@ -34,6 +35,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
@@ -77,6 +79,7 @@ import com.android.launcher3.DropTarget.DragObject;
 import com.android.launcher3.Flags;
 import com.android.launcher3.Insettable;
 import com.android.launcher3.InsettableFrameLayout;
+import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.allapps.BaseAllAppsAdapter.AdapterItem;
@@ -115,8 +118,7 @@ import java.util.stream.Stream;
 public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
         extends SpringRelativeLayout implements DragSource, Insettable,
         OnDeviceProfileChangeListener, PersonalWorkSlidingTabStrip.OnActivePageChangedListener,
-        ScrimView.ScrimDrawingController {
-
+        ScrimView.ScrimDrawingController, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = "ActivityAllAppsContainerView";
     public static final float PULL_MULTIPLIER = .02f;
@@ -134,7 +136,7 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
     protected WorkProfileManager mWorkManager;
     protected final PrivateProfileManager mPrivateProfileManager;
     protected final Point mFastScrollerOffset = new Point();
-    protected final int mScrimColor;
+    protected int mScrimColor;
     protected final float mHeaderThreshold;
     protected final AllAppsSearchUiDelegate mSearchUiDelegate;
 
@@ -338,12 +340,24 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
             mSearchUiDelegate.onInitializeSearchBar();
         }
         mActivityContext.addOnDeviceProfileChangeListener(this);
+        LauncherPrefs.getPrefs(getContext()).registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mActivityContext.removeOnDeviceProfileChangeListener(this);
+        LauncherPrefs.getPrefs(getContext()).unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        if (key.equals(KEY_APP_DRAWER_OPACITY)) {
+            mScrimColor = ColorUtils.setAlphaComponent(Themes.getAttrColor(getContext(),
+                    R.attr.allAppsScrimColor), Utilities.getAllAppsAlpha(getContext()));
+            mBottomSheetBackgroundColor = mScrimColor;
+            mBottomSheetBackgroundAlpha = Color.alpha(mBottomSheetBackgroundColor) / 255.0f;
+        }
     }
 
     public SearchUiManager getSearchUiManager() {
@@ -826,8 +840,7 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
 
     protected int getHeaderColor(float blendRatio) {
         return ColorUtils.blendARGB(
-                ColorUtils.setAlphaComponent(mScrimColor, (int) (mSearchContainer.getAlpha()
-                        * Utilities.getAllAppsAlpha(mActivityContext))),
+                mScrimColor,
                 ColorUtils.setAlphaComponent(mHeaderProtectionColor,
                         (int) (mSearchContainer.getAlpha() * 255)),
                 blendRatio);
