@@ -473,12 +473,10 @@ public class TaskbarActivityContext extends BaseTaskbarContext {
      * single window for taskbar and navbar.
      */
     public boolean isPhoneMode() {
-        if (mDeviceProfile.isTaskbarPresent &&
-                !SettingsCache.INSTANCE.get(this).getValue(ENABLE_TASKBAR, 1)) {
-            return true;
-        }
+        // isTaskbarPresent is false on tablet mode only if taskbar is disabled via setting,
+        // in that case fallback to phone mode to avoid a crash.
         return ENABLE_TASKBAR_NAVBAR_UNIFICATION
-                && mDeviceProfile.isPhone
+                && (mDeviceProfile.isPhone || mDeviceProfile.isTablet)
                 && !mDeviceProfile.isTaskbarPresent;
     }
 
