@@ -435,7 +435,8 @@ public class DeviceProfile {
         boolean taskbarOrBubbleBarOnPhones = enableTinyTaskbar()
                 || (enableBubbleBar() && enableBubbleBarOnPhones());
         isTaskbarPresent = (isTablet || (taskbarOrBubbleBarOnPhones && isGestureMode))
-                && wmProxy.isTaskbarDrawnInProcess();
+                && wmProxy.isTaskbarDrawnInProcess()
+                && SettingsCache.INSTANCE.get(context).getValue(ENABLE_TASKBAR, isTablet ? 1 : 0);
 
         // Some more constants.
         context = getContext(context, info, inv.isFixedLandscape
@@ -1966,8 +1967,6 @@ public class DeviceProfile {
      * Returns the padding for hotseat view
      */
     public Rect getHotseatLayoutPadding(Context context) {
-        boolean isTaskbarPresent = this.isTaskbarPresent &&
-                SettingsCache.INSTANCE.get(context).getValue(ENABLE_TASKBAR, 1);
         Rect hotseatBarPadding = new Rect();
         if (isVerticalBarLayout()) {
             // The hotseat icons will be placed in the middle of the hotseat cells.
