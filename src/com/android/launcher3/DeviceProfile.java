@@ -25,7 +25,6 @@ import static com.android.launcher3.Utilities.dpiFromPx;
 import static com.android.launcher3.deviceprofile.DevicePropertiesKt.createWindowBounds;
 import static com.android.launcher3.folder.ClippedFolderIconLayoutRule.ICON_OVERLAP_FACTOR;
 import static com.android.launcher3.icons.IconNormalizer.ICON_VISIBLE_AREA_FACTOR;
-import static com.android.launcher3.taskbar.TaskbarManagerImpl.ENABLE_TASKBAR;
 import static com.android.launcher3.testing.shared.ResourceUtils.INVALID_RESOURCE_HANDLE;
 import static com.android.launcher3.testing.shared.ResourceUtils.pxFromDp;
 import static com.android.launcher3.util.OverviewReleaseFlags.enableGridOnlyOverview;
@@ -44,6 +43,7 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.UserManager;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.Surface;
@@ -77,9 +77,10 @@ import com.android.launcher3.util.DisplayController;
 import com.android.launcher3.util.DisplayController.Info;
 import com.android.launcher3.util.IconSizeSteps;
 import com.android.launcher3.util.ResourceHelper;
-import com.android.launcher3.util.SettingsCache;
 import com.android.launcher3.util.WindowBounds;
 import com.android.launcher3.util.window.WindowManagerProxy;
+
+import com.libremobileos.providers.LMOSettings;
 
 import java.io.PrintWriter;
 import java.util.Locale;
@@ -299,6 +300,10 @@ public class DeviceProfile {
                         : Configuration.ORIENTATION_PORTRAIT,
                 windowBounds);
         final Resources res = context.getResources();
+
+        // Taskbar toggle: on by default on tablets, opt-in on phones
+        isTaskbarPresent = isTaskbarPresent && Settings.System.getInt(context.getContentResolver(),
+                LMOSettings.System.ENABLE_TASKBAR, mDeviceProperties.isTablet() ? 1 : 0) == 1;
 
         overviewProfile = OverviewProfile.Factory.createOverviewProfile(res);
 
@@ -1190,8 +1195,6 @@ public class DeviceProfile {
      * Returns the padding for hotseat view
      */
     public Rect getHotseatLayoutPadding(Context context) {
-        boolean isTaskbarPresent = this.isTaskbarPresent &&
-                SettingsCache.INSTANCE.get(context).getValue(ENABLE_TASKBAR);
         Rect hotseatBarPadding = new Rect();
         if (isVerticalBarLayout()) {
             // The hotseat icons will be placed in the middle of the hotseat cells.
