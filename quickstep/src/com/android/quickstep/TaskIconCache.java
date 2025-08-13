@@ -16,6 +16,7 @@
 package com.android.quickstep;
 
 import static com.android.launcher3.Flags.enableOverviewIconMenu;
+import static com.android.launcher3.customization.IconDatabase.KEY_ICON_PACK;
 import static com.android.launcher3.util.DisplayController.CHANGE_DENSITY;
 import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 
@@ -23,6 +24,7 @@ import android.annotation.Nullable;
 import android.app.ActivityManager;
 import android.app.ActivityManager.TaskDescription;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -36,6 +38,7 @@ import android.util.SparseArray;
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 
+import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.icons.BaseIconFactory;
@@ -61,7 +64,8 @@ import java.util.concurrent.Executor;
 /**
  * Manages the caching of task icons and related data.
  */
-public class TaskIconCache implements TaskIconDataSource, DisplayInfoChangeListener {
+public class TaskIconCache implements TaskIconDataSource, DisplayInfoChangeListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     private final Executor mBgExecutor;
 
@@ -88,11 +92,19 @@ public class TaskIconCache implements TaskIconDataSource, DisplayInfoChangeListe
         mIconCache = new TaskKeyLruCache<>(cacheSize);
 
         DisplayController.INSTANCE.get(mContext).addChangeListener(this);
+        LauncherPrefs.getPrefs(context).registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onDisplayInfoChanged(Context context, Info info, int flags) {
         if ((flags & CHANGE_DENSITY) != 0) {
+            clearCache();
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        if (key.equals(KEY_ICON_PACK)) {
             clearCache();
         }
     }
