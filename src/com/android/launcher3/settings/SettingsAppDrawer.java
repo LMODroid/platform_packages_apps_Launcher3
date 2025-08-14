@@ -17,6 +17,7 @@
 package com.android.launcher3.settings;
 
 import static androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_ACCESSIBILITY_FOCUS;
+import static com.android.launcher3.util.Themes.isThemedIconEnabled;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -145,6 +146,7 @@ public class SettingsAppDrawer extends CollapsingToolbarBaseActivity
 
         private String mHighLightKey;
         private boolean mPreferenceHighlighted = false;
+        private Preference mThemeAllAppsIconsPref;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -227,6 +229,13 @@ public class SettingsAppDrawer extends CollapsingToolbarBaseActivity
          * will remove that preference from the list.
          */
         protected boolean initPreference(Preference preference) {
+            switch (preference.getKey()) {
+                case InvariantDeviceProfile.KEY_ALLAPPS_THEMED_ICONS:
+                    mThemeAllAppsIconsPref = preference;
+                    updateThemeAllAppsIconsPref();
+                    break;
+            }
+
             return true;
         }
 
@@ -243,6 +252,18 @@ public class SettingsAppDrawer extends CollapsingToolbarBaseActivity
                     requestAccessibilityFocus(getListView());
                 }
             }
+
+            if (mThemeAllAppsIconsPref != null) {
+                updateThemeAllAppsIconsPref();
+            }
+        }
+
+        private void updateThemeAllAppsIconsPref() {
+            boolean enabled = isThemedIconEnabled(getContext());
+            mThemeAllAppsIconsPref.setEnabled(enabled);
+            mThemeAllAppsIconsPref.setSummary(getContext().getString(enabled
+                    ? R.string.pref_themed_icons_summary
+                    : R.string.themed_icons_disabled_summary));
         }
 
         private PreferenceHighlighter createHighlighter() {
