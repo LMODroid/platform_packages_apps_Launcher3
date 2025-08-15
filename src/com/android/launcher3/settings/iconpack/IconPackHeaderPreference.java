@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.launcher3.icons.pack;
+package com.android.launcher3.settings.iconpack;
 
 import android.content.Context;
 import android.content.Intent;
@@ -32,7 +32,7 @@ import androidx.preference.PreferenceViewHolder;
 
 import com.android.launcher3.R;
 import com.android.launcher3.icons.IconProvider;
-
+import com.android.launcher3.settings.widget.RadioHeaderPreference;
 
 public class IconPackHeaderPreference extends RadioHeaderPreference {
     private static final String TAG = "IconPackHeaderPreference";
