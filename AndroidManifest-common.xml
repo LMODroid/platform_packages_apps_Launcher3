@@ -209,7 +209,7 @@
 
         <!-- Icon Pack -->
         <activity
-            android:name="com.android.launcher3.icons.pack.IconPackSettingsActivity"
+            android:name="com.android.launcher3.settings.iconpack.IconPackSettingsActivity"
             android:label="@string/icon_pack_title"
             android:theme="@style/Theme.SubSettingsBase"
             android:exported="true"
