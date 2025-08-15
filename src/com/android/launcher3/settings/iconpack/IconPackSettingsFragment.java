@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.launcher3.icons.pack;
+package com.android.launcher3.settings.iconpack;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -30,8 +30,8 @@ import android.view.ViewGroup;
 import androidx.preference.Preference;
 
 import com.android.launcher3.R;
-
 import com.android.launcher3.customization.IconDatabase;
+import com.android.launcher3.settings.widget.RadioSettingsFragment;
 
 import com.android.settingslib.widget.SelectorWithWidgetPreference;
 

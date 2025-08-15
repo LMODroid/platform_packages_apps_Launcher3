@@ -53,8 +53,8 @@ import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.customization.IconDatabase;
-import com.android.launcher3.icons.pack.IconPackSettingsActivity;
 import com.android.launcher3.model.WidgetsModel;
+import com.android.launcher3.settings.iconpack.IconPackSettingsActivity;
 
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
 
