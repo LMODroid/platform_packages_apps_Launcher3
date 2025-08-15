@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.launcher3.icons.pack;
+package com.android.launcher3.settings.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
