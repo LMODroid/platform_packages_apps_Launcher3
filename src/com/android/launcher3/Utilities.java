@@ -1086,7 +1086,7 @@ public final class Utilities {
         return prefs.getBoolean(KEY_RECENTS_CLEAR_ALL, true);
     }
 
-    private static boolean isQSBEnabled(Context context) {
+    public static boolean isQSBEnabled(Context context) {
         SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
         return prefs.getBoolean(KEY_DOCK_SEARCH, true);
     }

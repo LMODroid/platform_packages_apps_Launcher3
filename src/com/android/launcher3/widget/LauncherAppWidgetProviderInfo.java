@@ -74,7 +74,7 @@ public class LauncherAppWidgetProviderInfo extends AppWidgetProviderInfo impleme
     private PackageManager mPM;
 
     public static LauncherAppWidgetProviderInfo fromProviderInfo(Context context,
-            AppWidgetProviderInfo info) {
+            AppWidgetProviderInfo info, boolean isQsb) {
         final LauncherAppWidgetProviderInfo launcherInfo;
         if (info instanceof LauncherAppWidgetProviderInfo) {
             launcherInfo = (LauncherAppWidgetProviderInfo) info;
@@ -90,8 +90,13 @@ public class LauncherAppWidgetProviderInfo extends AppWidgetProviderInfo impleme
             launcherInfo = new LauncherAppWidgetProviderInfo(p);
             p.recycle();
         }
-        launcherInfo.initSpans(context, LauncherAppState.getIDP(context));
+        launcherInfo.initSpans(context, LauncherAppState.getIDP(context), isQsb);
         return launcherInfo;
+    }
+
+    public static LauncherAppWidgetProviderInfo fromProviderInfo(Context context,
+            AppWidgetProviderInfo info) {
+        return fromProviderInfo(context, info, false);
     }
 
     protected LauncherAppWidgetProviderInfo() {}
@@ -100,7 +105,7 @@ public class LauncherAppWidgetProviderInfo extends AppWidgetProviderInfo impleme
         super(in);
     }
 
-    public void initSpans(Context context, InvariantDeviceProfile idp) {
+    public void initSpans(Context context, InvariantDeviceProfile idp, boolean isQsb) {
         mPM = context.getApplicationContext().getPackageManager();
         int minSpanX = 0;
         int minSpanY = 1;
@@ -118,8 +123,14 @@ public class LauncherAppWidgetProviderInfo extends AppWidgetProviderInfo impleme
                 continue;
             }
 
-            dp.getCellSize(cellSize);
-            Rect widgetPadding = dp.widgetPadding;
+            Rect widgetPadding = isQsb ? new Rect() : dp.widgetPadding;
+            if (isQsb) {
+                cellSize.x = dp.hotseatQsbWidth;
+                cellSize.y = dp.hotseatQsbHeight;
+                if (cellSize.x == 0 || cellSize.y == 0) continue;
+            } else {
+                dp.getCellSize(cellSize);
+            }
 
             minSpanX = Math.max(minSpanX,
                     getSpanX(widgetPadding, minResizeWidth, dp.cellLayoutBorderSpacePx.x,
@@ -169,6 +180,10 @@ public class LauncherAppWidgetProviderInfo extends AppWidgetProviderInfo impleme
         // Ensures the default span X and span Y will not exceed the current grid size.
         this.spanX = Math.min(spanX, idp.numColumns);
         this.spanY = Math.min(spanY, idp.numRows);
+    }
+
+    public void initSpans(Context context, InvariantDeviceProfile idp) {
+        initSpans(context, idp, false);
     }
 
     /**

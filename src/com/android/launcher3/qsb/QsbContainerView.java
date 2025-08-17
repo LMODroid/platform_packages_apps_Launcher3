@@ -23,6 +23,7 @@ import static android.content.Intent.ACTION_PACKAGE_CHANGED;
 import static android.content.Intent.ACTION_PACKAGE_REMOVED;
 
 import static com.android.launcher3.Utilities.SHOULD_SHOW_FIRST_PAGE_WIDGET;
+import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 
 import android.app.Activity;
 import android.app.SearchManager;
@@ -36,6 +37,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.ContentObserver;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.AttributeSet;
@@ -54,6 +56,8 @@ import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.config.FeatureFlags;
+import com.android.launcher3.settings.qsb.QsbSettingsActivity;
+import com.android.launcher3.widget.LauncherAppWidgetProviderInfo;
 import com.android.launcher3.widget.util.WidgetSizes;
 
 /**
@@ -65,9 +69,12 @@ import com.android.launcher3.widget.util.WidgetSizes;
 public class QsbContainerView extends FrameLayout implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String SEARCH_ENGINE_SETTINGS_KEY = "selected_search_engine";
+    public static final String SEARCH_COMPONENT_PREF_KEY =
+            "selected_search_component";
 
     public static final int QSB_WIDGET_HOST_ID = 1026;
     protected static final String mKeyWidgetId = "qsb_widget_id";
+    private static final int START_LISTENING_DELAY_MS = 1000;
 
     /**
      * Returns the package name for user configured search provider or from searchManager
@@ -83,7 +90,7 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
             SearchManager searchManager = context.getSystemService(SearchManager.class);
             ComponentName componentName = searchManager.getGlobalSearchActivity();
             if (componentName != null) {
-                providerPkg = searchManager.getGlobalSearchActivity().getPackageName();
+                providerPkg = componentName.getPackageName();
             }
             if (providerPkg == null && Utilities.isGSAEnabled(context)) {
                 providerPkg = Utilities.GSA_PACKAGE;
@@ -105,20 +112,44 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
             return null;
         }
 
+        String providerComponent = LauncherPrefs.getPrefs(context).getString(
+                SEARCH_COMPONENT_PREF_KEY, null);
         AppWidgetProviderInfo defaultWidgetForSearchPackage = null;
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         for (AppWidgetProviderInfo info :
                 appWidgetManager.getInstalledProvidersForPackage(providerPkg, null)) {
-            if (info.provider.getPackageName().equals(providerPkg) && info.configure == null) {
-                if ((info.widgetCategory
-                        & AppWidgetProviderInfo.WIDGET_CATEGORY_SEARCHBOX) != 0) {
-                    return info;
-                } else if (defaultWidgetForSearchPackage == null) {
-                    defaultWidgetForSearchPackage = info;
-                }
+            // If the provider component isn't set, find the first feasible widget for the given
+            // provider package.
+            if (info.provider.getPackageName().equals(providerPkg)
+                    && (providerComponent == null
+                            || info.provider.flattenToString().equals(providerComponent))
+                    && isQsbWidget(context, info)) {
+                return info;
             }
         }
-        return defaultWidgetForSearchPackage;
+        return null;
+    }
+
+    public static boolean isQsbWidget(Context context, AppWidgetProviderInfo info) {
+        LauncherAppWidgetProviderInfo launcherInfo =
+                LauncherAppWidgetProviderInfo.fromProviderInfo(context, info, true);
+        InvariantDeviceProfile idp = LauncherAppState.getIDP(context);
+        boolean isHomeScreenWidget = (info.widgetCategory
+                & AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN) != 0;
+
+        // Some widgets don't set their categories correctly so we guess by their provider class.
+        boolean isSearchWidget = (info.widgetCategory
+                & AppWidgetProviderInfo.WIDGET_CATEGORY_SEARCHBOX) != 0
+                || info.provider.getShortClassName().toLowerCase().contains("search");
+
+        // Ensure the widget fits inside the QSB area.
+        boolean fitsInQsb = launcherInfo.spanY == 1 && launcherInfo.spanX == 1;
+
+        // Exclude widgets that require initial configuration
+        boolean noConfig = info.configure == null || (info.widgetFeatures
+                & AppWidgetProviderInfo.WIDGET_FEATURE_CONFIGURATION_OPTIONAL) != 0;
+
+        return isHomeScreenWidget && isSearchWidget && fitsInQsb && noConfig;
     }
 
     /**
@@ -159,10 +190,18 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
             }
         }
     };
+    private ContentObserver mObserver =
+            new ContentObserver(MAIN_EXECUTOR.getHandler()) {
+        @Override
+        public void onChange(boolean selfChange) {
+            rebindFragment();
+        }
+    };
     private boolean mIsVisible = false;
     private QsbWidgetHost mQsbWidgetHost;
     protected AppWidgetProviderInfo mWidgetInfo;
     private QsbWidgetHostView mQsb;
+    private Runnable mStartListeningRunnable = () -> mQsbWidgetHost.startListening();
 
     public QsbContainerView(Context context) {
         this(context, null);
@@ -249,9 +288,10 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (!mKeyWidgetId.equals(key)) return;
+        boolean isProviderChange = SEARCH_COMPONENT_PREF_KEY.equals(key);
+        if (!mKeyWidgetId.equals(key) && !isProviderChange) return;
         int widgetId = LauncherPrefs.getPrefs(getContext()).getInt(mKeyWidgetId, -1);
-        if (widgetId > -1) {
+        if (widgetId > -1 || isProviderChange) {
             rebindFragment();
         } else {
             mQsbWidgetHost.deleteHost();
@@ -274,9 +314,6 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
         LauncherPrefs.getPrefs(getContext()).registerOnSharedPreferenceChangeListener(this);
-        if (isQsbEnabled()) {
-            mQsbWidgetHost.startListening();
-        }
         rebindFragment();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_PACKAGE_ADDED);
@@ -284,11 +321,14 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
         intentFilter.addAction(ACTION_PACKAGE_REMOVED);
         intentFilter.addDataScheme("package");
         getContext().registerReceiver(mReceiver, intentFilter, Context.RECEIVER_EXPORTED);
+        getContext().getContentResolver().registerContentObserver(
+                Settings.Secure.getUriFor(SEARCH_ENGINE_SETTINGS_KEY), false, mObserver);
     }
 
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        getContext().getContentResolver().unregisterContentObserver(mObserver);
         getContext().unregisterReceiver(mReceiver);
         LauncherPrefs.getPrefs(getContext()).unregisterOnSharedPreferenceChangeListener(this);
         mQsbWidgetHost.stopListening();
@@ -297,7 +337,13 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
     private void rebindFragment() {
         if (getContext() != null) {
             removeAllViews();
+            mQsbWidgetHost.stopListening();
             if (isQsbEnabled()) addView(createQsb(this));
+            // Start listening only after a short interval otherwise we may get stuck with
+            // bad widget layout. Perhaps there's a better way to check for this.
+            MAIN_EXECUTOR.getHandler().removeCallbacks(mStartListeningRunnable);
+            MAIN_EXECUTOR.getHandler().postDelayed(mStartListeningRunnable,
+                    START_LISTENING_DELAY_MS);
         }
     }
 
@@ -311,17 +357,16 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
                 idp.numColumns, 1);
     }
 
-    protected View getDefaultView(ViewGroup container, boolean showSetupIcon) {
+    protected View getDefaultView(ViewGroup container, boolean showSetupActivity) {
         // Return a default widget with setup icon.
         View v = QsbWidgetHostView.getDefaultView(container);
-        if (showSetupIcon) {
-            View setupButton = v.findViewById(R.id.btn_qsb_setup);
-            setupButton.setVisibility(View.VISIBLE);
-            setupButton.setOnClickListener((v2) -> getContext().startActivity(
-                    new Intent(getContext(), QsbSetupActivity.class)
+        View setupButton = v.findViewById(R.id.btn_qsb_setup);
+        Intent intent = showSetupActivity
+                ? new Intent(getContext(), QsbSetupActivity.class)
                             .putExtra(EXTRA_APPWIDGET_ID, mQsbWidgetHost.allocateAppWidgetId())
-                            .putExtra(EXTRA_APPWIDGET_PROVIDER, mWidgetInfo.provider)));
-        }
+                            .putExtra(EXTRA_APPWIDGET_PROVIDER, mWidgetInfo.provider)
+                : new Intent(getContext(), QsbSettingsActivity.class);
+        setupButton.setOnClickListener(v2 -> getContext().startActivity(intent));
         return v;
     }
 

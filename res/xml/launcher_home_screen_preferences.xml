@@ -20,6 +20,7 @@
     xmlns:settings="http://schemas.android.com/apk/res/com.android.launcher3">
 
     <PreferenceCategory
+        android:key="category_home_general"
         android:title="@string/general_category_title">
 
         <SwitchPreferenceCompat
@@ -73,7 +74,13 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="category_home_interface"
         android:title="@string/interface_category_title">
+
+        <Preference
+            android:key="pref_qsb"
+            android:title="@string/qsb_settings_title"
+            android:summary="@string/qsb_settings_summary" />
 
         <SwitchPreferenceCompat
             android:key="pref_enable_minus_one"
@@ -114,17 +121,6 @@
             settings:units="%"
             android:dependency="pref_show_hotseat_bg"
             android:defaultValue="40" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="@string/search_bar_category_title">
-
-        <SwitchPreferenceCompat
-            android:key="pref_dock_search"
-            android:title="@string/dock_search_title"
-            android:summary="@string/dock_search_summary"
-            android:defaultValue="true" />
 
     </PreferenceCategory>
 

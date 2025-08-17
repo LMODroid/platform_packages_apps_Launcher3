@@ -25,7 +25,8 @@
         android:layout_gravity="center_vertical"
         android:background="@drawable/round_rect_primary"
         android:elevation="2dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:theme="@style/LauncherTheme.Dark">
 
         <TextView
             android:layout_width="0dp"
@@ -43,7 +44,6 @@
             android:layout_width="48dp"
             android:id="@+id/btn_qsb_setup"
             android:clickable="true"
-            android:visibility="gone"
             android:layout_height="match_parent"
             android:src="@drawable/ic_setting"
             android:tint="?android:attr/textColorSecondary"

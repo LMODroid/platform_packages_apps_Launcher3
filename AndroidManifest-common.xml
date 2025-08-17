@@ -60,6 +60,9 @@
     <!-- LMOFreeform -->
     <uses-permission android:name="com.libremobileos.permission.START_FREEFORM" />
 
+    <!-- for opening google qsb settings -->
+    <uses-permission android:name="android.permission.START_ANY_ACTIVITY" />
+
     <!--
     Permissions required for read/write access to the workspace data. These permission name
     should not conflict with that defined in other apps, as such an app should embed its package
@@ -211,6 +214,14 @@
         <activity
             android:name="com.android.launcher3.settings.iconpack.IconPackSettingsActivity"
             android:label="@string/icon_pack_title"
+            android:theme="@style/Theme.SubSettingsBase"
+            android:exported="true"
+            android:autoRemoveFromRecents="true"  />
+
+        <!-- QSB -->
+        <activity
+            android:name="com.android.launcher3.settings.qsb.QsbSettingsActivity"
+            android:label="@string/qsb_settings_title"
             android:theme="@style/Theme.SubSettingsBase"
             android:exported="true"
             android:autoRemoveFromRecents="true"  />
