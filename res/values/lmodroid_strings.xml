@@ -82,10 +82,9 @@
 
     <!-- Hotseat searchbar -->
     <string name="label_search">Search</string>
-    <string name="label_lens">Google Lens</string>
-    <string name="label_voice_search">Voice search</string>
-    <string name="dock_search_title">Google search bar</string>
-    <string name="dock_search_summary">Search bar in the bottom dock</string>
+    <string name="qsb_settings_title">Search bar</string>
+    <string name="qsb_settings_summary">Choose the search bar to show in bottom dock</string>
+    <string name="qsb_disabled">None</string>
 
     <!-- Hotseat Background -->
     <string name="hotseat_bg_title">Hotseat background</string>

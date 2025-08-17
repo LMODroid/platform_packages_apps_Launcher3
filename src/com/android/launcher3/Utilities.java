@@ -22,6 +22,7 @@ import static com.android.launcher3.BuildConfig.WIDGET_ON_FIRST_SCREEN;
 import static com.android.launcher3.Flags.enableSmartspaceAsAWidget;
 import static com.android.launcher3.icons.BaseIconFactory.CONFIG_HINT_NO_WRAP;
 import static com.android.launcher3.icons.BitmapInfo.FLAG_THEMED;
+import static com.android.launcher3.qsb.QsbContainerView.getSearchWidgetPackageName;
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_POSITION_BOTTOM_OR_RIGHT;
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_POSITION_TOP_OR_LEFT;
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_TYPE_MAIN;
@@ -923,10 +924,10 @@ public final class Utilities {
     }
 
     public static boolean showQSB(Context context) {
-        return isGSAEnabled(context) && isQSBEnabled(context);
+        return getSearchWidgetPackageName(context) != null && isQSBEnabled(context);
     }
 
-    private static boolean isQSBEnabled(Context context) {
+    public static boolean isQSBEnabled(Context context) {
         SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
         return prefs.getBoolean(KEY_DOCK_SEARCH, true);
     }

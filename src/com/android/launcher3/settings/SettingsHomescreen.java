@@ -32,6 +32,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceFragmentCompat.OnPreferenceStartFragmentCallback;
 import androidx.preference.PreferenceFragmentCompat.OnPreferenceStartScreenCallback;
@@ -47,7 +48,7 @@ import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.model.WidgetsModel;
-import com.android.launcher3.qsb.QsbContainerView;
+import com.android.launcher3.settings.qsb.QsbSettingsActivity;
 
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity;
 
@@ -148,9 +149,9 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
         private boolean mPreferenceHighlighted = false;
 
         private static final String KEY_MINUS_ONE = "pref_enable_minus_one";
+        private static final String KEY_QSB = "pref_qsb";
 
         private Preference mShowGoogleAppPref;
-        private Preference mShowGoogleBarPref;
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -170,13 +171,23 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
             PreferenceScreen screen = getPreferenceScreen();
             for (int i = screen.getPreferenceCount() - 1; i >= 0; i--) {
                 Preference preference = screen.getPreference(i);
-                if (!initPreference(preference)) {
+                if (preference instanceof PreferenceCategory) {
+                    PreferenceCategory category = (PreferenceCategory) preference;
+                    for (int j = category.getPreferenceCount() - 1; j >= 0; j--) {
+                        Preference pref = category.getPreference(j);
+                        if (!initPreference(pref)) {
+                            category.removePreference(pref);
+                        }
+                    }
+                    if (category.getPreferenceCount() == 0) {
+                        screen.removePreference(category);
+                    }
+                } else if (!initPreference(preference)) {
                     screen.removePreference(preference);
                 }
             }
 
             mShowGoogleAppPref = screen.findPreference(KEY_MINUS_ONE);
-            mShowGoogleBarPref = screen.findPreference(Utilities.KEY_DOCK_SEARCH);
             updateIsGoogleAppEnabled();
 
             if (getActivity() != null && !TextUtils.isEmpty(getPreferenceScreen().getTitle())) {
@@ -214,7 +225,6 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             switch (key) {
-                case Utilities.KEY_DOCK_SEARCH:
                 case Utilities.KEY_SHOW_HOTSEAT_BG:
                 case Utilities.KEY_STATUS_BAR:
                 case Utilities.KEY_HOTSEAT_OPACITY:
@@ -241,9 +251,6 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
             if (mShowGoogleAppPref != null) {
                 mShowGoogleAppPref.setEnabled(Utilities.isGSAEnabled(getContext()));
             }
-            if (mShowGoogleBarPref != null) {
-                mShowGoogleBarPref.setEnabled(QsbContainerView.getSearchWidgetPackageName(getContext()) != null);
-            }
         }
 
         /**
@@ -251,6 +258,13 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
          * will remove that preference from the list.
          */
         protected boolean initPreference(Preference preference) {
+            switch (preference.getKey()) {
+                case KEY_QSB:
+                    preference.setOnPreferenceClickListener(p -> {
+                        startActivity(new Intent(getActivity(), QsbSettingsActivity.class));
+                        return true;
+                    });
+            }
             return true;
         }
 
