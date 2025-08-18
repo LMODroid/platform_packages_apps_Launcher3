@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.android.quickstep.views.MemInfoView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:androidprv="http://schemas.android.com/apk/prv/res/android"
     android:id="@+id/meminfo"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:textColor="?android:attr/textColorPrimary"
+    android:textColor="@androidprv:color/materialColorOnSecondaryContainer"
     android:textSize="12sp"
     android:background="@drawable/meminfo_bg"
     android:paddingHorizontal="8dp"
