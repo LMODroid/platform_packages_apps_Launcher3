@@ -988,4 +988,10 @@ public final class Utilities {
         SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
         return prefs.getBoolean(KEY_SINGLE_PAGE_CENTER, false);
     }
+
+    public static boolean useThemedIconsInRecents(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return Themes.isThemedIconEnabled(context)
+                && prefs.getBoolean(InvariantDeviceProfile.KEY_ALLAPPS_THEMED_ICONS, false);
+    }
 }
