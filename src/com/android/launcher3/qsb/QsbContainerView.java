@@ -317,7 +317,6 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
-        LauncherPrefs.getPrefs(getContext()).registerOnSharedPreferenceChangeListener(this);
         rebindFragment();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_PACKAGE_ADDED);
