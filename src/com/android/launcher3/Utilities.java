@@ -196,6 +196,8 @@ public final class Utilities {
     public static final String KEY_SINGLE_PAGE_CENTER = "pref_single_page_center";
     public static final String KEY_RECENTS_CHIPS = "pref_recents_chips";
     public static final String KEY_DRAWER_OPEN_KEYBOARD = "pref_drawer_open_keyboard";
+    public static final String KEY_HOTSEAT_SUGGESTIONS = "pref_hotseat_suggestions";
+    public static final String KEY_ALLAPPS_SUGGESTIONS = "pref_allapps_suggestions";
 
     /**
      * Returns true if theme is dark.
@@ -993,5 +995,15 @@ public final class Utilities {
         SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
         return Themes.isThemedIconEnabled(context)
                 && prefs.getBoolean(InvariantDeviceProfile.KEY_ALLAPPS_THEMED_ICONS, false);
+    }
+
+    public static boolean showHotseatSuggestions(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return prefs.getBoolean(KEY_HOTSEAT_SUGGESTIONS, true);
+    }
+
+    public static boolean showAllappsSuggestions(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return prefs.getBoolean(KEY_ALLAPPS_SUGGESTIONS, true);
     }
 }

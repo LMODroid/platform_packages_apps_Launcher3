@@ -209,6 +209,9 @@ public class SettingsAppDrawer extends CollapsingToolbarBaseActivity
                 case Utilities.KEY_DRAWER_SEARCH:
                     LauncherAppState.getInstance(getContext()).setNeedsRestart();
                     break;
+                case Utilities.KEY_ALLAPPS_SUGGESTIONS:
+                    LauncherAppState.getInstance(getContext()).getModel().forceReload();
+                    break;
                 default:
                     break;
             }

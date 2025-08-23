@@ -20,6 +20,13 @@
     xmlns:settings="http://schemas.android.com/apk/res/com.android.launcher3">
 
     <SwitchPreferenceCompat
+        android:key="pref_allapps_suggestions"
+        android:title="@string/pref_suggestions_title"
+        android:summary="@string/pref_allapps_suggestions_summary"
+        android:defaultValue="true"
+        android:persistent="true"/>
+
+    <SwitchPreferenceCompat
         android:key="pref_drawer_search"
         android:title="@string/drawer_search_title"
         android:summary="@string/drawer_search_summary"

@@ -232,6 +232,9 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
                 case Utilities.KEY_SINGLE_PAGE_CENTER:
                     LauncherAppState.getInstance(getContext()).setNeedsRestart();
                     break;
+                case Utilities.KEY_HOTSEAT_SUGGESTIONS:
+                    LauncherAppState.getInstance(getContext()).getModel().forceReload();
+                    break;
                 default:
                     break;
             }

@@ -112,8 +112,9 @@
     <string name="background_blur_summary">Set blur depth level for recents and app drawer</string>
 
     <!-- Suggestions -->
-    <string name="suggestion_pref_screen_title">Suggestions</string>
-    <string name="suggestion_pref_screen_desc">For All Apps &amp; Home screen suggestions</string>
+    <string name="pref_suggestions_title">Show app suggestions</string>
+    <string name="pref_hotseat_suggestions_summary">Bottom row of apps on the home screen</string>
+    <string name="pref_allapps_suggestions_summary">Suggestions in all apps list</string>
 
     <!-- Background opacity -->
     <string name="background_opacity_title">Background opacity</string>
