@@ -182,6 +182,8 @@ public final class Utilities {
     public static final String KEY_SHORT_PARALLAX = "pref_short_parallax";
     public static final String KEY_SINGLE_PAGE_CENTER = "pref_single_page_center";
     public static final String KEY_DOCK_SEARCH = "pref_dock_search";
+    public static final String KEY_HOTSEAT_SUGGESTIONS = "pref_hotseat_suggestions";
+    public static final String KEY_ALLAPPS_SUGGESTIONS = "pref_allapps_suggestions";
 
     /**
      * Returns true if theme is dark.
@@ -1096,4 +1098,13 @@ public final class Utilities {
                 && isQSBEnabled(context);
     }
 
+    public static boolean showHotseatSuggestions(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return prefs.getBoolean(KEY_HOTSEAT_SUGGESTIONS, true);
+    }
+
+    public static boolean showAllappsSuggestions(Context context) {
+        SharedPreferences prefs = LauncherPrefs.getPrefs(context.getApplicationContext());
+        return prefs.getBoolean(KEY_ALLAPPS_SUGGESTIONS, true);
+    }
 }

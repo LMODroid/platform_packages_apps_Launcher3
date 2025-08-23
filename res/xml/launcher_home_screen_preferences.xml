@@ -41,6 +41,13 @@
             launcher:logIdOff="614" />
 
         <SwitchPreferenceCompat
+            android:key="pref_hotseat_suggestions"
+            android:title="@string/pref_suggestions_title"
+            android:summary="@string/pref_hotseat_suggestions_summary"
+            android:defaultValue="true"
+            android:persistent="true"/>
+
+        <SwitchPreferenceCompat
             android:key="pref_sleep_gesture"
             android:title="@string/pref_sleep_gesture_title"
             android:summary="@string/pref_sleep_gesture_summary"
