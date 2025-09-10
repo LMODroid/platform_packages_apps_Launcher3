@@ -136,7 +136,7 @@ public class LauncherAppWidgetProviderInfo extends AppWidgetProviderInfo impleme
                             dp.getWorkspaceIconProfile().getCellLayoutBorderSpacePx().x,
                             cellSize.x));
             minSpanY = Math.max(minSpanY,
-                    getSpanY(widgetPadding, minResizeHeight,
+                    getSpanY(new Rect(), minResizeHeight,
                             dp.getWorkspaceIconProfile().getCellLayoutBorderSpacePx().y,
                             cellSize.y));
 
