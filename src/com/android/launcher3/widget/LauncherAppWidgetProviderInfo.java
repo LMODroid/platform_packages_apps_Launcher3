@@ -136,7 +136,7 @@ public class LauncherAppWidgetProviderInfo extends AppWidgetProviderInfo impleme
                     getSpanX(widgetPadding, minResizeWidth, dp.cellLayoutBorderSpacePx.x,
                             cellSize.x));
             minSpanY = Math.max(minSpanY,
-                    getSpanY(widgetPadding, minResizeHeight, dp.cellLayoutBorderSpacePx.y,
+                    getSpanY(new Rect(), minResizeHeight, dp.cellLayoutBorderSpacePx.y,
                             cellSize.y));
 
             if (maxResizeWidth > 0) {
