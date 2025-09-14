@@ -128,7 +128,7 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
 
     public static boolean isQsbWidget(Context context, AppWidgetProviderInfo info) {
         LauncherAppWidgetProviderInfo launcherInfo =
-                LauncherAppWidgetProviderInfo.fromProviderInfo(context, info);
+                LauncherAppWidgetProviderInfo.fromProviderInfo(context, info, true);
         InvariantDeviceProfile idp = LauncherAppState.getIDP(context);
         boolean isHomeScreenWidget = (info.widgetCategory
                 & AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN) != 0;
@@ -138,19 +138,14 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
                 & AppWidgetProviderInfo.WIDGET_CATEGORY_SEARCHBOX) != 0
                 || info.provider.getShortClassName().toLowerCase().contains("search");
 
-        // Only a Nx1 widget fits inside the QSB, where N is atleast columns-1.
-        // For example on a 5x5 grid only a 4x1 or 5x1 widget fits in QSB.
-        boolean fitsInQsb = launcherInfo.spanY == 1 && launcherInfo.spanX >= idp.numColumns - 1;
-
-        // Exclude widgets hidden from widget picker.
-        boolean isHidden = (info.widgetFeatures
-                & AppWidgetProviderInfo.WIDGET_FEATURE_HIDE_FROM_PICKER) != 0;
+        // Ensure the widget fits inside the QSB area.
+        boolean fitsInQsb = launcherInfo.spanY == 1 && launcherInfo.spanX == 1;
 
         // Exclude widgets that require initial configuration
         boolean noConfig = info.configure == null || (info.widgetFeatures
                 & AppWidgetProviderInfo.WIDGET_FEATURE_CONFIGURATION_OPTIONAL) != 0;
 
-        return isHomeScreenWidget && isSearchWidget && fitsInQsb && !isHidden && noConfig;
+        return isHomeScreenWidget && isSearchWidget && fitsInQsb && noConfig;
     }
 
     /**
