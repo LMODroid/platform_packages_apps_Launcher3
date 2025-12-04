@@ -230,12 +230,6 @@ class SystemUiProxy @Inject constructor(@ApplicationContext private val context:
         }
     }
 
-    fun injectPress(keyCode: Int) {
-        executeWithErrorLog({ "Failed call injectPress" }) {
-            systemUiProxy?.injectPress(keyCode)
-        }
-    }
-
     fun updateContextualEduStats(isTrackpadGesture: Boolean, gestureType: GestureType) =
         executeWithErrorLog({ "Failed call updateContextualEduStats" }) {
             systemUiProxy?.updateContextualEduStats(isTrackpadGesture, gestureType.name)
