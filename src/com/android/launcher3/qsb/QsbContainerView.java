@@ -42,6 +42,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -60,6 +61,10 @@ import com.android.launcher3.settings.qsb.QsbSettingsActivity;
 import com.android.launcher3.widget.LauncherAppWidgetProviderInfo;
 import com.android.launcher3.widget.util.WidgetSizes;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 /**
  * A frame layout which contains a QSB.
  *
@@ -68,9 +73,17 @@ import com.android.launcher3.widget.util.WidgetSizes;
  */
 public class QsbContainerView extends FrameLayout implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private static final String TAG = "QsbContainerView";
     public static final String SEARCH_ENGINE_SETTINGS_KEY = "selected_search_engine";
     public static final String SEARCH_COMPONENT_PREF_KEY =
             "selected_search_component";
+
+    private static final ComponentName SEARCH_PROVIDER_DEFAULT = ComponentName.unflattenFromString(
+            "com.google.android.googlequicksearchbox/com.google.android.googlequicksearchbox.SearchWidgetProvider");
+    private static final Set<String> SEARCH_PROVIDER_BLOCKLIST = Set.of(
+        // List of flattened component names
+        "com.google.android.googlequicksearchbox/com.google.android.apps.gsa.staticplugins.searchwidget.PremiumSearchWidgetProvider"
+    );
 
     public static final int QSB_WIDGET_HOST_ID = 1026;
     protected static final String mKeyWidgetId = "qsb_widget_id";
@@ -107,27 +120,59 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
     @WorkerThread
     @Nullable
     public static AppWidgetProviderInfo getSearchWidgetProviderInfo(@NonNull Context context) {
+        /**
+         * Handle following cases:
+         * 1) Search widget package is unavailable or not set:
+         *    - qsb is disabled.
+         * 2) Only search widget package is set:
+         *    - if it is the default search package (GSA) then use the specified default qsb
+         *      provider.
+         *    - if it is any other package, use its first available qsb provider
+         * 3) Both package and component is set:
+         *    - find the exact qsb provider matching both
+         *    - if no match found, use first available qsb provider for the package
+         */
         String providerPkg = getSearchWidgetPackageName(context);
         if (providerPkg == null) {
             return null;
         }
 
-        String providerComponent = LauncherPrefs.getPrefs(context).getString(
-                SEARCH_COMPONENT_PREF_KEY, null);
-        AppWidgetProviderInfo defaultWidgetForSearchPackage = null;
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        List<AppWidgetProviderInfo> providers = getQsbWidgetProviders(context, providerPkg);
+        if (providers.isEmpty()) {
+            return null;
+        }
+
+        String providerComponent =
+                LauncherPrefs.getPrefs(context).getString(SEARCH_COMPONENT_PREF_KEY, null);
+        Log.d(TAG, "providerPkg=" + providerPkg + " providerComponent=" + providerComponent);
+
+        if (providerComponent == null) {
+            if (providerPkg == SEARCH_PROVIDER_DEFAULT.getPackageName()) {
+                return providers.stream()
+                            .filter(p -> p.provider.equals(SEARCH_PROVIDER_DEFAULT))
+                            .findFirst()
+                            .orElse(null);
+            } else {
+                return providers.getFirst();
+            }
+        } else {
+            ComponentName provider = ComponentName.unflattenFromString(providerComponent);
+            return providers.stream()
+                    .filter(p -> p.provider.equals(provider))
+                    .findFirst()
+                    .orElse(providers.getFirst());
+        }
+    }
+
+    private static List<AppWidgetProviderInfo> getQsbWidgetProviders(Context context, String pkg) {
+        List<AppWidgetProviderInfo> providers = new ArrayList<>();
         for (AppWidgetProviderInfo info :
-                appWidgetManager.getInstalledProvidersForPackage(providerPkg, null)) {
-            // If the provider component isn't set, find the first feasible widget for the given
-            // provider package.
-            if (info.provider.getPackageName().equals(providerPkg)
-                    && (providerComponent == null
-                            || info.provider.flattenToString().equals(providerComponent))
-                    && isQsbWidget(context, info)) {
-                return info;
+                AppWidgetManager.getInstance(context).getInstalledProvidersForPackage(pkg, null)) {
+            if (info.provider.getPackageName().equals(pkg) && isQsbWidget(context, info)) {
+                providers.add(info);
             }
         }
-        return null;
+        return providers;
     }
 
     public static boolean isQsbWidget(Context context, AppWidgetProviderInfo info) {
@@ -136,6 +181,10 @@ public class QsbContainerView extends FrameLayout implements SharedPreferences.O
         InvariantDeviceProfile idp = LauncherAppState.getIDP(context);
         boolean isHomeScreenWidget = (info.widgetCategory
                 & AppWidgetProviderInfo.WIDGET_CATEGORY_HOME_SCREEN) != 0;
+
+        if (SEARCH_PROVIDER_BLOCKLIST.contains(info.provider.flattenToString())) {
+            return false;
+        }
 
         // Some widgets don't set their categories correctly so we guess by their provider class.
         boolean isSearchWidget = (info.widgetCategory

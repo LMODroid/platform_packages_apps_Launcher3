@@ -116,6 +116,7 @@ public final class QsbSettingsFragment extends RadioSettingsFragment {
 
     @Override
     public void onSelected(String key) {
+        Log.d(TAG, "selected qsb component: " + key);
         boolean isEnabled = Utilities.isQSBEnabled(getActivity());
         boolean enable = key != KEY_DISABLED;
         boolean needsRestart = false;
