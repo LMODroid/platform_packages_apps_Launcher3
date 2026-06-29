@@ -31,6 +31,7 @@ import com.android.launcher3.icons.BitmapInfo;
 import com.android.launcher3.icons.BitmapInfo.DrawableCreationFlags;
 import com.android.launcher3.icons.FastBitmapDrawable;
 import com.android.launcher3.icons.IconShape;
+import com.android.launcher3.icons.LauncherIcons;
 import com.android.launcher3.icons.cache.CacheLookupFlag;
 import com.android.launcher3.logging.FileLog;
 import com.android.launcher3.pm.PackageInstallInfo;
@@ -330,6 +331,9 @@ public abstract class ItemInfoWithIcon extends ItemInfo {
         }
         if (!themeManager.isIconThemeEnabled()) {
             creationFlags &= ~FLAG_THEMED;
+        }
+        try (LauncherIcons li = LauncherIcons.obtain(context)) {
+            bitmap = bitmap.withUser(user, li);
         }
         FastBitmapDrawable drawable = bitmap.newIcon(context, creationFlags, iconShape);
         drawable.setDisabled(isDisabled());
