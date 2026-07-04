@@ -148,6 +148,7 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
         private boolean mPreferenceHighlighted = false;
 
         private static final String KEY_MINUS_ONE = "pref_enable_minus_one";
+        private static final String KEY_SHOW_HOTSEAT_QSB = "pref_show_hotseat_qsb";
         private static final String SEARCH_PACKAGE = "com.google.android.googlequicksearchbox";
 
         private Preference mShowGoogleAppPref;
@@ -176,6 +177,12 @@ public class SettingsHomescreen extends CollapsingToolbarBaseActivity
             }
 
             mShowGoogleAppPref = screen.findPreference(KEY_MINUS_ONE);
+
+            // The hotseat search bar is the Google app's search widget
+            Preference hotseatQsb = screen.findPreference(KEY_SHOW_HOTSEAT_QSB);
+            if (hotseatQsb != null) {
+                hotseatQsb.setVisible(LMOUtils.isPackageEnabled(getContext(), SEARCH_PACKAGE));
+            }
             updateIsGoogleAppEnabled();
 
             if (getActivity() != null && !TextUtils.isEmpty(getPreferenceScreen().getTitle())) {

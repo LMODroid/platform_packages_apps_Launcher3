@@ -23,6 +23,13 @@
         android:title="@string/general_category_title">
 
         <SwitchPreferenceCompat
+            android:key="pref_show_hotseat_qsb"
+            android:title="@string/pref_show_hotseat_qsb_title"
+            android:summary="@string/pref_show_hotseat_qsb_summary"
+            android:defaultValue="false"
+            android:persistent="true" />
+
+        <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="pref_workspace_lock"
             android:persistent="true"
