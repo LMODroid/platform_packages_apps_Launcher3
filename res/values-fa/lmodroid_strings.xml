@@ -15,8 +15,10 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <!-- General -->
-    <string name="settings_title">تنظیمات صفحه اصلی</string>
+    <!-- All apps themed icons -->
+    <string name="pref_themed_icons_title">استفاده از آیکون‌های همگام با پوسته در منو</string>
+    <string name="pref_themed_icons_summary">پیروی از آیکون‌های همگام با پوسته‌ استفاده شده در صفحه اصلی</string>
+    <string name="themed_icons_disabled_summary">آیکون‌های همگام با پوسته در بخش «کاغذ دیواری و سبک» خاموش هستند</string>
 
     <!-- Categories -->
     <string name="home_category_title">صفحه اصلی</string>
@@ -31,7 +33,6 @@
     <string name="misc_category_summary">گزینه های دیگر</string>
     <string name="general_category_title">عمومی</string>
     <string name="interface_category_title">رابط</string>
-    <string name="search_bar_category_title">نوار جستجو</string>
     <string name="actions_category_title">اقدامات سریع</string>
 
     <!-- Developer options -->
@@ -56,15 +57,18 @@
     <!-- Settings message explaining when the -1 screen is available on an RTL device. [CHAR LIMIT=100] -->
     <string name="msg_minus_one_on_right">وقتی از صفحه خانه اصلی به سمت چپ بکشید</string>
 
+    <!-- Suggestions -->
+    <string name="pref_suggestions_title">نمایش برنامه‌های پیشنهادی</string>
+    <string name="pref_hotseat_suggestions_summary">ردیف پایین برنامه‌ها در صفحه اصلی</string>
+    <string name="pref_allapps_suggestions_summary">پیشنهادات در لیست همه برنامه‌ها</string>
+
+    <!-- Open keyboard -->
+    <string name="drawer_open_keyboard_title">کشیدن به بالا برای شروع جستجو</string>
+    <string name="drawer_open_keyboard_summary">باز شدن صفحه‌کلید به محض نمایان شدن کشوی برنامه‌ها</string>
+
     <!-- DT2S -->
     <string name="pref_sleep_gesture_title">برای قفل صفحه دوبار کلیک کنید</string>
     <string name="pref_sleep_gesture_summary">برای قفل کردن صفحه دوبار در فضای خالی کلیک کنید</string>
-
-    <!-- Custom seekbar -->
-    <string name="custom_seekbar_value">مقدار: <xliff:g id="v">%s</xliff:g></string>
-    <string name="custom_seekbar_default_value">به صورت پیش فرض</string>
-    <string name="custom_seekbar_default_value_to_set">مقدار پیش فرض: <xliff:g id="v">%s</xliff:g>\n لمس طولانی برای تنظیم</string>
-    <string name="custom_seekbar_default_value_is_set">مقدار پیش فرض تنظیم شده است.</string>
 
     <!-- Icon size -->
     <string name="icon_size_title">اندازه آیکون</string>
@@ -83,7 +87,7 @@
     <string name="dock_search_summary">نوار جستجو در حاشیه پایین</string>
 
     <!-- Hotseat Background -->
-    <string name="hotseat_bg_title">Hotseat پس زمینه</string>
+    <string name="hotseat_bg_title">پس‌زمینه داک پایین (Hotseat)</string>
     <string name="hotseat_bg_summary">افزودن پس زمینه شفاف به داک برنامه</string>
 
     <!-- Wallpaper scrolling -->
@@ -107,29 +111,15 @@
     <string name="background_blur_title">عمق ماتی پس زمینه</string>
     <string name="background_blur_summary">تنظیم عمق ماتی برای صفخه های اخیر و کشو برنامه</string>
 
-    <!-- Suggestions -->
-    <string name="suggestion_pref_screen_title">پیشنهادات</string>
-    <string name="suggestion_pref_screen_desc">برای همه برنامه ها و پیشنهادهای صفحه اصلی</string>
-
     <!-- Background opacity -->
     <string name="background_opacity_title">شفافیت پس زمینه</string>
 
     <!-- Recents icons -->
+    <string name="recents_chips_title">استفاده از طراحی فشرده اقدامات سریع</string>
+    <string name="recents_chips_summary">ممکن است برای نمایش تعداد زیاد اقدامات سریع لازم باشد</string>
     <string name="recents_screenshot_title">عکس برداری از صفحه</string>
     <string name="recents_clear_all_title">پاک کردن همه</string>
     <string name="recents_lens_title">لنز</string>
-
-    <!-- All apps themed icons -->
-    <string name="pref_themed_icons_title">آیکون هایتم دار</string>
-    <string name="pref_themed_icons_summary">دنبال کردن آیکون های تم دار صفحه برنامه ها</string>
-
-    <!-- AppInfo -->
-    <string name="app_info_version_value" translatable="false">%1$s (%2$d)</string>
-    <string name="app_info_source">منبع</string>
-    <string name="app_info_source_unknown">منبع ناشناس</string>
-    <string name="app_info_last_update">آخرین به روزرسانی</string>
-    <string name="app_info_version">نسخه</string>
-    <string name="app_info_more">بیشتر</string>
 
     <!-- Kill App recents action shortcut -->
     <string name="recent_task_option_kill_app">بستن</string>
@@ -138,14 +128,11 @@
     <!-- Memory info -->
     <string name="meminfo_text">%1$s در دسترس | %2$s همه</string>
     <string name="recents_meminfo_title">اطلاعات حافظه</string>
+    <string name="recents_meminfo_summary">نمایش میزان مصرف رم (RAM) در پایین صفحه</string>
 
     <!-- App drawer searchbar -->
     <string name="drawer_search_title">نوار جستجوی برنامه</string>
     <string name="drawer_search_summary">نوار جستجو در بالای کشو برنامه</string>
-
-    <!-- Restart launcher -->
-    <string name="pref_restart_title">راه اندازی مجدد</string>
-    <string name="pref_restart_summary">راه اندازی مجدد لانچر به صورت دستی برای اعمال تنظیمات در انتظار</string>
 
     <!-- Shake Clear Recents -->
     <string name="recents_shake_clear_all_title">برای حذف تمامی تسک ها دستگاه را تکان دهید</string>
@@ -161,4 +148,12 @@
     <string name="icon_pack_default_label">پیش فرض</string>
     <string name="icon_pack_add">نصب بیشتر</string>
     <string name="icon_pack_no_market">فروشگاه برنامه موجود نیست</string>
+
+    <!-- Hotseat searchbar -->
+    <string name="qsb_settings_title">نوار جستجو</string>
+    <string name="qsb_settings_summary">انتخاب نوار جستجو جهت نمایش در داک پایین</string>
+    <string name="qsb_disabled">هیچ‌کدام</string>
+
+    <!-- LMOFreeform -->
+    <string name="floating_window">سایدبار</string>
 </resources>
