@@ -102,8 +102,14 @@ class SetupNavLayoutter(
         )
 
         if (imeSwitcher != null) {
+            val imeStartMargin =
+                resources.getDimensionPixelSize(
+                    R.dimen.taskbar_ime_switcher_button_margin_start
+                )
             startContextualContainer.addView(imeSwitcher)
-            imeSwitcher.layoutParams = getParamsToCenterView()
+            val imeSwitcherButtonParams = getParamsToCenterView()
+            imeSwitcherButtonParams.marginStart = imeStartMargin
+            imeSwitcher.layoutParams = imeSwitcherButtonParams
         }
         if (a11yButton != null) {
             endContextualContainer.addView(a11yButton)
