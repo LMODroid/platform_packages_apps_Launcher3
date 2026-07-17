@@ -27,6 +27,7 @@ public class TaskbarKeyguardController implements TaskbarControllers.LoggableTas
     private final TaskbarActivityContext mContext;
     private long mKeyguardSysuiFlags;
     private boolean mBouncerShowing;
+    private boolean mIsKeyguardVisible;
     private NavbarButtonsViewController mNavbarButtonsViewController;
     private final KeyguardManager mKeyguardManager;
 
@@ -54,11 +55,10 @@ public class TaskbarKeyguardController implements TaskbarControllers.LoggableTas
                 (systemUiStateFlags & SYSUI_STATE_STATUS_BAR_KEYGUARD_SHOWING_OCCLUDED) != 0;
         boolean dozing = (systemUiStateFlags & SYSUI_STATE_DEVICE_DOZING) != 0;
 
-
         mBouncerShowing = bouncerShowing;
+        mIsKeyguardVisible = keyguardShowing || dozing;
 
-        mNavbarButtonsViewController.setKeyguardVisible(keyguardShowing || dozing,
-                keyguardOccluded);
+        mNavbarButtonsViewController.setKeyguardVisible(mIsKeyguardVisible, keyguardOccluded);
         updateIconsForBouncer();
 
         boolean asleepOrGoingToSleep = (systemUiStateFlags & SYSUI_STATE_AWAKE) == 0;
@@ -70,6 +70,10 @@ public class TaskbarKeyguardController implements TaskbarControllers.LoggableTas
                     (systemUiStateFlags & SYSUI_STATE_WAKEFULNESS_MASK) != WAKEFULNESS_ASLEEP;
             AbstractFloatingView.closeOpenViews(mContext, animateViewClosing, TYPE_ALL);
         }
+    }
+
+    public boolean isKeyguardVisible() {
+        return mIsKeyguardVisible;
     }
 
     /**
