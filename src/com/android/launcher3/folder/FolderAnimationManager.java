@@ -373,6 +373,39 @@ public class FolderAnimationManager {
         final int numItemsInFirstPagePreview = isOnFirstPage
                 ? numItemsInPreview : MAX_NUM_ITEMS_IN_PREVIEW;
 
+        // Smaller preview icons also shrink the rest of the grid into the reveal area.
+        // Hide non-preview items near the collapsed state instead of relying on clipping
+        // alone to keep a fifth icon out of the folder preview.
+        // Start revealing the other icons alongside the preview icons, while the folder
+        // is still expanding. On close, finish fading before reaching the small preview.
+        final int nonPreviewFadeDelay = mIsOpening ? mDelay : 0;
+        final int nonPreviewFadeDuration = mIsOpening ? mDuration - mDelay : mDuration / 2;
+        for (View icon : mFolder.getItemsOnPage(mContent.getCurrentPage())) {
+            if (itemsInPreview.contains(icon)) {
+                continue;
+            }
+            // Folder.animateOpen() seeks the AnimatorSet before starting it. Initialize
+            // newly bound views now so that the first frame and delayed fade both start
+            // transparent, even before onAnimationStart is delivered.
+            icon.setAlpha(mIsOpening ? 0f : 1f);
+            Animator fade = getAnimator(icon, ALPHA, 0f, 1f);
+            fade.setInterpolator(mIsOpening
+                    ? mFolderOpenInterpolator : mFolderCloseInterpolator);
+            play(animatorSet, fade, nonPreviewFadeDelay, nonPreviewFadeDuration);
+            animatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    icon.setAlpha(mIsOpening ? 0f : 1f);
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    // Also restore on cancellation, so reopening never leaves hidden apps.
+                    icon.setAlpha(1f);
+                }
+            });
+        }
+
         TimeInterpolator previewItemInterpolator = getPreviewItemInterpolator();
 
         ShortcutAndWidgetContainer cwc = mContent.getPageAt(0).getShortcutsAndWidgets();

@@ -193,6 +193,11 @@ public class PreviewItemManager {
         // The first item should be drawn last (ie. on top of later items)
         for (int i = params.size() - 1; i >= 0; i--) {
             PreviewItemDrawingParams p = params.get(i);
+            // Exit positions can still overlap the preview with compact icon spacing.
+            // Once the exit animation ends, this item is no longer part of the preview.
+            if (p.index == EXIT_INDEX && p.anim == null) {
+                continue;
+            }
             if (!p.hidden) {
                 // Exiting param should always be clipped.
                 boolean isExiting = p.index == EXIT_INDEX;
