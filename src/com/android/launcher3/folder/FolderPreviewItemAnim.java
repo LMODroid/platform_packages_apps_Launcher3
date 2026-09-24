@@ -85,6 +85,7 @@ class FolderPreviewItemAnim {
                     onCompleteRunnable.run();
                 }
                 params.anim = null;
+                mItemManager.onParamsChanged();
             }
         });
         mAnimator.setDuration(duration);

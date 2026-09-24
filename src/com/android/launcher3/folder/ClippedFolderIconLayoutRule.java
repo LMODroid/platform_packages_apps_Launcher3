@@ -7,14 +7,15 @@ public class ClippedFolderIconLayoutRule {
     public static final int MAX_NUM_ITEMS_IN_PREVIEW = 4;
     private static final int MIN_NUM_ITEMS_IN_PREVIEW = 2;
 
-    public static final float MIN_SCALE = 0.44f;
-    public static final float MAX_SCALE = 0.51f;
+    // Leave room for the full drawable bounds inside the circular folder background.
+    public static final float MIN_SCALE = 0.38f;
+    public static final float MAX_SCALE = 0.43f;
 
     private static final float MAX_RADIUS_DILATION = 0.25f;
     // The max amount of overlap the preview items can go outside of the background bounds.
     public static final float ICON_OVERLAP_FACTOR = 1 + (MAX_RADIUS_DILATION / 2f);
-    private static final float ITEM_RADIUS_SCALE_FACTOR = 1.15f;
-    private static final float ITEM_RADIUS_SCALE_FACTOR_SHAPES = 1.2f;
+    private static final float ITEM_RADIUS_SCALE_FACTOR = 0.95f;
+    private static final float ITEM_RADIUS_SCALE_FACTOR_SHAPES = 1.0f;
 
     public static final int EXIT_INDEX = -2;
     public static final int ENTER_INDEX = -3;
