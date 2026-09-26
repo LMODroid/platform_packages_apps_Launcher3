@@ -50,7 +50,8 @@ object DimensionUtils {
         }
 
         // Taskbar on phone, portrait
-        if (!deviceProfile.deviceProperties.isLandscape) {
+        if (deviceProfile.deviceProperties.isLandscape ==
+            deviceProfile.deviceProperties.isDefaultLandscape) {
             p.x = ViewGroup.LayoutParams.MATCH_PARENT
             p.y = res.getDimensionPixelSize(R.dimen.taskbar_phone_size)
             return p
