@@ -16,10 +16,13 @@
 
 package com.android.launcher3.deviceprofile
 
+import android.content.Context
 import android.graphics.Rect
+import android.provider.Settings
 import com.android.launcher3.display.LauncherDisplayInfo
 import com.android.launcher3.util.WindowBounds
 import com.android.wm.shell.Flags
+import com.libremobileos.providers.LMOSettings
 import kotlin.math.max
 import kotlin.math.min
 
@@ -61,6 +64,7 @@ data class DeviceProperties(
             windowBounds: WindowBounds,
             deviceConfiguration: DeviceConfiguration,
             isTaskbarDrawnInProcess: Boolean,
+            taskbarSetting: Int? = 1,
         ): DeviceProperties {
             val isLargeScreen = info.isLargeScreen(windowBounds)
             val windowX = windowBounds.bounds.left
@@ -93,9 +97,21 @@ data class DeviceProperties(
                         isTaskbarPresent =
                             (isLargeScreen ||
                                 (taskbarOrBubbleBarOnPhones &&
-                                    deviceConfiguration.isGestureMode)) && isTaskbarDrawnInProcess
+                                    deviceConfiguration.isGestureMode)) && isTaskbarDrawnInProcess &&
+                            isTaskbarEnabled(taskbarSetting, isLargeScreen)
                     ),
             )
         }
+
+        /** [LMOSettings.System.ENABLE_TASKBAR], or null when it was never set. */
+        @JvmStatic
+        fun readTaskbarSetting(context: Context): Int? =
+            Settings.System.getInt(context.contentResolver, LMOSettings.System.ENABLE_TASKBAR, -1)
+                .takeIf { it >= 0 }
+
+        /** The taskbar is on by default on large screens and opt-in on phones. */
+        @JvmStatic
+        fun isTaskbarEnabled(taskbarSetting: Int?, isLargeScreen: Boolean): Boolean =
+            taskbarSetting?.let { it != 0 } ?: isLargeScreen
     }
 }

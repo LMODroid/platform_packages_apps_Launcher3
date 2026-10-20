@@ -19,7 +19,6 @@ package com.android.launcher3;
 import static com.android.launcher3.InvariantDeviceProfile.createDisplayOptionSpec;
 import static com.android.launcher3.Utilities.dpiFromPx;
 import static com.android.launcher3.icons.IconNormalizer.ICON_VISIBLE_AREA_FACTOR;
-import static com.android.launcher3.taskbar.TaskbarManagerImpl.ENABLE_TASKBAR_URI;
 import static com.android.launcher3.testing.shared.ResourceUtils.INVALID_RESOURCE_HANDLE;
 import static com.android.launcher3.testing.shared.ResourceUtils.pxFromDp;
 import static com.android.systemui.shared.Flags.enableRecentsInTaskbar;
@@ -69,7 +68,6 @@ import com.android.launcher3.responsive.ResponsiveSpec.DimensionType;
 import com.android.launcher3.responsive.ResponsiveSpecsProvider;
 import com.android.launcher3.util.IconSizeSteps;
 import com.android.launcher3.util.ResourceHelper;
-import com.android.launcher3.util.SettingsCache;
 import com.android.launcher3.util.WindowBounds;
 import com.android.launcher3.util.window.WindowManagerProxy;
 
@@ -819,8 +817,6 @@ public class DeviceProfile {
      * Returns the padding for hotseat view
      */
     public Rect getHotseatLayoutPadding(Context context) {
-        boolean isTaskbarPresent = mDeviceProperties.getTaskbarConfiguration().isTaskbarPresent() &&
-                SettingsCache.INSTANCE.get(context).getValue(ENABLE_TASKBAR_URI);
         Rect hotseatBarPadding = new Rect();
         if (isVerticalBarLayout()) {
             // The hotseat icons will be placed in the middle of the hotseat cells.
@@ -879,7 +875,7 @@ public class DeviceProfile {
             } else {
                 hotseatBarPadding.left += qsbWidth;
             }
-        } else if (isTaskbarPresent) {
+        } else if (mDeviceProperties.getTaskbarConfiguration().isTaskbarPresent()) {
             // Center the QSB vertically with hotseat
             int hotseatBarBottomPadding = getHotseatBarBottomPadding();
             int hotseatBarTopPadding =
@@ -1667,6 +1663,7 @@ public class DeviceProfile {
         private boolean mIsExternalDisplay = false;
         private Boolean mTransposeLayoutWithOrientation;
         private Boolean mIsGestureMode;
+        private Integer mTaskbarSetting = 1;
 
         private Boolean mIsWorkspaceItemsLabelHidden = false;
 
@@ -1708,6 +1705,12 @@ public class DeviceProfile {
          */
         public Builder setIsWorkspaceItemsLabelHidden(boolean isWorkspaceItemsLabelHidden) {
             mIsWorkspaceItemsLabelHidden = isWorkspaceItemsLabelHidden;
+            return this;
+        }
+
+        /** {@link DeviceProperties#readTaskbarSetting}: null when unset */
+        public Builder setTaskbarSetting(@Nullable Integer taskbarSetting) {
+            mTaskbarSetting = taskbarSetting;
             return this;
         }
 
@@ -1783,7 +1786,8 @@ public class DeviceProfile {
                                     mIsGestureMode,
                                     mIsWorkspaceItemsLabelHidden
                             ),
-                            mWMProxy.isTaskbarDrawnInProcess()
+                            mWMProxy.isTaskbarDrawnInProcess(),
+                            mTaskbarSetting
                     ),
                     mViewScaleProvider,
                     mOverrideProvider,

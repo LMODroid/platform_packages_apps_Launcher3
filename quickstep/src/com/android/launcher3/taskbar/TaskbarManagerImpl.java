@@ -75,6 +75,7 @@ import com.android.launcher3.R;
 import com.android.launcher3.anim.AnimatorListeners;
 import com.android.launcher3.concurrent.annotations.TaskbarUi;
 import com.android.launcher3.dagger.ApplicationContext;
+import com.android.launcher3.deviceprofile.DeviceProperties;
 import com.android.launcher3.statehandlers.DesktopVisibilityController;
 import com.android.launcher3.statehandlers.DesktopVisibilityController.DesktopVisibilityListener;
 import com.android.launcher3.statemanager.StatefulActivity;
@@ -355,7 +356,7 @@ public class TaskbarManagerImpl {
 
         var enableTaskbarSafeCloseable = settingsCache.getListenableRef(ENABLE_TASKBAR_URI).forEach(
                 getTaskbarUiThread(),
-                v -> onTaskbarChanged(v, TaskbarActivityContext::isTaskbarEnabled));
+                v -> onTaskbarEnabledChanged());
         cleanupTasks.addCloseable(getTaskbarUiThread(), enableTaskbarSafeCloseable);
 
         var enableNavbarHintSafeCloseable = settingsCache.getListenableRef(NAVIGATION_BAR_HINT_URI)
@@ -496,6 +497,23 @@ public class TaskbarManagerImpl {
             if (activity != null && oldValue.apply(activity) != newValue) {
                 resource.debugMsg("onSettingChanged");
                 recreateTaskbarForDisplay(resource, 0, "onSettingChanged");
+            }
+        });
+        return Unit.INSTANCE;
+    }
+
+    /**
+     * The taskbar default differs per device (off on phones), but SettingsCache reads an unset
+     * value as enabled, so compare the effective value instead of the cached one.
+     */
+    private Unit onTaskbarEnabledChanged() {
+        Integer setting = DeviceProperties.readTaskbarSetting(mBaseContext);
+        mResources.forEach(resource -> {
+            var activity = resource.getTaskbar();
+            if (activity != null && activity.isTaskbarEnabled() != DeviceProperties.isTaskbarEnabled(
+                    setting, activity.getDeviceProfile().getDeviceProperties().isLargeScreen())) {
+                resource.debugMsg("Taskbar changed! Restarting process!");
+                System.exit(0);
             }
         });
         return Unit.INSTANCE;

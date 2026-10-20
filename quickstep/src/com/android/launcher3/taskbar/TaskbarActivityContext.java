@@ -117,6 +117,7 @@ import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.dagger.LauncherComponentProvider;
 import com.android.launcher3.desktop.DesktopAppLaunchTransition;
 import com.android.launcher3.desktop.DesktopAppLaunchTransition.AppLaunchType;
+import com.android.launcher3.deviceprofile.DeviceProperties;
 import com.android.launcher3.deviceprofile.TaskbarDeviceProfileFactory;
 import com.android.launcher3.deviceprofile.TaskbarProfile;
 import com.android.launcher3.display.DisplayController;
@@ -235,8 +236,6 @@ public class TaskbarActivityContext extends BaseTaskbarContext {
 
     private static final Uri URI_USER_SETUP_COMPLETE = Secure.getUriFor(Secure.USER_SETUP_COMPLETE);
     private static final Uri URI_NAV_BAR_KIDS_MODE = Secure.getUriFor(Secure.NAV_BAR_KIDS_MODE);
-    private static final Uri URI_ENABLE_TASKBAR = Settings.System.getUriFor(
-            LMOSettings.System.ENABLE_TASKBAR);
     private static final Uri URI_NAVIGATION_BAR_HINT = Settings.System.getUriFor(
             LMOSettings.System.NAVIGATION_BAR_HINT);
 
@@ -360,7 +359,9 @@ public class TaskbarActivityContext extends BaseTaskbarContext {
         SettingsCache settingsCache = SettingsCache.INSTANCE.get(this);
         mIsUserSetupComplete = settingsCache.getValue(URI_USER_SETUP_COMPLETE);
         mIsNavBarKidsMode = settingsCache.getValue(URI_NAV_BAR_KIDS_MODE);
-        mIsTaskbarEnabled = settingsCache.getValue(URI_ENABLE_TASKBAR);
+        mIsTaskbarEnabled = DeviceProperties.isTaskbarEnabled(
+                DeviceProperties.readTaskbarSetting(this),
+                launcherDp.getDeviceProperties().isLargeScreen());
         mIsNavbarHintEnabled = settingsCache.getValue(URI_NAVIGATION_BAR_HINT);
         mBubbleFeatureConfig =
                 new BubbleFeatureConfigImpl(mWindowContext, getDesktopState(mWindowContext));
@@ -694,15 +695,12 @@ public class TaskbarActivityContext extends BaseTaskbarContext {
      * single window for taskbar and navbar.
      */
     public boolean isPhoneMode() {
-        if (mDeviceProfile.getDeviceProperties().getTaskbarConfiguration().isTaskbarPresent() &&
-                !isTaskbarEnabled()) {
-            return true;
-        }
         return isDeviceProfileForPhoneMode(mDeviceProfile);
     }
 
     private boolean isDeviceProfileForPhoneMode(DeviceProfile deviceProfile) {
-        return deviceProfile.getDeviceProperties().isPhone()
+        // A large screen without taskbar (disabled in settings) uses the phone navbar too.
+        return (deviceProfile.getDeviceProperties().isPhone() || !isTaskbarEnabled())
                 && !deviceProfile.getDeviceProperties().getTaskbarConfiguration()
                 .isTaskbarPresent();
     }

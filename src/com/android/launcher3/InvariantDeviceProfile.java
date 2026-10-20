@@ -63,6 +63,7 @@ import com.android.launcher3.customization.IconDatabase;
 import com.android.launcher3.dagger.ApplicationContext;
 import com.android.launcher3.dagger.LauncherAppComponent;
 import com.android.launcher3.dagger.LauncherAppSingleton;
+import com.android.launcher3.deviceprofile.DeviceProperties;
 import com.android.launcher3.deviceprofile.parser.DisplayOption;
 import com.android.launcher3.deviceprofile.parser.GridOption;
 import com.android.launcher3.display.DisplayController;
@@ -263,6 +264,7 @@ public class InvariantDeviceProfile {
 
     public TaskbarModeUtil taskbarModeUtil;
     private final LooperExecutor mMainExecutor;
+    private final Context mContext;
 
     @Inject
     InvariantDeviceProfile(
@@ -274,6 +276,7 @@ public class InvariantDeviceProfile {
             DaggerSingletonTracker lifeCycle,
             TaskbarModeUtil taskbarModeUtil,
             @Ui final LooperExecutor mainExecutor) {
+        mContext = context;
         mDisplayController = dc;
         mWMProxy = wmProxy;
         this.taskbarModeUtil = taskbarModeUtil;
@@ -543,7 +546,8 @@ public class InvariantDeviceProfile {
     }
 
     DeviceProfile.Builder newDPBuilder(LauncherDisplayInfo info) {
-        return new DeviceProfile.Builder(this, info, mWMProxy);
+        return new DeviceProfile.Builder(this, info, mWMProxy)
+                .setTaskbarSetting(DeviceProperties.readTaskbarSetting(mContext));
     }
 
     public void addOnChangeListener(OnIDPChangeListener listener) {
