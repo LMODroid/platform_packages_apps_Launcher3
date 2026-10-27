@@ -47,7 +47,9 @@
 
     <!-- Hide labels -->
     <string name="desktop_show_labels">برچسب های آیکون روی دسکتاپ</string>
+    <string name="desktop_show_labels_summary">نمایش نام آیکون‌ها در صفحهٔ اصلی</string>
     <string name="drawer_show_labels">برچسب های آیکون در کشو</string>
+    <string name="drawer_show_labels_summary">نمایش نام آیکون‌ها در صفحهٔ همهٔ برنامه‌ها</string>
 
     <!-- Settings title to show Google Now at -1 screen on launcher. [CHAR LIMIT=50] -->
     <string name="title_show_google_app">کشیدن برای دسترسی به گوگل</string>
@@ -100,9 +102,11 @@
 
     <!-- Homescreen Statusbar -->
     <string name="show_statusbar_title">نوار وضعیت</string>
+    <string name="show_statusbar_summary">نمایش نوار وضعیت در صفحهٔ اصلی</string>
 
     <!-- Top shadow -->
     <string name="show_top_shadow">سایه بالا</string>
+    <string name="show_top_shadow_summary">نمایش سایه در پشت نوار وضعیت</string>
 
     <!-- Row Height -->
     <string name="row_height_title">ارتفاع ردیف</string>
@@ -118,8 +122,13 @@
     <string name="recents_chips_title">استفاده از طراحی فشرده اقدامات سریع</string>
     <string name="recents_chips_summary">ممکن است برای نمایش تعداد زیاد اقدامات سریع لازم باشد</string>
     <string name="recents_screenshot_title">عکس برداری از صفحه</string>
+    <string name="recents_screenshot_summary">نمایش دکمهٔ عکس‌گرفتن از صفحه در برنامه‌های اخیر</string>
+
     <string name="recents_clear_all_title">پاک کردن همه</string>
+    <string name="recents_clear_all_summary">نمایش دکمهٔ پاک کردن همه در برنامه‌های اخیر</string>
+
     <string name="recents_lens_title">لنز</string>
+    <string name="recents_lens_summary">نمایش دکمهٔ Google Lens در برنامه‌های اخیر</string>
 
     <!-- Kill App recents action shortcut -->
     <string name="recent_task_option_kill_app">بستن</string>
@@ -136,6 +145,7 @@
 
     <!-- Shake Clear Recents -->
     <string name="recents_shake_clear_all_title">برای حذف تمامی تسک ها دستگاه را تکان دهید</string>
+    <string name="recents_shake_clear_all_summary">پاک کردن همهٔ کارهای اخیر با تکان دادن گوشی</string>
 
     <!-- Parallax -->
     <string name="short_parallax_title">منظر کوتاه</string>
