@@ -52,7 +52,9 @@
 
     <!-- Hide labels -->
     <string name="desktop_show_labels">Icon labels on desktop</string>
+    <string name="desktop_show_labels_summary">Show icon labels on the home screen</string>
     <string name="drawer_show_labels">Icon labels in drawer</string>
+    <string name="drawer_show_labels_summary">Show icon labels in the all apps screen</string>
 
     <!-- Settings title to show Google Now at -1 screen on launcher. [CHAR LIMIT=50] -->
     <string name="title_show_google_app">Swipe to access Google app</string>
@@ -98,9 +100,11 @@
 
     <!-- Homescreen Statusbar -->
     <string name="show_statusbar_title">Status Bar</string>
+    <string name="show_statusbar_summary">Show the status bar on the home screen</string>
 
     <!-- Top shadow -->
     <string name="show_top_shadow">Top shadow</string>
+    <string name="show_top_shadow_summary">Show a shadow behind the status bar</string>
 
     <!-- Row Height -->
     <string name="row_height_title">Row height</string>
@@ -116,8 +120,11 @@
     <string name="recents_chips_title">Use compact action design</string>
     <string name="recents_chips_summary">May be required for large numbers of actions to display</string>
     <string name="recents_screenshot_title">Screenshot</string>
+    <string name="recents_screenshot_summary">Show the Screenshot button in recents</string>
     <string name="recents_clear_all_title">Clear all</string>
+    <string name="recents_clear_all_summary">Show the clear all button in recents</string>
     <string name="recents_lens_title">Lens</string>
+    <string name="recents_lens_summary">Show the Google lens button in recents</string>
 
     <!-- Kill App recents action shortcut -->
     <string name="recent_task_option_kill_app">Kill</string>
@@ -134,6 +141,7 @@
 
     <!-- Shake Clear Recents -->
     <string name="recents_shake_clear_all_title">Shake phone to clear all tasks</string>
+    <string name="recents_shake_clear_all_summary">Clear all recent tasks when you shake the phone</string>
 
     <!-- Parallax -->
     <string name="short_parallax_title">Allow short parallax</string>

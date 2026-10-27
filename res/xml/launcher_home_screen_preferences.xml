@@ -98,18 +98,21 @@
         <SwitchPreferenceCompat
             android:key="pref_show_statusbar"
             android:title="@string/show_statusbar_title"
+            android:summary="@string/show_statusbar_summary"
             android:defaultValue="true"
             android:persistent="true" />
 
         <SwitchPreferenceCompat
             android:key="pref_show_top_shadow"
             android:title="@string/show_top_shadow"
+            android:summary="@string/show_top_shadow_summary"
             android:defaultValue="true"
             android:persistent="true" />
 
         <SwitchPreferenceCompat
             android:key="pref_desktop_show_labels"
             android:title="@string/desktop_show_labels"
+            android:summary="@string/desktop_show_labels_summary"
             android:defaultValue="true"
             android:persistent="true" />
 
