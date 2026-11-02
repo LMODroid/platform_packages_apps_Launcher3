@@ -58,6 +58,7 @@ object WorkspaceProfileNonResponsiveFactory {
         iconSize: Int,
         desiredWorkspaceHorizontalMarginPx: Int,
         insets: Rect,
+        cutout: Rect,
         edgeMarginPx: Int,
         workspacePageIndicatorHeight: Int,
         workspacePageIndicatorOverlapWorkspace: Int,
@@ -102,14 +103,21 @@ object WorkspaceProfileNonResponsiveFactory {
                         (workspacePageIndicatorHeight - workspacePageIndicatorOverlapWorkspace),
                 )
 
-            // In fixed Landscape we don't need padding on the side next to the cutout because
-            // the cutout is already adding padding to all of Launcher, we only need on the other
-            // side
+            // In fixed landscape the side next to the display cutout already has padding from the
+            // cutout inset, so only add the margin on the other side. Devices without a cutout
+            // have no such inset, so share a single margin between both sides instead of applying
+            // the full margin twice, which would make the workspace too narrow. This also keeps
+            // the margin on the nav bar side, so the layout follows the nav bar position setting.
             if (isFixedLandscape) {
+                val hasCutout = cutout.left > 0 || cutout.right > 0
                 return Rect(
-                    if (isSeascape) padding.left else 0,
+                    if (cutout.left > 0) 0
+                    else if (hasCutout) padding.left
+                    else padding.left / 2,
                     padding.top,
-                    if (isSeascape) 0 else padding.right,
+                    if (cutout.right > 0) 0
+                    else if (hasCutout) padding.right
+                    else padding.right / 2,
                     padding.bottom,
                 )
             }
@@ -218,6 +226,7 @@ object WorkspaceProfileNonResponsiveFactory {
                 hotseatProfile = hotseatProfile,
                 desiredWorkspaceHorizontalMarginPx = desiredWorkspaceHorizontalMarginPx,
                 insets = deviceProperties.insets,
+                cutout = deviceProperties.cutout,
                 edgeMarginPx = edgeMarginPx,
                 workspacePageIndicatorHeight = workspacePageIndicatorHeight,
                 workspacePageIndicatorOverlapWorkspace = workspacePageIndicatorOverlapWorkspace,
@@ -415,6 +424,7 @@ object WorkspaceProfileNonResponsiveFactory {
                 hotseatProfile = hotseatProfile,
                 desiredWorkspaceHorizontalMarginPx = desiredWorkspaceHorizontalMarginPx,
                 insets = deviceProperties.insets,
+                cutout = deviceProperties.cutout,
                 edgeMarginPx = edgeMarginPx,
                 workspacePageIndicatorHeight = workspacePageIndicatorHeight,
                 workspacePageIndicatorOverlapWorkspace = workspacePageIndicatorOverlapWorkspace,

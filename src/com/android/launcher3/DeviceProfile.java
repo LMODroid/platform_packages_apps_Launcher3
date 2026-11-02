@@ -166,7 +166,8 @@ public class DeviceProfile {
                 ),
                 new TaskbarConfiguration(false),
                 0,
-                false
+                false,
+                new Rect(0, 0, 0, 0)
         );
         mBottomSheetProfile = new BottomSheetProfile(0, 0, 0, 0f, 0f);
         overviewProfile = new OverviewProfile(
