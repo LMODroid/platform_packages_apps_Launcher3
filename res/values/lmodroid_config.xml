@@ -22,6 +22,9 @@
     <!-- Use fixed landscape mode by default -->
     <bool name="config_defaultFixedLandscape">false</bool>
 
+    <!-- Use a full-screen AppDrawer for SecondaryDisplayLauncher -->
+    <bool name="config_secondaryLauncherOnlyAppDrawer">false</bool>
+
     <!-- String representing the fragment class for app drawer settings activity.-->
     <string name="app_drawer_settings_fragment_name" translatable="false">com.android.launcher3.settings.SettingsAppDrawer$AppDrawerSettingsFragment</string>
 
