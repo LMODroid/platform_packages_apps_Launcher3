@@ -23,7 +23,6 @@ import static android.view.Surface.ROTATION_0;
 import static com.android.launcher3.Flags.enableGridOnlyOverview;
 import static com.android.launcher3.Flags.enableRefactorTaskThumbnail;
 import static com.android.launcher3.Flags.enableShowEnabledShortcutsInAccessibilityMenu;
-import static com.android.launcher3.logging.StatsLogManager.LauncherEvent.LAUNCHER_SYSTEM_SHORTCUT_CLOSE_APP_TAP;
 import static com.android.launcher3.logging.StatsLogManager.LauncherEvent.LAUNCHER_SYSTEM_SHORTCUT_FREE_FORM_TAP;
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_POSITION_BOTTOM_OR_RIGHT;
 
@@ -37,9 +36,9 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.RemoteException;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.Log;
-import android.os.UserHandle;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowManagerGlobal;
@@ -301,29 +300,6 @@ public interface TaskShortcutFactory {
                     insets.getSystemWindowInsetTop() + 50);
             activityOptions.setLaunchBounds(r);
             return activityOptions;
-        }
-    }
-
-    class CloseSystemShortcut extends SystemShortcut {
-        private final TaskContainer mTaskContainer;
-
-        public CloseSystemShortcut(int iconResId, int textResId, RecentsViewContainer container,
-                TaskContainer taskContainer) {
-            super(iconResId, textResId, container, taskContainer.getTaskView().getFirstItemInfo(),
-                    taskContainer.getTaskView());
-            mTaskContainer = taskContainer;
-        }
-
-        @Override
-        public void onClick(View view) {
-            TaskView taskView = mTaskContainer.getTaskView();
-            RecentsView<?, ?> recentsView = taskView.getRecentsView();
-            if (recentsView != null) {
-                dismissTaskMenuView();
-                recentsView.dismissTaskView(taskView, true, true);
-                mTarget.getStatsLogManager().logger().withItemInfo(mTaskContainer.getItemInfo())
-                        .log(LAUNCHER_SYSTEM_SHORTCUT_CLOSE_APP_TAP);
-            }
         }
     }
 
@@ -647,26 +623,6 @@ public interface TaskShortcutFactory {
         }
     };
 
-    TaskShortcutFactory CLOSE = new TaskShortcutFactory() {
-        @Override
-        public List<SystemShortcut> getShortcuts(RecentsViewContainer container,
-                TaskContainer taskContainer) {
-            return Collections.singletonList(new CloseSystemShortcut(
-                    R.drawable.ic_close_option,
-                    R.string.recent_task_option_close, container, taskContainer));
-        }
-
-        @Override
-        public boolean showForGroupedTask() {
-            return true;
-        }
-
-        @Override
-        public boolean showForDesktopTask() {
-            return true;
-        }
-    };
-
     TaskShortcutFactory KILL_APP = new TaskShortcutFactory() {
         @Override
         public List<SystemShortcut> getShortcuts(RecentsViewContainer container,
@@ -697,7 +653,7 @@ public interface TaskShortcutFactory {
                 Task task = mTaskContainer.getTask();
                 if (task != null) {
                     try {
-                        iam.forceStopPackage(mPackageName, UserHandle.USER_CURRENT);
+                        iam.forceStopPackage(mPackageName, task.key.userId);
                         Toast appKilled = Toast.makeText(mTaskContainer.getTaskView().getContext(),
                                 R.string.recents_app_killed, Toast.LENGTH_SHORT);
                         appKilled.show();
