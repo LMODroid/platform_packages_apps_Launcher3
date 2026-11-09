@@ -40,6 +40,7 @@ import com.android.launcher3.util.CellContentDimensions
 import com.android.launcher3.util.IconSizeSteps
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 data class AllAppsProfile @JvmOverloads constructor(
     val borderSpacePx: Point,
@@ -110,7 +111,18 @@ data class AllAppsProfile @JvmOverloads constructor(
                     iconSizePx +
                         iconDrawablePaddingPx +
                         Utilities.calculateTextHeight(iconTextSizePx)
-            return squared.copy(cellHeightPx = max(squared.cellHeightPx, contentHeight))
+            return squared.copy(
+                cellHeightPx = max(squared.cellHeightPx, contentHeight + rowExtraPadding())
+            )
+        }
+
+        /**
+         * Gap kept between rows whose content fills the cell: none at the 75% row height, the
+         * full border space above and below at 100%.
+         */
+        private fun AllAppsProfile.rowExtraPadding(): Int {
+            val paddingFraction = ((cellHeightMultiplier - 0.75f) / 0.25f).coerceIn(0f, 1f)
+            return (2f * borderSpacePx.y * paddingFraction).roundToInt()
         }
 
         fun createAllAppsProfileScalableGrid(
