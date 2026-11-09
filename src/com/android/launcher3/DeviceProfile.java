@@ -1465,12 +1465,6 @@ public class DeviceProfile {
                 }
             }
 
-            int cellContentHeight = allAppsIconSizePx
-                    + Utilities.calculateTextHeight(allAppsIconTextSizePx) + allAppsBorderSpacePx.y;
-            if (allAppsCellHeightPx < cellContentHeight) {
-                // Increase allAppsCellHeight to fit its content.
-                allAppsCellHeightPx = cellContentHeight;
-            }
         } else {
             float invIconSizeDp = inv.allAppsIconSize[mTypeIndex];
             float invIconTextSizeSp = inv.allAppsIconTextSize[mTypeIndex];
@@ -1481,13 +1475,25 @@ public class DeviceProfile {
             allAppsCellWidthPx = allAppsIconSizePx + (2 * allAppsIconDrawablePaddingPx);
         }
 
-        if (!allAppsIconText) {
+        if (allAppsIconText) {
+            final int textHeight = Utilities.calculateTextHeight(allAppsIconTextSizePx);
+            final int cellContentHeight = allAppsIconSizePx
+                    + allAppsIconDrawablePaddingPx
+                    + textHeight;
+            // Icon and font size settings take priority over row height.
+            allAppsCellHeightPx = Math.max(allAppsCellHeightPx, cellContentHeight);
+        } else {
             int cellLayoutHorizontalPadding =
                     (cellLayoutPaddingPx.left + cellLayoutPaddingPx.right) / 2;
             int leftRightPadding = desiredWorkspaceHorizontalMarginPx + cellLayoutHorizontalPadding;
             int drawerWidth = availableWidthPx - leftRightPadding * 2;
-            allAppsCellHeightPx = (int) (drawerWidth / inv.numAllAppsColumns * allAppsCellHeightMultiplier);
             allAppsIconDrawablePaddingPx = 0;
+            final int baseRequestedCellHeight = drawerWidth / inv.numAllAppsColumns;
+            final int requestedCellHeight = (int) (baseRequestedCellHeight
+                    * allAppsCellHeightMultiplier);
+            final int iconContentHeight = allAppsIconSizePx;
+            // Icon size takes priority over row height when labels are hidden.
+            allAppsCellHeightPx = Math.max(requestedCellHeight, iconContentHeight);
         }
     }
 
