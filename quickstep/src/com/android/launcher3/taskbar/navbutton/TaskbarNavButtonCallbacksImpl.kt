@@ -23,6 +23,7 @@ import com.android.quickstep.OverviewCommandHelper
 import com.android.quickstep.OverviewCommandHelper.CommandType.HIDE_ALT_TAB
 import com.android.quickstep.OverviewCommandHelper.CommandType.HOME
 import com.android.quickstep.OverviewCommandHelper.CommandType.TOGGLE
+import com.android.quickstep.OverviewCommandHelper.CommandType.TOGGLE_OVERVIEW_PREVIOUS
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -46,7 +47,20 @@ constructor(
         commandHelper?.addCommand(TOGGLE, displayId)
     }
 
+    override fun onShowOverview(displayId: Int) {
+        commandHelper?.addCommand(TOGGLE_OVERVIEW_PREVIOUS, displayId)
+    }
+
     override fun onHideOverview(displayId: Int) {
         commandHelper?.addCommand(HIDE_ALT_TAB, displayId)
+    }
+
+    override fun onHideOverviewFromBack(displayId: Int) {
+        // Keep the command currently transitioning to Overview, but discard stale queued
+        // button presses so this HIDE command cannot be dropped when the queue is full.
+        commandHelper?.run {
+            clearPendingCommands()
+            addCommand(HIDE_ALT_TAB, displayId)
+        }
     }
 }
