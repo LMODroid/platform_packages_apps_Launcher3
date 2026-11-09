@@ -548,7 +548,20 @@ public class TouchInteractionService extends Service {
         }
 
         @Override
+        public void onShowOverview() {
+            mOverviewCommandHelper.addCommand(CommandType.SHOW);
+        }
+
+        @Override
         public void onHideOverview() {
+            mOverviewCommandHelper.addCommand(CommandType.HIDE);
+        }
+
+        @Override
+        public void onHideOverviewFromBack() {
+            // Keep the command currently transitioning to Overview, but discard stale queued
+            // button presses so this HIDE command cannot be dropped when the queue is full.
+            mOverviewCommandHelper.clearPendingCommands();
             mOverviewCommandHelper.addCommand(CommandType.HIDE);
         }
     };

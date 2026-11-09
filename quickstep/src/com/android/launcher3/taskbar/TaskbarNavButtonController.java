@@ -79,6 +79,8 @@ public class TaskbarNavButtonController implements TaskbarControllers.LoggableTa
     private boolean mScreenPinned;
     private boolean mAssistantLongPressEnabled;
     private int mLastSentBackAction = ACTION_UP;
+    private @TaskbarButton int mLastClickedButton = 0;
+    private boolean mBackHidesOverview;
 
     @Override
     public void dumpLogs(String prefix, PrintWriter pw) {
@@ -88,10 +90,13 @@ public class TaskbarNavButtonController implements TaskbarControllers.LoggableTa
         pw.println(prefix + "\tmScreenPinned=" + mScreenPinned);
         pw.println(prefix + "\tmLastSentBackAction="
                 + KeyEvent.actionToString(mLastSentBackAction));
+        pw.println(prefix + "\tmLastClickedButton=" + mLastClickedButton);
+        pw.println(prefix + "\tmBackHidesOverview=" + mBackHidesOverview);
     }
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef(value = {
+            BUTTON_NONE,
             BUTTON_BACK,
             BUTTON_HOME,
             BUTTON_RECENTS,
@@ -103,6 +108,7 @@ public class TaskbarNavButtonController implements TaskbarControllers.LoggableTa
 
     public @interface TaskbarButton {}
 
+    static final int BUTTON_NONE = 0;
     static final int BUTTON_BACK = 1;
     static final int BUTTON_HOME = BUTTON_BACK << 1;
     static final int BUTTON_RECENTS = BUTTON_HOME << 1;
@@ -148,9 +154,15 @@ public class TaskbarNavButtonController implements TaskbarControllers.LoggableTa
         }
         switch (buttonType) {
             case BUTTON_BACK:
-                executeBack(/* keyEvent */ null);
+                if (mLastClickedButton == BUTTON_RECENTS) {
+                    hideOverviewForBack();
+                } else {
+                    executeBack(/* keyEvent */ null);
+                }
+                mLastClickedButton = BUTTON_BACK;
                 break;
             case BUTTON_HOME:
+                mLastClickedButton = BUTTON_HOME;
                 logEvent(LAUNCHER_TASKBAR_HOME_BUTTON_TAP);
                 mSystemUiProxy.updateContextualEduStats(/* isTrackpadGesture= */ false,
                         GestureType.HOME);
@@ -160,20 +172,32 @@ public class TaskbarNavButtonController implements TaskbarControllers.LoggableTa
                 logEvent(LAUNCHER_TASKBAR_OVERVIEW_BUTTON_TAP);
                 mSystemUiProxy.updateContextualEduStats(/* isTrackpadGesture= */ false,
                         GestureType.OVERVIEW);
-                navigateToOverview();
+                if (mScreenPinned) {
+                    break;
+                }
+                if (mLastClickedButton == BUTTON_RECENTS) {
+                    navigateToOverview();
+                } else {
+                    showOverview();
+                }
+                mLastClickedButton = BUTTON_RECENTS;
                 break;
             case BUTTON_IME_SWITCH:
+                mLastClickedButton = BUTTON_IME_SWITCH;
                 logEvent(LAUNCHER_TASKBAR_IME_SWITCHER_BUTTON_TAP);
                 onImeSwitcherPress();
                 break;
             case BUTTON_A11Y:
+                mLastClickedButton = BUTTON_A11Y;
                 logEvent(LAUNCHER_TASKBAR_A11Y_BUTTON_TAP);
                 notifyA11yClick(false /* longClick */);
                 break;
             case BUTTON_QUICK_SETTINGS:
+                mLastClickedButton = BUTTON_QUICK_SETTINGS;
                 showQuickSettings();
                 break;
             case BUTTON_NOTIFICATIONS:
+                mLastClickedButton = BUTTON_NOTIFICATIONS;
                 showNotifications();
                 break;
         }
@@ -304,7 +328,11 @@ public class TaskbarNavButtonController implements TaskbarControllers.LoggableTa
     }
 
     public void updateSysuiFlags(@SystemUiStateFlags long sysuiFlags) {
-        mScreenPinned = (sysuiFlags & SYSUI_STATE_SCREEN_PINNING) != 0;
+        boolean screenPinned = (sysuiFlags & SYSUI_STATE_SCREEN_PINNING) != 0;
+        if (screenPinned != mScreenPinned) {
+            mLastClickedButton = BUTTON_NONE;
+        }
+        mScreenPinned = screenPinned;
     }
 
     public void init(TaskbarControllers taskbarControllers) {
@@ -341,13 +369,43 @@ public class TaskbarNavButtonController implements TaskbarControllers.LoggableTa
         mCallbacks.onToggleOverview();
     }
 
+    private void showOverview() {
+        if (mScreenPinned) {
+            return;
+        }
+        TestLogging.recordEvent(TestProtocol.SEQUENCE_MAIN, "onOverviewShow");
+        TaskUtils.closeSystemWindowsAsync(CLOSE_SYSTEM_WINDOWS_REASON_RECENTS);
+        mCallbacks.onShowOverview();
+    }
+
     public void hideOverview() {
         mCallbacks.onHideOverview();
+    }
+
+    private void hideOverviewForBack() {
+        logEvent(LAUNCHER_TASKBAR_BACK_BUTTON_TAP);
+        mSystemUiProxy.updateContextualEduStats(/* isTrackpadGesture= */ false,
+                GestureType.BACK);
+        mCallbacks.onHideOverviewFromBack();
     }
 
     void sendBackKeyEvent(int action, boolean cancelled) {
         if (action == mLastSentBackAction) {
             // There must always be an alternating sequence of ACTION_DOWN and ACTION_UP events
+            return;
+        }
+        if (action == ACTION_DOWN && mLastClickedButton == BUTTON_RECENTS) {
+            mBackHidesOverview = true;
+            mLastSentBackAction = ACTION_DOWN;
+            return;
+        }
+        if (action == ACTION_UP && mBackHidesOverview) {
+            mBackHidesOverview = false;
+            mLastSentBackAction = ACTION_UP;
+            if (!cancelled) {
+                hideOverviewForBack();
+                mLastClickedButton = BUTTON_BACK;
+            }
             return;
         }
         long time = SystemClock.uptimeMillis();
@@ -356,6 +414,9 @@ public class TaskbarNavButtonController implements TaskbarControllers.LoggableTa
             keyEvent.cancel();
         }
         executeBack(keyEvent);
+        if (action == ACTION_UP && !cancelled) {
+            mLastClickedButton = BUTTON_BACK;
+        }
     }
 
     private void executeBack(@Nullable KeyEvent keyEvent) {
@@ -413,7 +474,17 @@ public class TaskbarNavButtonController implements TaskbarControllers.LoggableTa
         /** Callback invoked when the overview button is pressed. */
         default void onToggleOverview() {}
 
+        /** Callback invoked when overview should be shown without toggling to another task. */
+        default void onShowOverview() {
+            onToggleOverview();
+        }
+
         /** Callback invoken when a visible overview needs to be hidden. */
         default void onHideOverview() { }
+
+        /** Callback invoked when Back should cancel or hide an in-flight overview transition. */
+        default void onHideOverviewFromBack() {
+            onHideOverview();
+        }
     }
 }
