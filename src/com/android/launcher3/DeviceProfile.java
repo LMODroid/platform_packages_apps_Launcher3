@@ -1481,7 +1481,8 @@ public class DeviceProfile {
                     + allAppsIconDrawablePaddingPx
                     + textHeight;
             // Icon and font size settings take priority over row height.
-            allAppsCellHeightPx = Math.max(allAppsCellHeightPx, cellContentHeight);
+            allAppsCellHeightPx = Math.max(allAppsCellHeightPx,
+                    cellContentHeight + getAllAppsRowExtraPadding());
         } else {
             int cellLayoutHorizontalPadding =
                     (cellLayoutPaddingPx.left + cellLayoutPaddingPx.right) / 2;
@@ -1493,8 +1494,15 @@ public class DeviceProfile {
                     * allAppsCellHeightMultiplier);
             final int iconContentHeight = allAppsIconSizePx;
             // Icon size takes priority over row height when labels are hidden.
-            allAppsCellHeightPx = Math.max(requestedCellHeight, iconContentHeight);
+            allAppsCellHeightPx = Math.max(requestedCellHeight,
+                    iconContentHeight + getAllAppsRowExtraPadding());
         }
+    }
+
+    private int getAllAppsRowExtraPadding() {
+        final float paddingFraction = Math.max(0f, Math.min(1f,
+                (allAppsCellHeightMultiplier - 0.75f) / 0.25f));
+        return Math.round(2f * allAppsBorderSpacePx.y * paddingFraction);
     }
 
     private void updateAllAppsWithResponsiveMeasures() {
