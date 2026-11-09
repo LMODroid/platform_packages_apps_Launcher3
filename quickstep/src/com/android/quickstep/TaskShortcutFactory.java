@@ -32,9 +32,9 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.RemoteException;
+import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.Log;
-import android.os.UserHandle;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowManagerGlobal;
@@ -592,7 +592,7 @@ public interface TaskShortcutFactory {
                 Task task = mTaskContainer.getTask();
                 if (task != null) {
                     try {
-                        iam.forceStopPackage(mPackageName, UserHandle.USER_CURRENT);
+                        iam.forceStopPackage(mPackageName, task.key.userId);
                         Toast appKilled = Toast.makeText(mTaskContainer.getTaskView().getContext(),
                                 R.string.recents_app_killed, Toast.LENGTH_SHORT);
                         appKilled.show();
