@@ -98,6 +98,21 @@ data class AllAppsProfile @JvmOverloads constructor(
                     iconDrawablePaddingPx = 0,
                 )
 
+        /**
+         * Grows the cells to fit their content: icon and font size settings take priority over
+         * the row height setting.
+         */
+        private fun AllAppsProfile.withCellsFittingContent(): AllAppsProfile {
+            val squared = withSquareCellsIfLabelsHidden()
+            val contentHeight =
+                if (labelsHidden) iconSizePx
+                else
+                    iconSizePx +
+                        iconDrawablePaddingPx +
+                        Utilities.calculateTextHeight(iconTextSizePx)
+            return squared.copy(cellHeightPx = max(squared.cellHeightPx, contentHeight))
+        }
+
         fun createAllAppsProfileScalableGrid(
             inv: InvariantDeviceProfile,
             metric: DisplayMetrics,
@@ -112,7 +127,7 @@ data class AllAppsProfile @JvmOverloads constructor(
             val allAppsBorderSpacePx =
                 calculateAllAppsBorderSpacePx(inv, metric, typeIndex, workspaceProfile.scale)
             val cellHeightMultiplier = getRowHeightMultiplier(context)
-            var allAppsCellHeightPx =
+            val allAppsCellHeightPx =
                 ((pxFromDp(inv.allAppsCellSize[typeIndex].y, metric) + allAppsBorderSpacePx.y) *
                         cellHeightMultiplier)
                     .toInt()
@@ -148,15 +163,6 @@ data class AllAppsProfile @JvmOverloads constructor(
                         min(allAppsIconSizePx.toDouble(), allAppsCellWidthPx.toDouble()).toInt()
                     allAppsBorderSpacePx.x = 0
                 }
-            }
-
-            val cellContentHeight: Int =
-                (allAppsIconSizePx +
-                    Utilities.calculateTextHeight(allAppsIconTextSizePx) +
-                    allAppsBorderSpacePx.y)
-            if (allAppsCellHeightPx < cellContentHeight) {
-                // Increase allAppsCellHeight to fit its content.
-                allAppsCellHeightPx = cellContentHeight
             }
 
             val numShownAllAppsColumns = displayOptionSpec.numAllAppsColumns
@@ -196,7 +202,7 @@ data class AllAppsProfile @JvmOverloads constructor(
                 cellHeightMultiplier = cellHeightMultiplier,
                 labelsHidden = areLabelsHidden(context),
             )
-                .withSquareCellsIfLabelsHidden()
+                .withCellsFittingContent()
         }
 
         fun calculateNonResponsivePadding(
@@ -298,7 +304,7 @@ data class AllAppsProfile @JvmOverloads constructor(
                     deviceProperties.heightPx - allAppsTopPadding + deviceProperties.insets.top,
                 padding = allAppsPadding,
             )
-                .withSquareCellsIfLabelsHidden()
+                .withCellsFittingContent()
         }
 
         fun calculateallAppsLeftRightMargin(
