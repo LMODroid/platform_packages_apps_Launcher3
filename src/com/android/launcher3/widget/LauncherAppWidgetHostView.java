@@ -39,6 +39,8 @@ import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.dynamicanimation.animation.DynamicAnimation;
+import androidx.dynamicanimation.animation.SpringAnimation;
 
 import com.android.launcher3.CheckLongPressHelper;
 import com.android.launcher3.Flags;
@@ -77,6 +79,10 @@ public class LauncherAppWidgetHostView extends BaseLauncherAppWidgetHostView
     private static final long UPDATE_LOCK_TIMEOUT_MILLIS = 1000;
 
     private static final String TRACE_METHOD_NAME = "appwidget load-widget ";
+
+    private static final float CONTENT_FADE_STIFFNESS = 1600f;
+
+    private boolean mHasContent;
 
     private static final Integer NO_LAYOUT_ID = Integer.valueOf(0);
 
@@ -170,9 +176,32 @@ public class LauncherAppWidgetHostView extends BaseLauncherAppWidgetHostView
         checkIfAutoAdvance();
     }
 
+    /**
+     * Fades in a widget's first content when it arrives while the widget is already on screen
+     * (e.g. its app is cold-started on the first boot after setup) instead of popping it in, on
+     * the Material 3 Expressive default effects spring. RemoteViews are applied asynchronously,
+     * so this runs when the content view is added.
+     */
+    private void maybeFadeInContent(View content) {
+        if (mHasContent || mLastRemoteViews == null) {
+            return;
+        }
+        mHasContent = true;
+        if (!isAttachedToWindow() || !isLaidOut() || !isShown()
+                || getWindowVisibility() != VISIBLE) {
+            return;
+        }
+        content.setAlpha(0f);
+        SpringAnimation fade = new SpringAnimation(content, DynamicAnimation.ALPHA, 1f);
+        fade.getSpring().setStiffness(CONTENT_FADE_STIFFNESS).setDampingRatio(1f);
+        fade.setMinimumVisibleChange(DynamicAnimation.MIN_VISIBLE_CHANGE_ALPHA);
+        fade.start();
+    }
+
     @Override
     public void onViewAdded(View child) {
         super.onViewAdded(child);
+        maybeFadeInContent(child);
         mReapplyOnResumeUpdates |= isDeferringUpdates();
     }
 
