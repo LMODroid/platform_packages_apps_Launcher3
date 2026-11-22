@@ -175,8 +175,8 @@ object WorkspaceProfileNonResponsiveFactory {
         panelCount: Int,
         scale: Float,
     ): WorkspaceProfile {
-        val iconSizePx = max(1, (iconSizePxParam * iconScale).roundToInt())
-        val iconTextSizePx = (iconTextSizePxParam * iconScale).roundToInt()
+        var iconSizePx = max(1, (iconSizePxParam * iconScale).roundToInt())
+        var iconTextSizePx = (iconTextSizePxParam * iconScale).roundToInt()
         val cellLayoutBorderSpacePx = Point(0, 0)
         var cellSize =
             calculateCellSize(
@@ -188,6 +188,12 @@ object WorkspaceProfileNonResponsiveFactory {
                 cellLayoutPadding = Rect(0, 0, 0, 0),
                 totalWorkspacePadding = Point(0, 0),
             )
+        val availableIconWidth = cellSize.x
+        if (iconSizePx > availableIconWidth) {
+            val horizontalIconScale = max(0, availableIconWidth) / iconSizePx.toFloat()
+            iconSizePx = max(1, (iconSizePx * horizontalIconScale).roundToInt())
+            iconTextSizePx = (iconTextSizePx * horizontalIconScale).roundToInt()
+        }
         val desiredWorkspaceHorizontalMarginOriginalPx =
             when {
                 isVerticalLayout -> 0
