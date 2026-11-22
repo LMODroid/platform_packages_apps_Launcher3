@@ -1371,6 +1371,13 @@ public class DeviceProfile {
                     pxFromDp(inv.iconSize[mTypeIndex], mMetrics) * iconScale));
             iconTextSizePx = Math.round(
                     pxFromSp(inv.iconTextSize[mTypeIndex], mMetrics) * iconScale);
+            int availableIconWidth = getCellSize().x;
+            if (iconSizePx > availableIconWidth) {
+                float horizontalIconScale = Math.max(0, availableIconWidth)
+                        / (float) iconSizePx;
+                iconSizePx = Math.max(1, Math.round(iconSizePx * horizontalIconScale));
+                iconTextSizePx = Math.round(iconTextSizePx * horizontalIconScale);
+            }
             iconDrawablePaddingPx = (int) (getNormalizedIconDrawablePadding(iconSizePx, iconDrawablePaddingPx) * iconScale);
             cellWidthPx = iconSizePx + iconDrawablePaddingPx;
             cellHeightPx = getIconSizeWithOverlap(iconSizePx)
