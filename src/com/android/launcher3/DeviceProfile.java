@@ -268,6 +268,7 @@ public class DeviceProfile {
     public float allAppsIconTextSizePx;
     private float allAppsCellHeightMultiplier;
     private boolean allAppsIconText;
+    private int allAppsIconMaxLines = 1;
 
     // Overview
     public int overviewTaskMarginPx;
@@ -502,7 +503,9 @@ public class DeviceProfile {
         allAppsCellHeightMultiplier =
                     (float) prefs.getInt(KEY_ROW_HEIGHT, 100) / 100F;
         allAppsIconText = prefs.getBoolean(InvariantDeviceProfile.KEY_SHOW_DRAWER_LABELS, true);
-
+        allAppsIconMaxLines = Math.max(
+                prefs.getInt(InvariantDeviceProfile.KEY_MAX_LINES, 1),
+                inv.enableTwoLinesInAllApps ? 2 : 1);
         edgeMarginPx = res.getDimensionPixelSize(R.dimen.dynamic_grid_edge_margin);
         workspaceContentScale = res.getFloat(R.dimen.workspace_content_scale);
 
@@ -1364,7 +1367,11 @@ public class DeviceProfile {
             desiredWorkspaceHorizontalMarginPx =
                     (int) (desiredWorkspaceHorizontalMarginOriginalPx * scale);
         } else {
-            iconDrawablePaddingPx = (int) (getNormalizedIconDrawablePadding() * iconScale);
+            iconSizePx = Math.max(1, Math.round(
+                    pxFromDp(inv.iconSize[mTypeIndex], mMetrics) * iconScale));
+            iconTextSizePx = Math.round(
+                    pxFromSp(inv.iconTextSize[mTypeIndex], mMetrics) * iconScale);
+            iconDrawablePaddingPx = (int) (getNormalizedIconDrawablePadding(iconSizePx, iconDrawablePaddingPx) * iconScale);
             cellWidthPx = iconSizePx + iconDrawablePaddingPx;
             cellHeightPx = getIconSizeWithOverlap(iconSizePx)
                     + iconDrawablePaddingPx
@@ -1412,6 +1419,10 @@ public class DeviceProfile {
         } else {
             widgetPadding.setEmpty();
         }
+    }
+
+    public int getAllAppsIconMaxLines() {
+        return allAppsIconMaxLines;
     }
 
     /**
@@ -1476,10 +1487,12 @@ public class DeviceProfile {
         }
 
         if (allAppsIconText) {
-            final int textHeight = Utilities.calculateTextHeight(allAppsIconTextSizePx);
+            final int textHeight = Utilities.calculateTextHeight(allAppsIconTextSizePx) * allAppsIconMaxLines;
+            int textExtraPadding = allAppsIconMaxLines == 1 ?
+                    res.getDimensionPixelSize(R.dimen.all_apps_label_extra_padding) : 0;
             final int cellContentHeight = allAppsIconSizePx
                     + allAppsIconDrawablePaddingPx
-                    + textHeight;
+                    + textHeight + textExtraPadding;
             // Icon and font size settings take priority over row height.
             allAppsCellHeightPx = Math.max(allAppsCellHeightPx,
                     cellContentHeight + getAllAppsRowExtraPadding());

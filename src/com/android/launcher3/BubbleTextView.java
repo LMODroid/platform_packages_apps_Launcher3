@@ -343,7 +343,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
             defaultIconSize = mDeviceProfile.iconSizePx;
             mShouldShowLabel = true;
         }
-        mMaxLines = prefs.getInt(KEY_MAX_LINES, 1);
+        mMaxLines = displayIsAppDrawer() ? prefs.getInt(KEY_MAX_LINES, 1) : 1;
 
 
         mIconSize = a.getDimensionPixelSize(R.styleable.BubbleTextView_iconSizeOverride,
@@ -998,9 +998,13 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
         int height = MeasureSpec.getSize(heightMeasureSpec);
         if (mCenterVertically || !mShouldShowLabel) {
             Paint.FontMetrics fm = getPaint().getFontMetrics();
-            int textHeight = mShouldShowLabel ? (int) Math.ceil(fm.bottom - fm.top) : 0;
+            int textLineCount = displayIsAppDrawer()
+                    ? mDeviceProfile.getAllAppsIconMaxLines() : 1;
+            int textHeight = mShouldShowLabel
+                    ? (int) Math.ceil(fm.bottom - fm.top) * textLineCount : 0;
             int cellHeightPx = mIconSize + getCompoundDrawablePadding() + textHeight;
-            setPadding(getPaddingLeft(), (height - cellHeightPx) / 2, getPaddingRight(),
+            setPadding(getPaddingLeft(), Math.max(0, (height - cellHeightPx) / 2),
+                    getPaddingRight(),
                     getPaddingBottom());
         }
         if (shouldDrawAppContrastTile()) {
