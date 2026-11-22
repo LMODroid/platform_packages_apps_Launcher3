@@ -26,6 +26,7 @@ import android.util.DisplayMetrics
 import com.android.launcher3.DeviceProfile.KEY_ROW_HEIGHT
 import com.android.launcher3.InvariantDeviceProfile
 import com.android.launcher3.InvariantDeviceProfile.DisplayOptionSpec
+import com.android.launcher3.InvariantDeviceProfile.KEY_MAX_LINES
 import com.android.launcher3.LauncherPrefs
 import com.android.launcher3.R
 import com.android.launcher3.Utilities
@@ -60,6 +61,8 @@ data class AllAppsProfile @JvmOverloads constructor(
     val cellHeightMultiplier: Float = 1f,
     /** Drawer labels turned off: square cells without icon padding */
     val labelsHidden: Boolean = false,
+    /** Lines a drawer label can take: the user's max lines setting or the two-line toggle */
+    val labelMaxLines: Int = 1,
 ) {
 
     /**
@@ -90,6 +93,12 @@ data class AllAppsProfile @JvmOverloads constructor(
             context.getSystemService(UserManager::class.java)!!.isUserUnlocked &&
                 !LauncherPrefs.SHOW_DRAWER_LABELS.get(context)
 
+        private fun getLabelMaxLines(context: Context, inv: InvariantDeviceProfile): Int =
+            max(
+                LauncherPrefs.getIntWhenUnlocked(context, KEY_MAX_LINES, 1),
+                if (inv.enableTwoLinesInAllApps) 2 else 1,
+            )
+
         /** Square cells (a column's width) when the drawer labels are hidden */
         private fun AllAppsProfile.withSquareCellsIfLabelsHidden(): AllAppsProfile =
             if (!labelsHidden) this
@@ -103,14 +112,19 @@ data class AllAppsProfile @JvmOverloads constructor(
          * Grows the cells to fit their content: icon and font size settings take priority over
          * the row height setting.
          */
-        private fun AllAppsProfile.withCellsFittingContent(): AllAppsProfile {
+        private fun AllAppsProfile.withCellsFittingContent(res: Resources): AllAppsProfile {
             val squared = withSquareCellsIfLabelsHidden()
+            val textExtraPadding =
+                if (labelMaxLines == 1)
+                    res.getDimensionPixelSize(R.dimen.all_apps_label_extra_padding)
+                else 0
             val contentHeight =
                 if (labelsHidden) iconSizePx
                 else
                     iconSizePx +
                         iconDrawablePaddingPx +
-                        Utilities.calculateTextHeight(iconTextSizePx)
+                        Utilities.calculateTextHeight(iconTextSizePx) * labelMaxLines +
+                        textExtraPadding
             return squared.copy(
                 cellHeightPx = max(squared.cellHeightPx, contentHeight + rowExtraPadding())
             )
@@ -213,8 +227,9 @@ data class AllAppsProfile @JvmOverloads constructor(
                     deviceProperties.heightPx - allAppsTopPadding + deviceProperties.insets.top,
                 cellHeightMultiplier = cellHeightMultiplier,
                 labelsHidden = areLabelsHidden(context),
+                labelMaxLines = getLabelMaxLines(context, inv),
             )
-                .withCellsFittingContent()
+                .withCellsFittingContent(res)
         }
 
         fun calculateNonResponsivePadding(
@@ -312,11 +327,12 @@ data class AllAppsProfile @JvmOverloads constructor(
                 numShownAllAppsColumns = numShownAllAppsColumns,
                 cellHeightMultiplier = getRowHeightMultiplier(context),
                 labelsHidden = areLabelsHidden(context),
+                labelMaxLines = getLabelMaxLines(context, inv),
                 shiftRange =
                     deviceProperties.heightPx - allAppsTopPadding + deviceProperties.insets.top,
                 padding = allAppsPadding,
             )
-                .withCellsFittingContent()
+                .withCellsFittingContent(res)
         }
 
         fun calculateallAppsLeftRightMargin(

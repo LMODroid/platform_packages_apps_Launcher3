@@ -35,6 +35,7 @@ import com.android.launcher3.testing.shared.ResourceUtils.INVALID_RESOURCE_HANDL
 import com.android.launcher3.testing.shared.ResourceUtils.pxFromDp
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 @Deprecated(
     "Non responsive grids are deprecated, please refer to responsive grid for a " +
@@ -164,8 +165,8 @@ object WorkspaceProfileNonResponsiveFactory {
         inv: InvariantDeviceProfile,
         cellScaleToFit: Float,
         iconScale: Float,
-        iconSizePx: Int,
-        iconTextSizePx: Int,
+        iconSizePxParam: Int,
+        iconTextSizePxParam: Int,
         isVerticalLayout: Boolean,
         iconDrawablePaddingOriginalPx: Int,
         isFirstPass: Boolean,
@@ -174,6 +175,8 @@ object WorkspaceProfileNonResponsiveFactory {
         panelCount: Int,
         scale: Float,
     ): WorkspaceProfile {
+        val iconSizePx = max(1, (iconSizePxParam * iconScale).roundToInt())
+        val iconTextSizePx = (iconTextSizePxParam * iconScale).roundToInt()
         val cellLayoutBorderSpacePx = Point(0, 0)
         var cellSize =
             calculateCellSize(
@@ -575,8 +578,8 @@ object WorkspaceProfileNonResponsiveFactory {
                         deviceProperties = deviceProperties,
                         cellScaleToFit = cellScaleToFit,
                         iconScale = iconScale,
-                        iconSizePx = iconSizePx,
-                        iconTextSizePx = iconTextSizePx,
+                        iconSizePxParam = iconSizePx,
+                        iconTextSizePxParam = iconTextSizePx,
                         isVerticalLayout = isVerticalLayout,
                         iconDrawablePaddingOriginalPx = iconDrawablePaddingOriginalPx,
                         inv = inv,

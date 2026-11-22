@@ -142,17 +142,8 @@ public class PredictionRowView<T extends Context & ActivityContext>
     @Override
     public int getExpectedHeight() {
         DeviceProfile deviceProfile = mActivityContext.getDeviceProfile();
-        int iconHeight = deviceProfile.getAllAppsProfile().getIconSizePx();
-        int iconPadding = deviceProfile.getAllAppsProfile().getIconDrawablePaddingPx();
-        int textHeight = Utilities.calculateTextHeight(
-                deviceProfile.getAllAppsProfile().getIconTextSizePx());
-        int totalHeight = iconHeight + iconPadding + textHeight + mVerticalPadding * 2;
-        // Prediction row height will be 4dp bigger than the regular apps in A-Z list when two line
-        // is not enabled. Otherwise, the extra height will increase by just the textHeight.
-        int extraHeight = deviceProfile.inv.enableTwoLinesInAllApps
-                ? (textHeight + mTopRowExtraHeight) : mTopRowExtraHeight;
-        totalHeight += extraHeight;
-        return getVisibility() == GONE ? 0 : totalHeight + getPaddingTop() + getPaddingBottom();
+        return getVisibility() == GONE ? 0 : deviceProfile.getAllAppsProfile().getCellHeightPx()
+                + getPaddingTop() + getPaddingBottom();
     }
 
     @Override

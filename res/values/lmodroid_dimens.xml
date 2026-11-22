@@ -15,4 +15,5 @@
 
     <!-- Meminfo in overview -->
     <dimen name="meminfo_claimed_height">28dp</dimen>
+    <dimen name="all_apps_label_extra_padding">2dp</dimen>
 </resources>
