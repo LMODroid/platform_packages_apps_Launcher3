@@ -159,6 +159,7 @@ internal constructor(
     @WorkerThread
     fun generateNewItemId(): Int {
         createDbIfNotExists()
+        openHelper.refreshMaxItemId()
         return openHelper.generateNewItemId()
     }
 
