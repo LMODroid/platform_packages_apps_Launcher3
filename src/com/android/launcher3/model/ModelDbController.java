@@ -232,6 +232,7 @@ public class ModelDbController {
     @WorkerThread
     public int generateNewItemId() {
         createDbIfNotExists();
+        mOpenHelper.refreshMaxItemId();
         return mOpenHelper.generateNewItemId();
     }
 

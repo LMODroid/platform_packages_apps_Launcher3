@@ -456,6 +456,11 @@ public class DatabaseHelper extends NoLocaleSQLiteHelper implements
         return mMaxItemId.incrementAndGet();
     }
 
+    public void refreshMaxItemId() {
+        mMaxItemId.accumulateAndGet(
+                initializeMaxItemId(getWritableDatabase()), Math::max);
+    }
+
     /**
      * @return A new {@link LauncherWidgetHolder} based on the current context
      */
