@@ -16,6 +16,7 @@
 
 package com.android.quickstep.split
 
+import android.app.WindowConfiguration.WINDOWING_MODE_MULTI_WINDOW
 import android.util.Log
 import android.view.WindowManager.TRANSIT_CHANGE
 import android.window.TransitionInfo
@@ -39,7 +40,28 @@ class SplitScreenUtils {
         ): Pair<Change, List<Change>>? {
             val parentToChildren = mutableMapOf<Change, MutableList<Change>>()
             val hasParent = mutableSetOf<Change>()
+            // A task returning from freeform can stand in for an omitted stage root.
+            fun isCrossDisplaySplitTask(change: Change): Boolean =
+                change.mode == TRANSIT_CHANGE &&
+                    change.startDisplayId != change.endDisplayId &&
+                    change.taskInfo?.windowingMode == WINDOWING_MODE_MULTI_WINDOW &&
+                    change.parent?.let(transitionInfo::getChange) != null
+
             val taskChanges: List<Change> = getNonClosingChanges(transitionInfo)
+
+            // A reported stage can also be CHANGE when its child returns from freeform.
+            val changedStages =
+                taskChanges
+                    .filter(::isCrossDisplaySplitTask)
+                    .mapNotNull { task ->
+                        task.parent?.let(transitionInfo::getChange)?.takeIf { stage ->
+                            stage.mode == TRANSIT_CHANGE &&
+                                stage.flags < FLAG_FIRST_CUSTOM &&
+                                stage.parent != null &&
+                                stage.taskInfo?.taskId == task.taskInfo?.parentTaskId
+                        }
+                    }
+                    .toSet()
 
             // 1. Build Parent-Child Relationships
             for (change in taskChanges) {
@@ -54,13 +76,30 @@ class SplitScreenUtils {
             }
 
             // 2. Find Top Parent
-            val topParent = taskChanges.firstOrNull { it !in hasParent }
+            val openingRoot = taskChanges.firstOrNull { it !in hasParent }
+            // The shared root of a cross-display split launch can itself be a CHANGE.
+            val topParent =
+                if (openingRoot != null && parentToChildren[openingRoot]?.size == 2) {
+                    openingRoot
+                } else {
+                    parentToChildren.entries.singleOrNull { (root, children) ->
+                        root.parent == null &&
+                            root.mode == TRANSIT_CHANGE &&
+                            children.size == 2 &&
+                            children.any { it in changedStages || isCrossDisplaySplitTask(it) }
+                    }?.key ?: openingRoot
+                }
 
             // 3. Extract Immediate Children
             return if (topParent != null) {
                 val immediateChildren = parentToChildren.getOrDefault(topParent, emptyList())
                 if (immediateChildren.size != 2) {
-                    throw IllegalStateException("incorrect split stage root size")
+                    Log.w(
+                        TAG,
+                        "Expected 2 split stage roots, found ${immediateChildren.size}: " +
+                            transitionInfo,
+                    )
+                    return null
                 }
                 Pair(topParent, immediateChildren)
             } else {

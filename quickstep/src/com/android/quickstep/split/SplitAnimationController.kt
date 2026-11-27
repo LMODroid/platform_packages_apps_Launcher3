@@ -775,7 +775,17 @@ class SplitAnimationController(val splitSelectStateController: SplitSelectStateC
         val launchAnimation = AnimatorSet()
 
         val splitRoots: Pair<Change, List<Change>>? = extractTopParentAndChildren(transitionInfo)
-        check(splitRoots != null) { "Could not find split roots" }
+        if (splitRoots == null) {
+            composeFadeInSplitLaunchAnimator(
+                splitSelectStateController.initialTaskId,
+                splitSelectStateController.secondTaskId,
+                transitionInfo,
+                t,
+                finishCallback,
+                windowRadius,
+            )
+            return
+        }
 
         // Will point to change (0) in diagram above
         val mainRootCandidate = splitRoots.first
